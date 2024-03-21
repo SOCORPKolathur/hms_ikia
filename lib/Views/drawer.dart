@@ -12,6 +12,7 @@ import 'package:hms_ikia/Constants/constants.dart';
 import 'package:hms_ikia/Views/ComNotifications.dart';
 import 'package:hms_ikia/Views/SMSPage.dart';
 import 'package:hms_ikia/Views/asset_tab.dart';
+import 'package:hms_ikia/Views/block_name.dart';
 import 'package:hms_ikia/Views/email.dart';
 import 'package:hms_ikia/Views/entry.dart';
 import 'package:hms_ikia/Views/fees.dart';
@@ -41,7 +42,7 @@ class _HomeDrawerState extends State<HomeDrawer> {
   @override
   void initState() {
     //addinglist();
-    getChurchDetails();
+    getHostelDetails();
     setState(() {
      pages=Dashboard();
     });
@@ -105,7 +106,7 @@ class _HomeDrawerState extends State<HomeDrawer> {
 
 
   String churchLogo = '';
-  getChurchDetails() async {
+  getHostelDetails() async {
     var church = await FirebaseFirestore.instance.collection('AdminDetails').get();
     setState(() {
       churchLogo = church.docs.first.get("logo");
@@ -141,8 +142,13 @@ class _HomeDrawerState extends State<HomeDrawer> {
                       child: SingleChildScrollView(
                         child: Column(
                           children: [
-
                             Container(
+                              decoration: BoxDecoration(
+                                borderRadius: BorderRadius.circular(20),
+                                color: Colors.white,
+                              ),
+                              width: width/4.878,
+                              height: height/6.57,
                               child: Row(
                                 children: [
                                   // Image.asset("assets/imagevidh.png"),
@@ -165,13 +171,12 @@ class _HomeDrawerState extends State<HomeDrawer> {
                                       SizedBox(width:10),
 
                                       KText(text:
-                                      "IKIA Hostel",
+                                      " IKIA Hostel",
                                         style: GoogleFonts.kanit(
                                             fontSize: 23,
                                             fontWeight: FontWeight.w600,
                                             //color:Color(0xffb80d38)
                                             color:Colors.black
-
                                         ),
                                       ),
 
@@ -180,12 +185,6 @@ class _HomeDrawerState extends State<HomeDrawer> {
 
                                 ],
                               ),
-                              decoration: BoxDecoration(
-                                borderRadius: BorderRadius.circular(20),
-                                color: Colors.white,
-                              ),
-                              width: width/4.878,
-                              height: height/6.57,
 
                             ),
 
@@ -321,16 +320,13 @@ class _HomeDrawerState extends State<HomeDrawer> {
                               ),
                             ),
                             SizedBox(height: 5,),
-
+                            // Entry and records
                             Padding(
                               padding: const EdgeInsets.symmetric(horizontal: 6),
                               child: AnimatedContainer(
-
                                 height: 35,
-
                                 decoration: BoxDecoration(
                                   borderRadius: BorderRadius.circular(10),
-
                                 ),
                                 padding:  EdgeInsets.only(left: dawer == 2 ? 10.0 :0),
                                 duration: Duration(milliseconds: 700),
@@ -348,7 +344,6 @@ class _HomeDrawerState extends State<HomeDrawer> {
                                         color: dawer == 2
                                             ? Constants().primaryAppColor : Colors.transparent,
                                       ),
-
                                     ),
                                     InkWell(
                                       onTap: () {
@@ -387,17 +382,79 @@ class _HomeDrawerState extends State<HomeDrawer> {
                                 ),
                               ),
                             ),
-                            SizedBox(height: 5,),
 
+                            SizedBox(height: 5,),
+                            // Block
                             Padding(
                               padding: const EdgeInsets.symmetric(horizontal: 6),
                               child: AnimatedContainer(
-
                                 height: 35,
-
                                 decoration: BoxDecoration(
                                   borderRadius: BorderRadius.circular(10),
+                                ),
+                                padding:  EdgeInsets.only(left: dawer == 12 ? 10.0 :0),
+                                duration: Duration(milliseconds: 700),
+                                child: Stack(
+                                  alignment: Alignment.centerLeft,
+                                  children: [
+                                    AnimatedContainer(
+                                      curve: Curves.fastOutSlowIn,
+                                      duration: Duration(milliseconds: 700),
+                                      padding: EdgeInsets.only(left: 50),
+                                      width:  dawer == 12
+                                          ? 200 : 0,
+                                      decoration: BoxDecoration(
+                                        borderRadius: BorderRadius.circular(20),
+                                        color: dawer == 12
+                                            ? Constants().primaryAppColor : Colors.transparent,
+                                      ),
+                                    ),
+                                    InkWell(
+                                      onTap: () {
+                                        setState(() {
+                                          pages=BlockName();
+                                          dawer=12;
+                                          col1=false;
+                                          col2=false;
+                                          col3=false;
+                                          col4=false;
+                                          col5=false;
+                                          col6=false;
+                                          col7=false;
+                                          col8=false;
+                                          col9=false;
+                                          pagename="";
+                                        });
+                                      },
+                                      child: Row(
+                                        children: [
+                                          Padding(
+                                            padding: const EdgeInsets.only(left: 8.0),
+                                            child: KText(text:
+                                            "Block",
+                                              style: GoogleFonts.openSans(
+                                                  fontSize: width/95,
+                                                  fontWeight: FontWeight.w500,
+                                                  color: dawer == 12 ?  Colors.white : Color(0xff9197B3)),
+                                            ),
+                                          ),
+                                        ],
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                              ),
+                            ),
 
+
+                            SizedBox(height: 5,),
+                            // This is Room and bed
+                            Padding(
+                              padding: const EdgeInsets.symmetric(horizontal: 6),
+                              child: AnimatedContainer(
+                                height: 35,
+                                decoration: BoxDecoration(
+                                  borderRadius: BorderRadius.circular(10),
                                 ),
                                 padding:  EdgeInsets.only(left: dawer == 3 ? 10.0 :0),
                                 duration: Duration(milliseconds: 700),
@@ -415,7 +472,6 @@ class _HomeDrawerState extends State<HomeDrawer> {
                                         color: dawer == 3
                                             ? Constants().primaryAppColor : Colors.transparent,
                                       ),
-
                                     ),
                                     InkWell(
                                       onTap: () {
@@ -432,7 +488,6 @@ class _HomeDrawerState extends State<HomeDrawer> {
                                           col8=false;
                                           col9=false;
                                           pagename="";
-
                                         });
                                       },
                                       child: Row(

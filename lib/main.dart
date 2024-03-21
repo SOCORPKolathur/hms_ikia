@@ -20,19 +20,15 @@ void main() async {
       fallbackLocale: 'en_US',
       supportedLocales: ['ta','te','ml','kn','en_US','bn','hi','es','pt','fr','nl','de','it','sv','mr','gu','or',]);
   initializeDateFormatting("ar_SA", null).then((_) {
-    print(DateFormat('EEEE, h:mm a','ar_SA').format(DateTime.parse("2022-10-02 23:59:59")));
   });
-  print(DateFormat('EEEE, h:mm a','en_US').format(DateTime.parse("2022-10-02 23:59:59")));
   runApp(LocalizedApp(delegate, const MyApp()));
 }
 
 class MyApp extends StatefulWidget {
   const MyApp({super.key});
-
   @override
   State<MyApp> createState() => _MyAppState();
 }
-
 class _MyAppState extends State<MyApp> {
   @override
   Widget build(BuildContext context) {

@@ -478,6 +478,8 @@ class _DashboardState extends State<Dashboard> {
                    ),
                  ),
                  SizedBox(width: 10,),
+
+
                  Material(
                    elevation: 4,
                    borderRadius: BorderRadius.circular(38),
