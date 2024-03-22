@@ -363,6 +363,7 @@ color: Color(0xffddffe7),
                         ),
                         Container(
                             width: 150,
+
                             child: Center(child: Padding(
                               padding: const EdgeInsets.only(right: 20),
                               child: Text('9:12 Am', style: GoogleFonts.openSans( fontSize: 18),),
