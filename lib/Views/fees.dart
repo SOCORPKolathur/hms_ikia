@@ -1,9 +1,15 @@
+import 'dart:html';
+
 import 'package:animate_do/animate_do.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:dropdown_button2/dropdown_button2.dart';
+import 'package:firebase_core/firebase_core.dart';
 // import 'package:dropdown_button2/dropdown_button2.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:intl/intl.dart';
+import 'package:top_snackbar_flutter/custom_snack_bar.dart';
+import 'package:top_snackbar_flutter/top_snack_bar.dart';
 import '../widgets/ReusableHeader.dart';
 import '../widgets/customtextfield.dart';
 import '../widgets/userMiniDetails.dart';
@@ -13,17 +19,46 @@ class FeesPage extends StatefulWidget {
   @override
   State<FeesPage> createState() => _FeesPageState();
 }
-
 class _FeesPageState extends State<FeesPage> {
   final TextEditingController ResidentName = TextEditingController();
-
-  final List<String> NotifyType = [
-    'Male',
-    'Female',
+  final TextEditingController ResidentId = TextEditingController();
+  //payment
+  final TextEditingController paymentAmount = TextEditingController();
+  //to get the userID
+  // String? userId;
+  final List<String> selectFee =[
+    'Hostel Fee',
+    'Mess Fee',
+    'Others'
   ];
-  String? selectedNotify;
+  final List<String> paymentMethod =[
+    'UPI',
+    'Cash',
+    'Card',
+    'Others'
+  ];
 
+  static const IconData filter_alt_outlined = IconData(0xf068, fontFamily: 'MaterialIcons');
+  double height = 220;
+  // String? selectedNotify;
+  String ? selectedPaymentFor;
+  String ? selectedMethod;
   List<Map<String, dynamic>> searchSuggestions = [];
+  Map<String, dynamic>? selectedUser;
+  @override
+  void initState() {
+    super.initState();
+    fetchUsers();
+    getUser();
+  }
+  void getUser() async {
+    var documents = await FirebaseFirestore.instance.collection('Users').get();
+    for (int i = 0; i < documents.docs.length; i++) {
+      var documentId = documents.docs[i].id;
+      var userId = documents.docs[i]['userid'];
+      print('Document ID: $documentId, UserID: $userId');
+    }
+  }
 
   void fetchUsers() async {
     QuerySnapshot snapshot = await FirebaseFirestore.instance.collection('Users').get();
@@ -39,18 +74,16 @@ class _FeesPageState extends State<FeesPage> {
     }
     );
   }
-
-
   @override
   Widget build(BuildContext context) {
+    double listViewHeight = calculateListViewHeight();
     return  FadeInRight(
       child: Padding(
         padding: const EdgeInsets.all(8.0),
         child: SingleChildScrollView(
           child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              // Image.asset("assets/fees.png"),
-              // Image.asset("assets/fees.png"),
               const ReusableHeader(Headertext: 'Fees Register ', SubHeadingtext: '"Manage Easily Residents Records"'),
           const SizedBox(height: 10,),
           Container(
@@ -66,7 +99,7 @@ class _FeesPageState extends State<FeesPage> {
                 // SizedBox(width: 20,),
                 Padding(
                   padding: const EdgeInsets.only(left: 20),
-                  child: CustomTextField(hint: 'Search Resident Name',  controller: ResidentName, validator: null, fillColor: const Color(0xffF5F5F5),header: '', width: 335, preffixIcon: Icons.search,height: 45,
+                  child: CustomTextField(hint: 'Search Resident Name',controller: ResidentName, validator: null, fillColor: const Color(0xffF5F5F5),header: '', width: 465, preffixIcon: Icons.search,height: 45,
                     onChanged: (value) {
                       setState(() {
                         if(value.isEmpty){
@@ -74,7 +107,9 @@ class _FeesPageState extends State<FeesPage> {
                           print('values Emp');
                         }
                         else{
-                          searchSuggestions = searchSuggestions.where((user) => user['name'].toLowerCase().contains(value.toLowerCase())).toList();
+                          // searchSuggestions = searchSuggestions.where((user) => user['name'].toLowerCase().contains(value.toLowerCase())).toList();
+                          searchSuggestions = searchSuggestions.where((user) => user['name'].toLowerCase().startsWith(value.toLowerCase())).toList();
+
                           print('getting data');
                           print(value);}
                         print(searchSuggestions);
@@ -82,19 +117,17 @@ class _FeesPageState extends State<FeesPage> {
                       }
                       );
                     },
-
                   ),
-                ),
-                Padding(
-                  padding: const EdgeInsets.only(left: 20),
-                  child: CustomTextField(hint: 'Search Resident User ID',  controller: ResidentName, validator: null, fillColor: const Color(0xffF5F5F5),header: '', width: 335, preffixIcon: Icons.search,height: 45, ),
                 ),
                 SizedBox.fromSize(size: const Size(0, 0),),
                 Padding(
                   padding: const EdgeInsets.only(left: 20, right: 20),
                   child: Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                    mainAxisAlignment: MainAxisAlignment.center,
                     children: [
+                      SizedBox.fromSize(size: const Size(23,0),),
+
+                      SizedBox.fromSize(size: const Size(23,0),),
                       Container(
                         height: 44,
                         // width: 100,
@@ -107,14 +140,13 @@ class _FeesPageState extends State<FeesPage> {
                           children: [
                             const Text('Search', style: TextStyle(color: Colors.white),),
                             SizedBox.fromSize(size: const Size(8,0),),
-                            const Icon(Icons.search)
+                            const Icon(Icons.search, color: Colors.white,)
                               ],)
                         ),
                       ),
                       SizedBox.fromSize(size: const Size(23,0),),
                       SizedBox(
                         height: 44,
-                        // width: 100,
                         child:
                         Container(
                           height: 44,
@@ -132,12 +164,22 @@ class _FeesPageState extends State<FeesPage> {
                               ),
                               // elevation: MaterialStatePropertyAll(2),
                             ),
-                            onPressed: () {},
+                            onPressed: () {
+                              ResidentName.clear();
+                              setState(() {
+                                fetchUsers();
+                                selectedUser = null;
+                              });
+                            },
                             child: Row(
                               children: [
                                 const Text('Reset', style: TextStyle(color: Color(0xff37D1D3))),
                                 SizedBox.fromSize(size: const Size(8, 0)),
-                                const Icon(Icons.recycling, size: 18, color: Color(0xff37D1D3)),
+                                SizedBox(
+                                  width: 20,
+                                  child: Image.asset('assets/ui-design-/images/sync.png')
+                                  ,
+                                )
                               ],
                             ),
                           ),
@@ -149,6 +191,54 @@ class _FeesPageState extends State<FeesPage> {
             ),
           ),
               const SizedBox(height: 10,),
+              ResidentName.text != '' ?
+              Padding(
+                padding: const EdgeInsets.only(left: 20),
+                child: ClipRRect(
+                  borderRadius: BorderRadius.circular(20),
+                  child: SizedBox(
+                    width: 460,
+                    height: listViewHeight,
+                    child: ListView.builder(
+                      itemCount: searchSuggestions.length,
+                      itemBuilder: (context, index) {
+                        Color titleColor = index == 0 ? const Color(0xffd1f4f5) : const Color(0xffF5F5F5);
+                        return Container(
+                          color: titleColor,
+                          child: Padding(
+                            padding: const EdgeInsets.all(2.0),
+                            child: ListTile(
+                              leading: CircleAvatar(
+                                backgroundImage: NetworkImage(searchSuggestions[index]['profilePicture']),
+                              ),
+                              title: Text(
+                                searchSuggestions[index]['name'],
+                                style: GoogleFonts.openSans(
+                                  fontWeight: FontWeight.w700,
+                                  fontSize: 15,
+                                ),
+                              ),
+                              onTap: () {
+                                setState(() {
+                                  ResidentName.text = searchSuggestions[index]['name'];
+                                  selectedUser = searchSuggestions[index];
+                                  searchSuggestions = [];
+                                });
+                                String? defaultPaymentMethod = selectedMethod;
+                                String ? defaultPaymentFor = selectedPaymentFor;
+                                double defaultFees = double.parse(paymentAmount.text);
+                                Resident(defaultPaymentMethod!, defaultPaymentFor!, defaultFees);
+                              },
+                            ),
+                          ),
+                        );
+                      },
+                    ),
+                  ),
+                ),
+              )
+                  : const SizedBox(),
+            if (selectedUser != null && ResidentName.text.isNotEmpty ) ...[
               Container(
                 decoration: BoxDecoration(
                   border: Border.all(color: const Color(0xff262626).withOpacity(0.10)),
@@ -163,7 +253,6 @@ class _FeesPageState extends State<FeesPage> {
                        width: 300,
                        decoration: const BoxDecoration(
                            color: Color(0xff37D1D3),
-
                            borderRadius: BorderRadius.all(Radius.circular(10))),
                        child: ClipRRect(
                          child: Column(
@@ -184,18 +273,18 @@ class _FeesPageState extends State<FeesPage> {
                                      child: CircleAvatar(
                                        radius: 62,
                                        backgroundColor: const Color(0xffF5F6F7),
-                                       child: Image.asset('assets/ui-design-/images/d-portrait-high-school-teenager-photoroom-1.png'),)
+                                       child: Image.network(selectedUser!['profilePicture']),)
                                    ),
                                  ),
                                ],),
-                             const Padding(
+                              Padding(
                                padding: EdgeInsets.all(10),
                                child: Column(children: [
-                                 UserMiniDetails(IconName: Icons.contact_mail, iName: 'User ID                : '  , userDet: '   832983',),
+                                 UserMiniDetails(IconName: Icons.contact_mail, iName: 'User ID                : '  ,userDet: selectedUser!['userid']),
                                  SizedBox(height: 8,),
-                                 UserMiniDetails(IconName: Icons.phone, iName: 'Phone Number  :      ',userDet: '9391020012'),
+                                 UserMiniDetails(IconName: Icons.phone, iName: 'Phone Number  :      ',userDet: selectedUser!['phone']),
                                  SizedBox(height: 48,),
-                                 Padding(
+                                 const Padding(
                                    padding: EdgeInsets.only(top: 3, bottom: 3),
                                    child: SizedBox(
                                        height: 35,
@@ -245,65 +334,6 @@ class _FeesPageState extends State<FeesPage> {
                           Row(children: [
                             Text('Selected Fees                    :     ', style: GoogleFonts.openSans(fontWeight: FontWeight.w600 ),),
                        const SizedBox(height: 30),
-                       // Container(
-                       //   width: 510,
-                       //   decoration: BoxDecoration(borderRadius: BorderRadius.circular(25)),
-                       //   child: DropdownButtonFormField2<String>(
-                       //     value: selectedValue,
-                       //     isExpanded: true,
-                       //     decoration: InputDecoration(
-                       //       contentPadding: const EdgeInsets.symmetric(vertical: 16),
-                       //       border: OutlineInputBorder(
-                       //         borderRadius: BorderRadius.circular(15),
-                       //       ),
-                       //     ),
-                       //     hint: const Text(
-                       //       'Monthly',
-                       //       style: TextStyle(fontSize: 14),
-                       //     ),
-                       //     items: genderItems
-                       //         .map((item) => DropdownMenuItem<String>(
-                       //       value: item,
-                       //       child: Text(
-                       //         item,
-                       //         style: const TextStyle(
-                       //           fontSize: 14,
-                       //         ),
-                       //       ),
-                       //     ))
-                       //         .toList(),
-                       //        validator: (value){
-                       //          if (value == null) {
-                       //            return 'Please select gender.';
-                       //          }
-                       //          return null;
-                       //        },
-                       //     onChanged: (value) {
-                       //       setState(() {
-                       //         value = selectedValue;
-                       //       });
-                       //     },
-                       //     buttonStyleData: const ButtonStyleData(
-                       //       padding: EdgeInsets.only(right: 8),
-                       //     ),
-                       //     iconStyleData: const IconStyleData(
-                       //       icon: Icon(
-                       //         Icons.arrow_drop_down,
-                       //         color: Colors.black45,
-                       //       ),
-                       //       iconSize: 24,
-                       //     ),
-                       //     dropdownStyleData: DropdownStyleData(
-                       //       decoration: BoxDecoration(
-                       //         borderRadius: BorderRadius.circular(15),
-                       //       ),
-                       //     ),
-                       //     menuItemStyleData: const MenuItemStyleData(
-                       //       padding: EdgeInsets.symmetric(horizontal: 16),
-                       //     ),
-                       //   ),
-                       // )
-                       //
                             Padding(
                               padding: const EdgeInsets.only(top: 8.0),
                               child: Container(
@@ -321,14 +351,14 @@ class _FeesPageState extends State<FeesPage> {
                                         String>(
                                       isExpanded: true,
                                       hint: Text(
-                                        'Prefix', style:
+                                        'Select Fee', style:
                                       GoogleFonts.openSans (
                                         fontSize: 12,
                                         fontWeight: FontWeight.w600,
                                         color: const Color(0x7f262626),
                                       ),
                                       ),
-                                      items: NotifyType
+                                      items: selectFee
                                           .map((String
                                       item) =>
                                           DropdownMenuItem<
@@ -344,11 +374,11 @@ class _FeesPageState extends State<FeesPage> {
                                             ),
                                           )).toList(),
                                       value:
-                                      selectedNotify,
+                                      selectedPaymentFor,
                                       onChanged:
                                           (String? value) {
                                         setState(() {
-                                          selectedNotify =
+                                          selectedPaymentFor =
                                           value!;
                                         });
                                       },
@@ -368,13 +398,11 @@ class _FeesPageState extends State<FeesPage> {
                                 ),
                               ),
                             ),
-
-
                           ]
                          ,),
                          const SizedBox(height: 25,),
                          Row(children: [
-                            Text('Patment Method              :     ',style: GoogleFonts.openSans(fontWeight: FontWeight.w600 )),
+                            Text('Payment Method              :     ',style: GoogleFonts.openSans(fontWeight: FontWeight.w600 )),
                            const SizedBox(height: 30),
                            Padding(
                              padding: const EdgeInsets.only(top: 8.0),
@@ -393,14 +421,14 @@ class _FeesPageState extends State<FeesPage> {
                                        String>(
                                      isExpanded: true,
                                      hint: Text(
-                                       'Prefix', style:
+                                       'Select Payment Method', style:
                                      GoogleFonts.openSans (
                                        fontSize: 12,
                                        fontWeight: FontWeight.w600,
                                        color: const Color(0x7f262626),
                                      ),
                                      ),
-                                     items: NotifyType
+                                     items: paymentMethod
                                          .map((String
                                      item) =>
                                          DropdownMenuItem<
@@ -416,11 +444,11 @@ class _FeesPageState extends State<FeesPage> {
                                            ),
                                          )).toList(),
                                      value:
-                                     selectedNotify,
+                                     selectedMethod,
                                      onChanged:
                                          (String? value) {
                                        setState(() {
-                                         selectedNotify =
+                                         selectedMethod =
                                          value!;
                                        });
                                      },
@@ -440,168 +468,199 @@ class _FeesPageState extends State<FeesPage> {
                                ),
                              ),
                            ),
-
                          ],),
-                         const SizedBox(height: 15,),
+                         const SizedBox(height: 30,),
                          Row(children: [
-                            Text('Payment Amount             :     ',style: GoogleFonts.openSans(fontWeight: FontWeight.w600 )),
+                            Text('Payment Amount             :     ',style: GoogleFonts.openSans(fontWeight: FontWeight.w600,  )),
                            const SizedBox(height: 30),
-                           Padding(
-                             padding: const EdgeInsets.only(top: 8.0),
-                             child: Container(
-                               width: 430,
-                               height: 50,
-                               decoration: BoxDecoration (
-                                 border: Border.all(color: const Color(0x7f262626)),
-                                 borderRadius: BorderRadius.circular(30),
-                               ),
-                               child: Padding(
-                                 padding: const EdgeInsets.only(left: 12.0,right: 6),
-                                 child:  DropdownButtonHideUnderline(
-                                   child:
-                                   DropdownButtonFormField2<
-                                       String>(
-                                     isExpanded: true,
-                                     hint: Text(
-                                       'Prefix', style:
-                                     GoogleFonts.openSans (
-                                       fontSize: 12,
-                                       fontWeight: FontWeight.w600,
-                                       color: const Color(0x7f262626),
+                           CustomTextField(hint: 'Enter the Amount', controller: paymentAmount, validator: null, header: '', width: 430,)
+                         ],),
+                         const SizedBox(height: 30,),
+
+                         Padding(
+                           padding: const EdgeInsets.only(right: 1),
+                           child: Row(
+                             mainAxisAlignment: MainAxisAlignment.end,
+                             children: [
+                               Container(
+                                 height: 44,
+                                 width: 128,
+                                 // width: 130,
+                                 child:
+                                 ElevatedButton(
+                                   style: ButtonStyle(
+                                     backgroundColor: MaterialStatePropertyAll(Color(0xff37D1D3)),
+                                     shape: MaterialStateProperty.all<RoundedRectangleBorder>(
+                                         RoundedRectangleBorder(
+                                             borderRadius: BorderRadius.circular(50),
+                                             side:
+                                             const BorderSide(color: Color(0xff37D1D3)
+                                             )
+                                         )
                                      ),
-                                     ),
-                                     items: NotifyType
-                                         .map((String
-                                     item) =>
-                                         DropdownMenuItem<
-                                             String>(
-                                           value: item,
-                                           child: Text(
-                                             item,
-                                             style:
-                                             GoogleFonts.openSans (
-                                               fontSize: 12,
-                                               fontWeight: FontWeight.w600,
-                                             ),
-                                           ),
-                                         )).toList(),
-                                     value:
-                                     selectedNotify,
-                                     onChanged:
-                                         (String? value) {
+                                     // elevation: MaterialStatePropertyAll(2),
+                                   ),
+                                   onPressed: () {
+                                     if (
+                                     paymentAmount.text.isNotEmpty &&
+                                         selectedPaymentFor != null &&
+                                         selectedMethod != null
+                                     ) {
+                                       String defaultPaymentMethod = selectedMethod!;
+                                       String defaultPaymentFor = selectedPaymentFor!;
+                                       double defaultFees = double.parse(paymentAmount.text);
+
+                                       // Call the method to process Resident with the provided values
+                                       Resident(defaultPaymentMethod, defaultPaymentFor, defaultFees);
+
+                                       // Clear the fields
+                                       paymentAmount.clear();
                                        setState(() {
-                                         selectedNotify =
-                                         value!;
+                                         selectedPaymentFor = null;
+                                         selectedMethod = null;
                                        });
-                                     },
-                                     buttonStyleData:
-                                     const ButtonStyleData(
-                                     ),
-                                     menuItemStyleData:
-                                     const MenuItemStyleData(
-                                     ),
-                                     decoration:
-                                     const InputDecoration(
-                                         border:
-                                         InputBorder
-                                             .none),
+
+                                       showTopSnackBar(
+                                         Overlay.of(context),
+                                         CustomSnackBar.success(
+                                           message: "Fees Added Successfully",
+                                         ),
+                                       );
+                                     } else {
+                                       print('Write');
+                                       showTopSnackBar(
+                                         Overlay.of(context),
+                                         CustomSnackBar.error(
+                                           message: "Please Enter all the fields",
+                                         ),
+                                       );
+                                     }
+                                   },
+
+                                   child: Row(
+                                     children: [
+                                        Text('Submit', style: GoogleFonts.openSans(color: Colors.white)),
+                                       SizedBox.fromSize(size: const Size(8, 0)),
+                                       const Icon(Icons.slideshow_rounded, size: 18, color: Colors.white),
+                                     ],
                                    ),
                                  ),
                                ),
-                             ),
+                             ],
                            ),
-
-                         ],),
-                         const SizedBox(height: 15,),
-
+                         ),
+                         const SizedBox(height: 30,),
                          SizedBox(
-
-                           // width: 200,
                            child: Row(children: [
                               Text('Previous Payments          :     ',style: GoogleFonts.openSans(fontWeight: FontWeight.w600 )),
                             Container(
                               width: 510,
-
                               child: Row(
                                 mainAxisAlignment: MainAxisAlignment.spaceAround,
                                children: [
-
                                SizedBox(
                                    width: 80,
                                    child: Text('Date', style: GoogleFonts.openSans(fontWeight: FontWeight.w600,),)),
-
-                               SizedBox(child: Text('Fees Type', style: GoogleFonts.openSans(fontWeight: FontWeight.w600,color: Color(0xff262626).withOpacity(0.8)))),
-
+                               SizedBox(child: Text('Fees Type', style: GoogleFonts.openSans(fontWeight: FontWeight.w600,))),
                                SizedBox(child: Text('Amount', style: GoogleFonts.openSans(fontWeight: FontWeight.w600,))),
-
                                SizedBox(child: Text('Method', style: GoogleFonts.openSans(fontWeight: FontWeight.w600,))),
-                                                         ],),
+                               ],),
                             )
                            ],),
                          ),
+
                          const SizedBox(height: 15,),
-                         Padding(
-                           padding: const EdgeInsets.only(left: 145),
-                           child: Container(
-                             width: 510,
-                             // color: Colors.blue,
-                             child: Row(
-                               // crossAxisAlignment: CrossAxisAlignment.end,
-                               mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                               children: [
-                                 SizedBox(
-                                     width: 125,
-                                     child: Text('12/02/2024', style: GoogleFonts.openSans(fontWeight: FontWeight.w600,color: Color(0xff262626).withOpacity(0.8)),)),
-                                 Container(
-                                   width: 120,
-                                     child: Center(child: Text('Hostel Rent', style: GoogleFonts.openSans(fontWeight: FontWeight.w600,color: Color(0xff262626).withOpacity(0.8))))),
-                                 Padding(
-                                   padding: const EdgeInsets.only(left: 10, right: 40),
-                                   child: Container(
-                                       width: 60,
-                                       child: Center(child: Text('8500/-', style: GoogleFonts.openSans(fontWeight: FontWeight.w600,color: Color(0xff262626).withOpacity(0.8))))),
+                        StreamBuilder(stream: FirebaseFirestore.instance.collection('Users').doc(selectedUser?['docId']).collection('fees').orderBy("timestamp", descending: true).snapshots(), builder: (context, snapshot) {
+                           if(snapshot.hasData){
+                             return ListView.builder(
+                               shrinkWrap: true,
+                               itemBuilder: (context, index) {
+                               var data = snapshot.data!.docs[index];
+                               return  Padding(
+                                 padding: const EdgeInsets.only(left: 145),
+                                 child: SingleChildScrollView(
+                                   child: Padding(
+                                     padding: const EdgeInsets.all(2.0),
+                                     child: Container(
+                                       width: 510,
+                                       // color: Colors.blue,
+                                       child: Row(
+                                         mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                                         children: [
+                                           Padding(
+                                             padding: const EdgeInsets.only(left: 40, right: 10),
+                                             child: Container(
+                                                 width: 110,
+                                                 child: Text(data['date'], style: GoogleFonts.openSans(fontWeight: FontWeight.w600,color: Color(0xff262626).withOpacity(0.8)),)),
+                                           ),
+                                           Container(
+                                               width: 100,
+                                               child: Text(data['feesType'], style: GoogleFonts.openSans(fontWeight: FontWeight.w600,color: Color(0xff262626).withOpacity(0.8)))),
+                                           Padding(
+                                             padding: const EdgeInsets.only(left: 10, right: 0),
+                                             child: Container(
+                                                 width: 60,
+                                                 child: Text('₹${data['fees'].toString()}', style: GoogleFonts.openSans(fontWeight: FontWeight.w600,color: Color(0xff262626).withOpacity(0.8)))),
+                                           ),
+                                           Padding(
+                                             padding: const EdgeInsets.only(left: 25),
+                                             child: Container(
+                                                 width: 60,
+                                                 child: Text(data['paymentMethod'].toString(), style: GoogleFonts.openSans(fontWeight: FontWeight.w600,color: Color(0xff262626).withOpacity(0.8)))),
+                                           ),
+                                         ],),
+                                     ),
+                                   ),
                                  ),
-                                 Text('Cash', style: GoogleFonts.openSans(fontWeight: FontWeight.w600,color: Color(0xff262626).withOpacity(0.8))),
-                               ],),
-                           ),
-                         ),
-
+                               );
+                             },itemCount:  snapshot.data!.docs.length,);
+                         }else{
+                             return CircularProgressIndicator();
+                           }
+                         },),
                          SizedBox(height: 10,),
-                         Padding(
-                           padding: const EdgeInsets.only(left: 145),
-                           child: Container(
-                             width: 510,
-                             // color: Colors.blue,
-                             child: Row(
-                               // crossAxisAlignment: CrossAxisAlignment.end,
-                               mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                               children: [
-                                 SizedBox(
-                                     width: 120,
-                                     child: Text('12/02/2024', style: GoogleFonts.openSans(fontWeight: FontWeight.w600,color: Color(0xff262626).withOpacity(0.8)),)),
-                                 Container(
-                                     width: 120,
-                                     child: Center(child: Text('Hostel Rent', style: GoogleFonts.openSans(fontWeight: FontWeight.w600,color: Color(0xff262626).withOpacity(0.8))))),
-                                 Padding(
-                                   padding: const EdgeInsets.only(left: 10, right: 40),
-                                   child: Container(
-                                       width: 60,
-                                       child: Center(child: Text('8500/-', style: GoogleFonts.openSans(fontWeight: FontWeight.w600,color: Color(0xff262626).withOpacity(0.8))))),
-                                 ),
-                                 Text('Cash', style: GoogleFonts.openSans(fontWeight: FontWeight.w600,color: Color(0xff262626).withOpacity(0.8))),
-                               ],),
-                           ),
-                         ),
-
                        ],),
                      ),
                    )
                  ],)
               )
             ],
-          ),
+          ]
         ),
       ),
+    )
     );
+  }
+  double calculateListViewHeight() {
+    // Calculate the total height of the ListView
+    double itemHeight = 60; // Height of each item
+    int itemCount = searchSuggestions.length;
+    double totalHeight = itemHeight * itemCount;
+    return totalHeight;
+  }
+
+  void Resident(String paymentMethod, String paymentFor, double fees) async {
+      DateTime now = DateTime.now();
+      String formattedDate = DateFormat('yyyy-MM-dd').format(now);
+    // main collection
+    CollectionReference mainCollection =
+    FirebaseFirestore.instance.collection('Users');
+    //getting thje document ID
+    DocumentReference documentRef =
+    mainCollection.doc(selectedUser!['docId']);
+    // creating a new sub collection
+    CollectionReference subcollectionRef =
+    documentRef.collection('fees');
+    // mentioned timestamp
+    int millisecondsSinceEpoch = Timestamp.now().millisecondsSinceEpoch;
+    // adding the data
+    await subcollectionRef.add({
+      'fees': fees,
+      'paymentMethod': paymentMethod,
+      'feesType': paymentFor,
+      'date': formattedDate,
+      'timestamp' : millisecondsSinceEpoch
+    });
+    print('Subcollection created successfully');
   }
 }

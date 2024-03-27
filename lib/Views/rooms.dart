@@ -9,21 +9,21 @@ import 'package:hms_ikia/widgets/customtextfield.dart';
 
 class Rooms extends StatefulWidget {
   const Rooms({Key? key}) : super(key: key);
-
   @override
   State<Rooms> createState() => _RoomsState();
 }
-
 class _RoomsState extends State<Rooms> {
   final TextEditingController RoomName = TextEditingController();
   final TextEditingController SelectedRoom = TextEditingController();
   final TextEditingController SelectedBedCount = TextEditingController();
-
+  int roomCount = 0;
+  int totalVacant = 0;
   List<String> BlockNames = [];
   String selectedBlockName = "Select Block Name";
   @override
   void initState() {
     super.initState();
+    getRoomsLength();
     getBlockNames().then((names) {
       setState(() {
         BlockNames.addAll(names);
@@ -31,6 +31,18 @@ class _RoomsState extends State<Rooms> {
     }
     );
   }
+  Future<void> getRoomsLength() async {
+    try {
+      QuerySnapshot querySnapshot = await FirebaseFirestore.instance.collection('Room').get();
+      int length = querySnapshot.docs.length;
+      setState(() {
+        roomCount = length;
+      });
+    } catch (e) {
+      print("Error getting rooms length: $e");
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return FadeInRight(
@@ -46,13 +58,13 @@ class _RoomsState extends State<Rooms> {
               ),
               SizedBox.fromSize(size: const Size(0, 10)),
               const SizedBox(height: 20),
-              const Row(
+               Row(
                 mainAxisAlignment: MainAxisAlignment.spaceAround,
                 children: [
                   ReusableRoomContainer(
                     firstColor: Color(0xff04267d),
                     secondColor: Color(0xff6085e5),
-                    totalRooms: '40',
+                    totalRooms: roomCount.toString(),
                     title: 'Rooms',
                     waveImg: 'assets/ui-design-/images/wave.png', roomImg: 'assets/ui-design-/images/Group 90.png',
                   ),
@@ -72,7 +84,6 @@ class _RoomsState extends State<Rooms> {
                   ),
                 ],
               ),
-
               const SizedBox(height: 30),
               Container(
                 decoration: BoxDecoration(
@@ -155,44 +166,34 @@ class _RoomsState extends State<Rooms> {
                   borderRadius: BorderRadius.circular(20),
                 ),
                 child:
-                //     works
                 // StreamBuilder(
-                //   stream: FirebaseFirestore.instance.collection('Room').snapshots(),
+                //   stream: FirebaseFirestore.instance.collection('Room').orderBy("timeStamp", descending: true).snapshots(),
                 //   builder: (context, snapshot) {
                 //     if (snapshot.hasData) {
                 //       List<DocumentSnapshot> matchedData = [];
                 //       List<DocumentSnapshot> remainingData = [];
-                //
                 //       if (RoomName.text.isNotEmpty) {
                 //         snapshot.data!.docs.forEach((doc) {
-                //           // before
-                //           // final roomNumberField = doc["roomnumber"];
                 //           final roomNumberField = doc["roomnumber"].toString().toLowerCase();
-                //
-                //           if (roomNumberField is String) {
-                //             final roomNumber = roomNumberField.toLowerCase();
-                //             final searchText = RoomName.text.toLowerCase();
-                //             if (roomNumber.contains(searchText)) {
-                //               matchedData.add(doc);
-                //             } else {
-                //               remainingData.add(doc);
-                //             }
+                //           final searchText = RoomName.text.toLowerCase();
+                //           if (roomNumberField.contains(searchText)) {
+                //             matchedData.add(doc);
                 //           } else {
-                //             // Handle unexpected field type or throw an error
+                //             remainingData.add(doc);
                 //           }
                 //         });
+                //         // Sort matchedData separately
                 //         matchedData.sort((a, b) {
-                //           final nameA = ((a.data() as Map<String, dynamic>?)?["roomnumber"] as String?)?.toLowerCase() ?? '';
-                //           final nameB = ((b.data() as Map<String, dynamic>?)?["roomnumber"] as String?)?.toLowerCase() ?? '';
+                //           final nameA = a["roomnumber"].toString().toLowerCase();
+                //           final nameB = b["roomnumber"].toString().toLowerCase();
+                //           final searchText = RoomName.text.toLowerCase();
                 //           return nameA.compareTo(nameB);
                 //         });
-                //
                 //       } else {
                 //         remainingData = snapshot.data!.docs;
                 //       }
-                //
+                //       // Concatenate matched data and remaining data
                 //       List<DocumentSnapshot> combinedData = [...matchedData, ...remainingData];
-                //
                 //       return GridView.builder(
                 //         gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
                 //           crossAxisCount: 7,
@@ -202,7 +203,7 @@ class _RoomsState extends State<Rooms> {
                 //         itemCount: combinedData.length,
                 //         itemBuilder: (BuildContext context, index) {
                 //           final documents = combinedData[index];
-                //           var data = documents.data() as Map<String, dynamic>?; // Cast data to Map<String, dynamic>
+                //           var data = documents.data() as Map<String, dynamic>?;
                 //           if (data != null) {
                 //             int bedCount = data['bedcount'] ?? 0;
                 //             int vacantCount = data['vacant'] ?? bedCount;
@@ -276,35 +277,129 @@ class _RoomsState extends State<Rooms> {
                 //     }
                 //   },
                 // ),
+
                 StreamBuilder(
-                  stream: FirebaseFirestore.instance.collection('Room').snapshots(),
+                  stream: FirebaseFirestore.instance.collection('Room').orderBy("timeStamp", descending: true).snapshots(),
                   builder: (context, snapshot) {
+                    print("Builder function called!");
                     if (snapshot.hasData) {
+                      // Add print statement to check snapshot contents
+                      print("Snapshot Data: ${snapshot.data}");
                       List<DocumentSnapshot> matchedData = [];
                       List<DocumentSnapshot> remainingData = [];
                       if (RoomName.text.isNotEmpty) {
+                        print("Searching for: ${RoomName.text}");
                         snapshot.data!.docs.forEach((doc) {
                           final roomNumberField = doc["roomnumber"].toString().toLowerCase();
                           final searchText = RoomName.text.toLowerCase();
+                          print("Room Number Field: $roomNumberField");
+                          print("Search Text: $searchText");
                           if (roomNumberField.contains(searchText)) {
                             matchedData.add(doc);
                           } else {
                             remainingData.add(doc);
                           }
                         });
-
                         // Sort matchedData separately
                         matchedData.sort((a, b) {
                           final nameA = a["roomnumber"].toString().toLowerCase();
                           final nameB = b["roomnumber"].toString().toLowerCase();
+                          final searchText = RoomName.text.toLowerCase();
                           return nameA.compareTo(nameB);
                         });
                       } else {
                         remainingData = snapshot.data!.docs;
                       }
-
+                      // Add print statement to check matchedData and remainingData
+                      print("Matched Data: $matchedData");
+                      print("Remaining Data: $remainingData");
                       // Concatenate matched data and remaining data
                       List<DocumentSnapshot> combinedData = [...matchedData, ...remainingData];
+                      // Add print statement to check combinedData
+                      print("Combined Data: $combinedData");
+
+                      //real one
+                      // return GridView.builder(
+                      //   gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+                      //     crossAxisCount: 7,
+                      //     crossAxisSpacing: 10.0,
+                      //     childAspectRatio: 1.0,
+                      //   ),
+                      //   itemCount: combinedData.length,
+                      //   itemBuilder: (BuildContext context, index) {
+                      //     final documents = combinedData[index];
+                      //     var data = documents.data() as Map<String, dynamic>?;
+                      //     if (data != null) {
+                      //       int bedCount = data['bedcount'] ?? 0;
+                      //       int vacantCount = data['vacant'] ?? bedCount;
+                      //       double occupancyPercentage = bedCount != 0 ? ((bedCount - vacantCount) / bedCount) * 100 : 0;
+                      //       String occupancyStatus;
+                      //       Color homeColor = const Color(0xff37d1d3);
+                      //       if (occupancyPercentage == 100) {
+                      //         occupancyStatus = 'Occupied';
+                      //         homeColor = const Color(0xfff12d2d);
+                      //       } else if (occupancyPercentage >= 50) {
+                      //         occupancyStatus = 'Reserved';
+                      //         homeColor = const Color(0xfffd7e50);
+                      //       } else if (occupancyPercentage > 0) {
+                      //         occupancyStatus = 'Empty';
+                      //         homeColor = const Color(0xff37d1d3);
+                      //       } else {
+                      //         occupancyStatus = 'Empty';
+                      //         homeColor = const Color(0xff37d1d3);
+                      //       }
+                      //       // Change the occupancyStatus to "Full" if vacantCount is 0
+                      //       if (vacantCount == 0) {
+                      //         occupancyStatus = 'Occupied';
+                      //         homeColor = const Color(0xfff12d2d);
+                      //       }
+                      //       return Padding(
+                      //         padding: const EdgeInsets.all(10),
+                      //         child: Container(
+                      //           height: 40,
+                      //           width: 40,
+                      //           decoration: BoxDecoration(
+                      //             border: Border.all(color: homeColor), // Change border color dynamically
+                      //             borderRadius: BorderRadius.circular(20),
+                      //           ),
+                      //           child: Column(
+                      //             mainAxisAlignment: MainAxisAlignment.center,
+                      //             children: [
+                      //               Text(
+                      //                 'Room No: ${data['roomnumber']}',
+                      //                 style: TextStyle(
+                      //                   color: const Color(0xff595959),
+                      //                   fontWeight: FontWeight.w600,
+                      //                 ),
+                      //               ),
+                      //               Icon(
+                      //                 Icons.home_work,
+                      //                 size: 40,
+                      //                 color: homeColor, // Change color dynamically
+                      //               ),
+                      //               Text(
+                      //                 occupancyStatus,
+                      //                 style: TextStyle(
+                      //                   fontWeight: FontWeight.w700,
+                      //                   fontSize: 16,
+                      //                   color: homeColor,
+                      //                 ),
+                      //               ),
+                      //             ],
+                      //           ),
+                      //         ),
+                      //       );
+                      //     } else {
+                      //       // Handle the case when data is null
+                      //       return Container();
+                      //     }
+                      //   },
+                      // );
+
+
+
+
+                    //  try
 
                       return GridView.builder(
                         gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
@@ -315,10 +410,12 @@ class _RoomsState extends State<Rooms> {
                         itemCount: combinedData.length,
                         itemBuilder: (BuildContext context, index) {
                           final documents = combinedData[index];
-                          var data = documents.data() as Map<String, dynamic>?; // Cast data to Map<String, dynamic>
-                          if (data != null) {
-                            int bedCount = data['bedcount'] ?? 0;
-                            int vacantCount = data['vacant'] ?? bedCount;
+
+                          var data = documents.data() as Map<String, dynamic>?;
+                          if (snapshot.hasData) {
+                            final document = combinedData[index];
+                            int bedCount = document['bedcount'] ?? 0;
+                            int vacantCount = document['vacant'] ?? bedCount;
                             double occupancyPercentage = bedCount != 0 ? ((bedCount - vacantCount) / bedCount) * 100 : 0;
                             String occupancyStatus;
                             Color homeColor = const Color(0xff37d1d3);
@@ -353,7 +450,7 @@ class _RoomsState extends State<Rooms> {
                                   mainAxisAlignment: MainAxisAlignment.center,
                                   children: [
                                     Text(
-                                      'Room No: ${data['roomnumber']}',
+                                      'Room No: ${document['roomnumber']}',
                                       style: TextStyle(
                                         color: const Color(0xff595959),
                                         fontWeight: FontWeight.w600,
@@ -377,8 +474,66 @@ class _RoomsState extends State<Rooms> {
                               ),
                             );
                           } else {
-                            // Handle the case when data is null
-                            return Container();
+                            final document = combinedData[index];
+                            int bedCount = document['bedcount'] ?? 0;
+                            int vacantCount = document['vacant'] ?? bedCount;
+                            double occupancyPercentage = bedCount != 0 ? ((bedCount - vacantCount) / bedCount) * 100 : 0;
+                            String occupancyStatus;
+                            Color homeColor = const Color(0xff37d1d3);
+                            if (occupancyPercentage == 100) {
+                              occupancyStatus = 'Occupied';
+                              homeColor = const Color(0xfff12d2d);
+                            } else if (occupancyPercentage >= 50) {
+                              occupancyStatus = 'Reserved';
+                              homeColor = const Color(0xfffd7e50);
+                            } else if (occupancyPercentage > 0) {
+                              occupancyStatus = 'Empty';
+                              homeColor = const Color(0xff37d1d3);
+                            } else {
+                              occupancyStatus = 'Empty';
+                              homeColor = const Color(0xff37d1d3);
+                            }
+                            // Change the occupancyStatus to "Full" if vacantCount is 0
+                            if (vacantCount == 0) {
+                              occupancyStatus = 'Occupied';
+                              homeColor = const Color(0xfff12d2d);
+                            }
+                            return Padding(
+                              padding: const EdgeInsets.all(10),
+                              child: Container(
+                                height: 40,
+                                width: 40,
+                                decoration: BoxDecoration(
+                                  border: Border.all(color: homeColor), // Change border color dynamically
+                                  borderRadius: BorderRadius.circular(20),
+                                ),
+                                child: Column(
+                                  mainAxisAlignment: MainAxisAlignment.center,
+                                  children: [
+                                    Text(
+                                      'Room No: ${document['roomnumber']}',
+                                      style: TextStyle(
+                                        color: const Color(0xff595959),
+                                        fontWeight: FontWeight.w600,
+                                      ),
+                                    ),
+                                    Icon(
+                                      Icons.home_work,
+                                      size: 40,
+                                      color: homeColor, // Change color dynamically
+                                    ),
+                                    Text(
+                                      document['occupancyStatus'],
+                                      style: TextStyle(
+                                        fontWeight: FontWeight.w700,
+                                        fontSize: 16,
+                                        color: homeColor,
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                              ),
+                            );
                           }
                         },
                       );
@@ -388,7 +543,9 @@ class _RoomsState extends State<Rooms> {
                       return CircularProgressIndicator();
                     }
                   },
-                ),
+                )
+
+
               ),
             ],
           ),
@@ -396,8 +553,6 @@ class _RoomsState extends State<Rooms> {
       ),
     );
   }
-
-
   Future<void> AddRoom() async {
     return showDialog<void>(
         context: context,
@@ -595,7 +750,6 @@ class _RoomsState extends State<Rooms> {
           //   ),
           // ),
           //
-
             SizedBox(
               width: 110,
               height: 40,
@@ -704,7 +858,6 @@ class _RoomsState extends State<Rooms> {
             ),
           );
           print('Room with the same block name and room number already exists.');
-
         }
       } else {
         print('Room number and block name must not be empty.');

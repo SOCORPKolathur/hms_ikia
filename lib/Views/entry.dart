@@ -8,7 +8,9 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:hms_ikia/widgets/ReusableHeader.dart';
 import 'package:hms_ikia/widgets/customtextfield.dart';
 import 'package:toggle_switch/toggle_switch.dart';
+import '../Constants/constants.dart';
 import '../widgets/ReusableIconName.dart';
+import '../widgets/switch_button.dart';
 import '../widgets/userMiniDetails.dart';
 import 'package:intl/intl.dart';
 
@@ -30,8 +32,8 @@ class _EntryState extends State<Entry> {
   void initState() {
     super.initState();
     fetchUsers();
-
   }
+
   // Fetching the user data here...
   void fetchUsers() async {
     QuerySnapshot snapshot = await FirebaseFirestore.instance.collection('Users').get();
@@ -48,8 +50,13 @@ class _EntryState extends State<Entry> {
     );
   }
 
+
+
+  bool ChangeValue = false;
+
   @override
   Widget build(BuildContext context) {
+    double listViewHeight = calculateListViewHeight();
     return FadeInRight(
       child: Padding(
         padding: const EdgeInsets.all(15),
@@ -81,10 +88,10 @@ class _EntryState extends State<Entry> {
                             print('values Emp');
                           }
                           else{
-                            searchSuggestions = searchSuggestions.where((user) => user['name'].toLowerCase().contains(value.toLowerCase())).toList();
-print('getting data');
+                            searchSuggestions = searchSuggestions.where((user) => user['name'].toLowerCase().startsWith(value.toLowerCase()) ||
+                                user['userid'].toLowerCase().startsWith(value.toLowerCase())
+                            ).toList();
                           print(value);}
-
                           print(searchSuggestions);
                           print('ide');
                         });
@@ -100,6 +107,21 @@ print('getting data');
                     CustomTextField(
                       hint: 'Search Resident User ID',
                       controller: ResidentUid,
+                      onChanged: (value) {
+                        setState(() {
+                          if(value.isEmpty){
+                            fetchUsers();
+                            print('values Emp');
+                          }
+                          else{
+                            searchSuggestions = searchSuggestions.where((user) => user['name'].toLowerCase().startsWith(value.toLowerCase())  ||
+                                user['userId'].toLowerCase().startsWith(value.toLowerCase())
+                            ).toList();
+                            print(value);}
+                          print(searchSuggestions);
+                          print('ide');
+                        });
+                      },
                       fillColor: const Color(0xffF5F5F5),
                       header: '',
                       width: 335,
@@ -133,7 +155,14 @@ print('getting data');
                             ),
                           ),
                         ),
-                        onPressed: () {},
+                        onPressed: () {
+                            ResidentName.clear();
+                            ResidentUid.clear();
+                            setState(() {
+                              fetchUsers();
+                              selectedUser = null;
+                            });
+                        },
                         child: const Row(
                           children: [
                             Text('Reset', style: TextStyle(color: Color(0xff37D1D3))),
@@ -147,14 +176,14 @@ print('getting data');
                 ),
               ),
               SizedBox.fromSize(size: const Size(0, 15)),
-            ResidentName.text != ''?
+            ResidentName.text != '' || ResidentUid.text != ''?
                 Padding(
-                  padding: const EdgeInsets.only(left: 30),
+                  padding: const EdgeInsets.only(left: 50),
                   child: ClipRRect(
                     borderRadius: BorderRadius.circular(20),
                     child: SizedBox(
-                      width: 300,
-                      height: 60,
+                      width: 350,
+                      height: listViewHeight,
                       child: ListView.builder(
                         itemCount: searchSuggestions.length,
                         itemBuilder: (context, index) {
@@ -190,8 +219,7 @@ print('getting data');
                     ),
                   ),
                 ) : const SizedBox(),
-
-              if (selectedUser != null && ResidentName.text.isNotEmpty ) ...[
+              if (selectedUser != null && ResidentName.text.isNotEmpty || ResidentUid.text.isNotEmpty ) ...[
                 ClipRRect(
                   child: Container(
                       height: 450,
@@ -241,7 +269,6 @@ print('getting data');
                                               getStatusButton(selectedUser!['status']),
                                             ],
                                           ),
-
                                           const SizedBox(height: 8,),
                                           const Padding(
                                             padding: EdgeInsets.only(top: 3, bottom: 3),
@@ -256,203 +283,214 @@ print('getting data');
                               )),
                           const SizedBox(width: 30,),
                           Expanded(
-                            child: SingleChildScrollView(
-                              child: Container(
-                                height: 1000,
-                                width: double.infinity,
-                                decoration: BoxDecoration(
-                                  border: Border.all(color: const Color(0xff262626).withOpacity(0.10)),
-                                  borderRadius: BorderRadius.circular(20),
-                                ),
-                                child:  Column(
-                                  crossAxisAlignment: CrossAxisAlignment.start ,
-                                  children: [
-                                    const Padding(
-                                      padding: EdgeInsets.only(left: 30, top: 30),
-                                      child: SizedBox(height: 36, width: 36,
-                                        child:
-                                        Image(image: AssetImage('assets/ui-design-/images/Layer1.png',), fit: BoxFit.contain,),),
-                                    ),
-                                    const SizedBox(height: 20,),
-                                    Center(
-                                      child:
-                                      ToggleSwitch(
-                                        minWidth: 250.0,
-                                        minHeight: 60.0,
-                                        cornerRadius: 20.0,
-                                        activeBgColors: [[Colors.red[800]!], [Colors.green[800]!]],
-                                        activeFgColor: Colors.white,
-                                        inactiveBgColor: Colors.grey,
-                                        inactiveFgColor: Colors.white,
-                                        initialLabelIndex: selectedUser!['status'] ? 1 : 0,
-                                        totalSwitches: 2,
-                                        labels: ['Check Out', 'Check In'],
-                                        radiusStyle: true,
-                                        onToggle: (index) async {
-                                          if (index == 1) {
-                                            await FirebaseFirestore.instance
-                                                .collection('Users')
-                                                .doc(selectedUser!['docId'])
-                                                .update({'status': true });
-                                            statusTrue();
-                                            print('Checked In');
-                              
-                                          } else {
-                                            await FirebaseFirestore.instance
-                                                .collection('Users')
-                                                .doc(selectedUser!['docId'])
-                                                .update({'status': false });
-                                            statusFalse();
-                                            print('Checked Out');
-                                          }
-                                        },
-                                      ),
-                                    ),
-                                    const SizedBox(height: 20,),
-                                    const Padding(
-                                      padding: EdgeInsets.only(right: 30),
-                                      child: Row(
-                                        mainAxisAlignment: MainAxisAlignment.end,
-                                        children: [
-                                          SizedBox(height: 40, child: Image(image: AssetImage('assets/ui-design-/images/Group 68.png')),)
-                                        ],),
-                                    ),
-                                    // History...
-                                    Column(
-                                      crossAxisAlignment: CrossAxisAlignment.start,
-                                      children: [
-                                        Padding(
-                                          padding: const EdgeInsets.only(left: 100),
-                                          child: Text('History', style: GoogleFonts.openSans(fontWeight: FontWeight.w800),),
-                                        ),
-                                        const SizedBox(height: 30,),
-                                        // IconWithName(PrDateIcon: Icons.date_range, PrTimeIcon: Icons.watch_later_outlined, PrStatusIcon: Icons.downloading, TPrDate: 'Date', TPrTime: 'Time', TStatus: 'Status',textColor:  const Color(0xff262626).withOpacity(0.7),),
-                                        //
-                                        const SizedBox(height: 7,),
-                                         Row(
-                                           mainAxisAlignment: MainAxisAlignment.center,
-                              
-                                           children: [
-                                          Container(
-                                            width: 200,
-                                            child: Row(
-                                              mainAxisAlignment: MainAxisAlignment.center,
-                                              children: [
-                                                Icon(Icons.calendar_month, color: Color(0xff262626).withOpacity(0.7),size: 20), Text('Date',
-                                                  style: GoogleFonts.openSans(fontWeight: FontWeight.w700, color: Color(0xff262626).withOpacity(0.9)
-                                                )
-                                                )
-                                              ],
-                                            ),
-                                          ),
-                              
-                                          Container(
-                                            width: 200,
-                                            child: Row(
-                                              mainAxisAlignment: MainAxisAlignment.center,
-                                              children: [
-                                                Icon(Icons.watch,color: Color(0xff262626).withOpacity(0.7),size: 20,), Text('Time',
-                                                    style: GoogleFonts.openSans(fontWeight: FontWeight.w700, color: Color(0xff262626).withOpacity(0.9)
-                                                    )
-                                                )
-                                              ],
-                                            ),
-                                          ),
-                                          Container(
-                                            width: 200,
-                                            child: Row(
-                                              mainAxisAlignment: MainAxisAlignment.center,
-                                              children: [
-                                                Icon(Icons.downloading,color: Color(0xff262626).withOpacity(0.7),size: 20,), Text('Status',
-                                              style: GoogleFonts.openSans(fontWeight: FontWeight.w700, color: Color(0xff262626).withOpacity(0.9)
-                                          )
-                                                )
-                                              ],
-                                            ),
-                                          ),
-                              
-                                        ],),
-                                        const SizedBox(height: 30,),
-                                        StreamBuilder(
-                                        stream: FirebaseFirestore.instance
-                                            .collection('Users')
-                                            .doc(selectedUser!['docId'])
-                                            .collection('entries')
-                                            .snapshots(),
-                                        builder: (context, snapshot) {
-                                          if (snapshot.connectionState == ConnectionState.waiting) {
-                                            return CircularProgressIndicator();
-                                          }
-                                          if (snapshot.hasError) {
-                                            return Text('Error: ${snapshot.error}');
-                                          }
-                                          if (snapshot.hasData) {
-                                            return ListView.builder(
-                                              reverse: true,
-                                              shrinkWrap: true,
-                                              itemCount: snapshot.data!.docs.length,
-                                              itemBuilder: (context, index) {
-                                                var entry = snapshot.data!.docs[index].data();
-                                                if (entry != null) {
-                                                  // Storing the date nd time
-                                                  DateTime date = (entry['date'] as Timestamp).toDate();
-                                                  DateTime time = (entry['time'] as Timestamp).toDate();
-                                                  // Formatting  the date and time
-                                                  String formattedDate = DateFormat.yMMMd().format(date);
-                                                  String formattedTime = DateFormat('h:mm a').format(time);
-                                                  return Padding(
-                                                    padding: const EdgeInsets.only(left: 70, right: 70),
-                                                    child: Row(
-                                                      mainAxisAlignment: MainAxisAlignment.center,
-                                                      children: [
-                                                        Container(
-                              width: 200,
-                              child: Center(
-                                child: Text(
-                                  formattedDate,
-                                ),
-                              ),
-                                                        ),
-                                                         SizedBox(
-                              width: 200,
-                              child: Center(child: Text(formattedTime)),
-                                                        ),
-                                                         SizedBox(
-                              width: 200,
-                              child: Center(child: entry['status'] == 'true' ?  Text('Check In') : Text('Check Out')),
-                                                        ),
-                                                      ],
-                                                    ),
-                                                  );
-                                                } else {
-                                                  return Container();
-                                                }
-                                              },
-                                            );
-
-                                          } else {
-                                            return Text('No data available');
-                                          }
-                                        },
-                                      ),
-                              
+                            child: SizedBox(
+                              height: 750,
+                              child: SingleChildScrollView(
+                                child: Container(
+                                  width: double.infinity,
+                                  decoration: BoxDecoration(
+                                    border: Border.all(color: const Color(0xff262626).withOpacity(0.10)),
+                                    borderRadius: BorderRadius.circular(20),
+                                  ),
+                                  child:  Column(
+                                    crossAxisAlignment: CrossAxisAlignment.start ,
+                                    children: [
                                       const Padding(
-                                          padding: EdgeInsets.only(left: 100, right: 60, top: 20, bottom: 20),
-                                          child: Row(
-                                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                                            children: [
-                                              SizedBox(
-                                                  width: 18,
-                                                  child: Image(image: AssetImage('assets/ui-design-/images/Vector 33.png'))),
-                                              SizedBox(
-                                                  width: 30,
-                                                  child: Image(image: AssetImage('assets/ui-design-/images/Vector 33.png'))),
-                              
-                                            ],),
+                                        padding: EdgeInsets.only(left: 30, top: 30),
+                                        child: SizedBox(height: 36, width: 36,
+                                          child:
+                                          Image(image: AssetImage('assets/ui-design-/images/Layer1.png',), fit: BoxFit.contain,),),
+                                      ),
+                                      const SizedBox(height: 20,),
+                                      Center(
+                                        child:
+                                        SizedBox(
+                                          child: SmartSwitch(
+                                            size: SwitchSize.medium,
+                                            disabled: false,
+                                            // activeColor: Constants()
+                                            //     .primaryAppColor,
+                                            activeColor: Color(0xff1DA644),
+                                            inActiveColor: Color(0xffF12D2D),
+                                            defaultActive:  selectedUser!['status'],
+                                            onChanged: (ChangeValue) async {
+                                                  if (ChangeValue == true) {
+                                                    await FirebaseFirestore.instance
+                                                        .collection('Users')
+                                                        .doc(selectedUser!['docId'])
+                                                        .update({'status': true });
+                                                    statusTrue();
+                                                    print('Checked In');
+                                                  }
+                                                  else {
+                                                    await FirebaseFirestore.instance
+                                                        .collection('Users')
+                                                        .doc(selectedUser!['docId'])
+                                                        .update({'status': false });
+                                                    statusFalse();
+                                                    print('Checked Out');
+                                                  }
+                                                },
+                                          ),
                                         ),
-                                      ],
-                                    ),
-                                  ],),
+                                      ),
+                                      const SizedBox(height: 20,),
+                                      const Padding(
+                                        padding: EdgeInsets.only(right: 30),
+                                        child: Row(
+                                          mainAxisAlignment: MainAxisAlignment.end,
+                                          children: [
+                                            SizedBox(height: 40, child: Image(image: AssetImage('assets/ui-design-/images/Group 68.png')),)
+                                          ],),
+                                      ),
+                                      // History...
+                                      Column(
+                                        crossAxisAlignment: CrossAxisAlignment.start,
+                                        children: [
+                                          Padding(
+                                            padding: const EdgeInsets.only(left: 50),
+                                            child: Text('History', style: GoogleFonts.openSans(fontWeight: FontWeight.w800),),
+                                          ),
+                                          const SizedBox(height: 30,),
+                                          // IconWithName(PrDateIcon: Icons.date_range, PrTimeIcon: Icons.watch_later_outlined, PrStatusIcon: Icons.downloading, TPrDate: 'Date', TPrTime: 'Time', TStatus: 'Status',textColor:  const Color(0xff262626).withOpacity(0.7),),
+                                          //
+                                          const SizedBox(height: 7,),
+                                           Container(
+                                             // color: Colors.pink,
+                                             child: Row(
+                                               mainAxisAlignment: MainAxisAlignment.center,
+                                               children: [
+                                              Container(
+                                                width: 200,
+                                                child: Row(
+                                                  // mainAxisAlignment: MainAxisAlignment.center,
+                                                  children: [
+                                                    SizedBox(width: 20, child: Image.asset('assets/ui-design-/images/calendar.png'),),
+                                                    SizedBox(width: 3,),
+                                                    Text('Date',
+                                                      style: GoogleFonts.openSans(fontWeight: FontWeight.w700, fontSize: 16,color: Color(0xff262626).withOpacity(0.8)
+                                                    )
+                                                    )
+                                                  ],
+                                                ),
+                                              ),
+                                              Container(
+                                                width: 200,
+                                                child: Row(
+                                                  children: [
+                                                    // Icon(Icons.watch,color: Color(0xff262626).withOpacity(0.7),size: 20,),
+                                                    SizedBox(width: 20, child: Image.asset('assets/ui-design-/images/time.png'),),
+                                                    SizedBox(width: 3,),
+                                                    Text('Time',
+                                                        style: GoogleFonts.openSans(fontWeight: FontWeight.w700, fontSize: 16,color: Color(0xff262626).withOpacity(0.8)
+                                                        )
+                                                    )
+                                                  ],
+                                                ),
+                                              ),
+                                              Container(
+                                                width: 110,
+                                                child: Row(
+                                                  children: [
+                                                  SizedBox(width: 20, child: Image.asset('assets/ui-design-/images/loading.png'),),
+                                                    SizedBox(width: 3,),
+                                                    Text('Status',
+                                                  style: GoogleFonts.openSans(fontWeight: FontWeight.w700,fontSize: 16, color: Color(0xff262626).withOpacity(0.8)
+                                              )
+                                                    )
+                                                  ],
+                                                ),
+                                              ),
+
+                                                                                       ],),
+                                           ),
+                                          const SizedBox(height: 30,),
+                                          StreamBuilder(
+                                          stream: FirebaseFirestore.instance
+                                              .collection('Users')
+                                              .doc(selectedUser!['docId'])
+                                              .collection('entries').orderBy("timestamp", descending: true).snapshots(),
+                                          builder: (context, snapshot) {
+                                            if (snapshot.connectionState == ConnectionState.waiting) {
+                                              return CircularProgressIndicator();
+                                            }
+                                            if (snapshot.hasError) {
+                                              return Text('Error: ${snapshot.error}');
+                                            }
+                                            if (snapshot.hasData) {
+                                              return ListView.builder(
+                                                reverse: true,
+                                                shrinkWrap: true,
+                                                itemCount: snapshot.data!.docs.length,
+                                                itemBuilder: (context, index) {
+                                                  var entry = snapshot.data!.docs[index].data();
+                                                  if (entry != null) {
+                                                    // Storing the date nd time
+                                                    DateTime date = (entry['date'] as Timestamp).toDate();
+                                                    DateTime time = (entry['time'] as Timestamp).toDate();
+                                                    // Formatting  the date and time
+                                                    String formattedDate = DateFormat.yMMMd().format(date);
+                                                    String formattedTime = DateFormat('h:mm a').format(time);
+                                                    return Padding(
+                                                      padding: const EdgeInsets.only(left: 70, right: 70,top: 2, bottom: 2),
+                                                      child: Row(
+                                                        mainAxisAlignment: MainAxisAlignment.center,
+                                                        children: [
+                                                          //data
+                                                          Container(
+                                                            width: 200,
+                                child: Text(
+                                  formattedDate,style: GoogleFonts.openSans(color: Color(0xff262626), fontWeight: FontWeight.w700),
+                                ),),
+                                                          Container(
+                                width: 200,
+                                child: Padding(
+                                  padding: const EdgeInsets.only(left: 5),
+                                  child: Text(formattedTime,style: GoogleFonts.openSans(color: Color(0xff262626), fontWeight: FontWeight.w700),),
+                                ),
+                                                          ),
+                                                           Container(
+                                width: 110,
+                                child: entry['status'] == 'true' ?  Padding(
+                                  padding: const EdgeInsets.only(left: 5),
+                                  child: Text('Check In',style: GoogleFonts.openSans(color: Color(0xff1DA644), fontWeight: FontWeight.w700),),
+                                ) : Padding(
+                                  padding: const EdgeInsets.only(left: 5),
+                                  child: Text('Check Out',style: GoogleFonts.openSans(color: Color(0xffF12D2D), fontWeight: FontWeight.w700),),
+                                ),
+                                                          ),
+                                                        ],
+                                                      ),
+                                                    );
+                                                  } else {
+                                                    return Container();
+                                                  }
+                                                },
+                                              );
+
+                                            } else {
+                                              return Text('No data available');
+                                            }
+                                          },
+                                        ),
+                                        const Padding(
+                                            padding: EdgeInsets.only(left: 100, right: 60, top: 20, bottom: 20),
+                                            child: Row(
+                                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                              children: [
+                                                SizedBox(
+                                                    width: 18,
+                                                    child: Image(image: AssetImage('assets/ui-design-/images/Vector 33.png'))),
+                                                SizedBox(
+                                                    width: 30,
+                                                    child: Image(image: AssetImage('assets/ui-design-/images/Vector 33.png'))),
+
+                                              ],),
+                                          ),
+                                        ],
+                                      ),
+                                    ],),
+                                ),
                               ),
                             ),
                           )
@@ -468,6 +506,13 @@ print('getting data');
         ),
       ),
     );
+  }
+  double calculateListViewHeight() {
+    // Calculate the total height of the ListView
+    double itemHeight = 60; // Height of each item
+    int itemCount = searchSuggestions.length;
+    double totalHeight = itemHeight * itemCount;
+    return totalHeight;
   }
 
   // creating sub collection (entries)
@@ -512,31 +557,6 @@ print('getting data');
       'timestamp' : millisecondsSinceEpoch
     });
  }
- //  changeStatus(){
- //    setState(() {
- //      selectedUser!['status'] == true ?
- //      SizedBox(
- //          width: 100,
- //          height: 29,
- //          child: Padding(
- //            padding: const EdgeInsets.all(0),
- //            child: ElevatedButton(
- //                style: const ButtonStyle(backgroundColor: MaterialStatePropertyAll(Color(0xffDDFFE7))),
- //                onPressed: (){
- //                }, child: const Text('In Room', style: TextStyle(fontSize: 12,fontWeight: FontWeight.w600,color: Color(0xff1DA644)),)),
- //          )) :
- //      SizedBox(
- //          width: 100,
- //          height: 29,
- //          child: Padding(
- //            padding: const EdgeInsets.all(0),
- //            child: ElevatedButton(
- //                style: const ButtonStyle(backgroundColor: MaterialStatePropertyAll(Color(0xffFFD3D3))),
- //                onPressed: (){
- //                }, child: const Text('Out Room', style: TextStyle(fontSize: 11,fontWeight: FontWeight.w600,color: Color(0xffF12D2D)),)),
- //          ));
- //    });
- // }
 
   Widget getStatusButton(bool status) {
     return status
@@ -579,5 +599,8 @@ print('getting data');
       ),
     );
   }
+
+
+
 
 }

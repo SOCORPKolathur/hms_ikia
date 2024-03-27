@@ -81,7 +81,6 @@ class _Resident_TabState extends State<Resident_Tab> {
                             // effortlesslymanageyourusersx6Z (41:667)
                             '“EFFORTLESSLY MANAGE YOUR USERS”',
                             style: GoogleFonts.openSans (
-
                               fontSize: 16*ffem,
                               fontWeight: FontWeight.w600,
                               height: 1.3625*ffem/fem,
@@ -370,7 +369,6 @@ class _Resident_TabState extends State<Resident_Tab> {
                             List<DocumentSnapshot> matchedData = [];
                             // this is remaining one
                             List<DocumentSnapshot> remainingData = [];
-
                             if (searchNamePhone.text.isNotEmpty) {
                               // Separate the snapshot data based on the search text
                               snapshot.data!.docs.forEach((doc) {
@@ -392,11 +390,12 @@ class _Resident_TabState extends State<Resident_Tab> {
                                 final searchText = searchNamePhone.text.toLowerCase();
                                 return nameA.compareTo(nameB);
                               });
-                            } else {
+                            }
+
+                            else {
                               // If search query is empty, display original data
                               remainingData = snapshot.data!.docs;
                             }
-
                             // Concatenate matched data and remaining data
                             List<DocumentSnapshot> combinedData = [...matchedData, ...remainingData];
                             print(searchNamePhone);
@@ -496,7 +495,7 @@ class _Resident_TabState extends State<Resident_Tab> {
                                                 ),
                                                 Container(
                                                   // QFF (59:1641)
-                                                  margin: EdgeInsets.fromLTRB(0*fem, 0*fem, 105*fem, 0*fem),
+                                                  margin: EdgeInsets.fromLTRB(0*fem, 0*fem, 125*fem, 0*fem),
                                                   child: Text(
                                                     // snap.data!.docs[index]["phone"],
                                                     document["phone"],
@@ -508,15 +507,18 @@ class _Resident_TabState extends State<Resident_Tab> {
                                                     ),
                                                   ),
                                                 ),
-                                                Text(
-                                                  // Kd7 (59:1642)
-                                                  // snapshot.data!.docs[index]["pincode"],
-                                                  document["pincode"],
-                                                  style: GoogleFonts.openSans (
-                                                    fontSize: 16*ffem,
-                                                    fontWeight: FontWeight.w600,
-                                                    height: 1.3625*ffem/fem,
-                                                    color: const Color(0xcc262626),
+                                                Container(
+                                                  margin: EdgeInsets.fromLTRB(0*fem, 0*fem, 30*fem, 0*fem),
+                                                  child: Text(
+                                                    // Kd7 (59:1642)
+                                                    // snapshot.data!.docs[index]["pincode"],
+                                                    document["pincode"],
+                                                    style: GoogleFonts.openSans (
+                                                      fontSize: 16*ffem,
+                                                      fontWeight: FontWeight.w600,
+                                                      height: 1.3625*ffem/fem,
+                                                      color: const Color(0xcc262626),
+                                                    ),
                                                   ),
                                                 ),
                                               ],
@@ -625,8 +627,6 @@ class _Resident_TabState extends State<Resident_Tab> {
                                       ),
                                     ),
                                   );
-
-
                                 }
 
                                   else {
@@ -707,7 +707,6 @@ class _Resident_TabState extends State<Resident_Tab> {
                                                         .only(top: 8),
                                                     child: Text(
                                                       // snap.data!.docs[index]["firstName"],
-
                                                       document["firstName"],
                                                       style: GoogleFonts
                                                           .openSans(
@@ -830,7 +829,6 @@ class _Resident_TabState extends State<Resident_Tab> {
                                                   width: 16 * fem,
                                                 ),
                                                 // View Button
-
                                                 InkWell(
                                                   onTap: () {
                                                     print('View Button');
@@ -1142,7 +1140,6 @@ class _Resident_TabState extends State<Resident_Tab> {
                                             child: Text(
                                               'Choose Image',
                                               style: GoogleFonts.openSans (
-
                                                 fontSize: 16*ffem,
                                                 fontWeight: FontWeight.w700,
                                                 height: 1.3625*ffem/fem,
@@ -1172,10 +1169,8 @@ class _Resident_TabState extends State<Resident_Tab> {
                               child: Text(
                                 'Personal Details',
                                 style: GoogleFonts.openSans (
-
                                   fontSize: 20*ffem,
                                   fontWeight: FontWeight.w700,
-
                                   color: const Color(0xff000000),
                                 ),
                               ),
@@ -1192,14 +1187,11 @@ class _Resident_TabState extends State<Resident_Tab> {
                             children: [
                               Container(
                                 // firstnameSVK (87:1540)
-
                                 child: Text(
                                   "Prefix",
                                   style: GoogleFonts.openSans (
-
                                     fontSize: 14,
                                     fontWeight: FontWeight.w600,
-
                                     color: const Color(0xff262626),
                                   ),
                                 ),
@@ -1207,8 +1199,6 @@ class _Resident_TabState extends State<Resident_Tab> {
                               Padding(
                                 padding: const EdgeInsets.only(top: 8.0),
                                 child: Container(
-
-
                                   width: 220,
                                   height: 50,
                                   decoration: BoxDecoration (
@@ -1218,7 +1208,6 @@ class _Resident_TabState extends State<Resident_Tab> {
                                   child: Padding(
                                     padding: const EdgeInsets.only(left: 12.0,right: 6),
                                     child:  DropdownButtonHideUnderline(
-
                                       child:
                                       DropdownButtonFormField2<
                                           String>(
@@ -1226,10 +1215,8 @@ class _Resident_TabState extends State<Resident_Tab> {
                                         hint: Text(
                                           'Prefix', style:
                                         GoogleFonts.openSans (
-
                                           fontSize: 12,
                                           fontWeight: FontWeight.w600,
-
                                           color: const Color(0x7f262626),
                                         ),
                                         ),
@@ -1243,11 +1230,8 @@ class _Resident_TabState extends State<Resident_Tab> {
                                                 item,
                                                 style:
                                                 GoogleFonts.openSans (
-
                                                   fontSize: 12,
                                                   fontWeight: FontWeight.w600,
-
-
                                                 ),
                                               ),
                                             )).toList(),
@@ -1262,12 +1246,9 @@ class _Resident_TabState extends State<Resident_Tab> {
                                         },
                                         buttonStyleData:
                                         const ButtonStyleData(
-
-
                                         ),
                                         menuItemStyleData:
                                         const MenuItemStyleData(
-
                                         ),
                                         decoration:
                                         const InputDecoration(
@@ -1299,11 +1280,9 @@ class _Resident_TabState extends State<Resident_Tab> {
                             children: [
                               Container(
                                 // firstnameSVK (87:1540)
-
                                 child: Text(
                                   "Date of Birth",
                                   style: GoogleFonts.openSans (
-
                                     fontSize: 14,
                                     fontWeight: FontWeight.w600,
 
@@ -1314,8 +1293,6 @@ class _Resident_TabState extends State<Resident_Tab> {
                               Padding(
                                 padding: const EdgeInsets.only(top: 8.0),
                                 child: Container(
-
-
                                   width: 220 ,
                                   height: 50,
                                   decoration: BoxDecoration (
@@ -1327,15 +1304,12 @@ class _Resident_TabState extends State<Resident_Tab> {
                                     child: TextFormField(
                                       cursorColor: Constants().primaryAppColor,
                                       controller: dob,
-
                                       decoration: InputDecoration(
                                         border: InputBorder.none,
                                         hintText: "Select date of birth",
                                         hintStyle: GoogleFonts.openSans (
-
                                           fontSize: 12,
                                           fontWeight: FontWeight.w600,
-
                                           color: const Color(0x7f262626),
                                         ),
                                       ),
@@ -1985,6 +1959,7 @@ class _Resident_TabState extends State<Resident_Tab> {
       },
     );
   }
+
   deleteUserData(id)async{
    await FirebaseFirestore.instance.collection("Users").doc(id).delete();
 }
@@ -2002,7 +1977,6 @@ class _Resident_TabState extends State<Resident_Tab> {
     )..show();
   }
   // BuildContext con,id
-
 
 
   Future<void> ShowProfile(BuildContext con, DocumentSnapshot userData) async {

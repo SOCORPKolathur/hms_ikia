@@ -3,6 +3,7 @@
 import 'dart:collection';
 
 import 'package:animate_do/animate_do.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:country_flags/country_flags.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
@@ -72,6 +73,53 @@ class Dashboard extends StatefulWidget {
 }
 
 class _DashboardState extends State<Dashboard> {
+  int roomCount = 0;
+  int Hostellers = 0;
+
+  Future<void> getRoomsLength() async {
+    try {
+      QuerySnapshot querySnapshot = await FirebaseFirestore.instance.collection('Room').get();
+      int length = querySnapshot.docs.length;
+      setState(() {
+        roomCount = length;
+      });
+    } catch (e) {
+      print("Error getting rooms length: $e");
+    }
+  }
+  //get hostellers
+  Future<void> getHostellersLength() async {
+    try {
+      QuerySnapshot querySnapshot = await FirebaseFirestore.instance.collection('Users').get();
+      int length = querySnapshot.docs.length;
+      setState(() {
+        Hostellers = length;
+      });
+    } catch (e) {
+      print("Error getting rooms length: $e");
+    }
+  }
+
+
+  // Future<void> getTotalBedCount() async {
+  //   try {
+  //     QuerySnapshot querySnapshot =
+  //     await FirebaseFirestore.instance.collection('Room').get();
+  //     int totalBedCount = 0;
+  //     querySnapshot.docs.forEach((doc) {
+  //       // totalBedCount += (doc.data()['bedcount'] ?? 0).round();
+  //       totalBedCount += (doc.data()['bedcount'] ?? 0).round();
+  //     });
+  //     setState(() {
+  //       // Assign the total bed count to your variable
+  //       totalBedCountVariable = totalBedCount;
+  //     });
+  //   } catch (e) {
+  //     print("Error getting total bed count: $e");
+  //   }
+  // }
+
+
 
   List name =["JD", "MJ", "VJ"];
   List namelist =["John David", "Mary Jane", "Vignesh Joe"];
@@ -229,6 +277,8 @@ class _DashboardState extends State<Dashboard> {
   @override
   void initState() {
     super.initState();
+    getRoomsLength();
+    getHostellersLength();
 
     _selectedDay = _focusedDay;
     _selectedEvents = ValueNotifier(_getEventsForDay(_selectedDay!));
@@ -542,7 +592,6 @@ class _DashboardState extends State<Dashboard> {
                                 borderRadius: BorderRadius.circular(20)
                               ),
                               child: Stack(
-        
                                 children: [
                                   Column(
                                     crossAxisAlignment: CrossAxisAlignment.start,
@@ -642,7 +691,7 @@ class _DashboardState extends State<Dashboard> {
                                       ),
                                       Padding(
                                         padding: const EdgeInsets.only(left: 15.0,top: 10),
-                                        child: Text("67",
+                                        child: Text(roomCount.toString(),
                                           style: GoogleFonts.openSans (
                                             fontSize: 40,
                                             fontWeight: FontWeight.w700,
@@ -816,7 +865,7 @@ class _DashboardState extends State<Dashboard> {
                                       ),
                                       Padding(
                                         padding: const EdgeInsets.only(left: 15.0,top: 10),
-                                        child: Text("89",
+                                        child: Text(Hostellers.toString(),
                                           style: GoogleFonts.openSans (
                                             fontSize: 40,
                                             fontWeight: FontWeight.w700,

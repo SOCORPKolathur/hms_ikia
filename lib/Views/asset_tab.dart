@@ -41,7 +41,6 @@ class _AssetManagementState extends State<AssetManagement> {
     if(picked != null){
       setState(() {
         _selectedDate = picked;
-
         print('normal date $_selectedDate');
         DateController.text = DateFormat('yyyy-MM-dd').format(picked);
       });
@@ -110,7 +109,6 @@ class _AssetManagementState extends State<AssetManagement> {
               const ReusableHeader(Headertext: 'Asset Management ',
                   SubHeadingtext: '"Manage Easily Your Assets"'),
               const SizedBox(height: 10,),
-
               Container(
                 height: 100,
                 decoration: BoxDecoration(
@@ -134,7 +132,6 @@ class _AssetManagementState extends State<AssetManagement> {
                         preffixIcon: Icons.search,
                         height: 45,),
                     ),
-
                     SizedBox.fromSize(size: const Size(0, 0),),
                     Padding(
                       padding: const EdgeInsets.only(left: 20, right: 20),
@@ -196,7 +193,6 @@ class _AssetManagementState extends State<AssetManagement> {
                               ],)
                             ),
                           ),
-
                         ],),
                     )
                   ],),),
@@ -242,17 +238,13 @@ class _AssetManagementState extends State<AssetManagement> {
                                     fontWeight: FontWeight.w700,
                                     fontSize: 19),)
                               ],),
-
                           ),
-
-
                           Container(
                             decoration: const BoxDecoration(color: Colors.white,
                                 borderRadius: BorderRadius.all(
                                     Radius.circular(10))),
                             width: 200,
                             height: 75,
-                            // utilized
                             child: Column(
                               mainAxisAlignment: MainAxisAlignment.center,
                               children: [
@@ -267,7 +259,6 @@ class _AssetManagementState extends State<AssetManagement> {
                                     color: const Color(0xff37D1D3)),)
                               ],),
                           ),
-
                         ],),
                       const SizedBox(height: 10,),
                       // second row
@@ -348,7 +339,6 @@ class _AssetManagementState extends State<AssetManagement> {
                                             fontSize: 19,
                                             color: const Color(0xff262626))),
                                     const SizedBox(height: 7,),
-
                                     Text('9,78,79,827',
                                         style: GoogleFonts.openSans(
                                             fontWeight: FontWeight.w700,
@@ -1825,7 +1815,6 @@ class _AssetManagementState extends State<AssetManagement> {
                         prefixIcon: IconButton(
                           onPressed: () {
                             _selectDate(context);
-
                           },
                           icon: Icon(Icons.calendar_month),
                         ),

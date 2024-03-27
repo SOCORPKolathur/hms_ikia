@@ -105,13 +105,13 @@ class _SmartSwitchState extends State<SmartSwitch> {
                     children: [
                       Expanded(
                           child: Text(
-                            'Absent',
+                            'Check Out',
                             textAlign: TextAlign.start,
                             style: TextStyle(color: Colors.white),
                           )),
                       Expanded(
                           child: Text(
-                            'Present',
+                            'Check Out',
                             textAlign: TextAlign.end,
                             style: TextStyle(color: Colors.white),
                           )),
