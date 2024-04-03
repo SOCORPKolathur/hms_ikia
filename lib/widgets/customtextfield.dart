@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart'; // Import for TextInputFormatter
 import 'package:google_fonts/google_fonts.dart';
 import 'package:hms_ikia/Constants/constants.dart';
+
+import 'kText.dart';
 //
 // class CustomTextField extends StatefulWidget {
 //   final String hint;
@@ -202,7 +204,7 @@ class _CustomTextFieldState extends State<CustomTextField> {
   @override
   Widget build(BuildContext context) {
     return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
+            crossAxisAlignment: CrossAxisAlignment.start,
       mainAxisAlignment: MainAxisAlignment.center,
       children: [
         if (widget.header != '')
@@ -210,9 +212,10 @@ class _CustomTextFieldState extends State<CustomTextField> {
             padding: const EdgeInsets.only(left: 10),
             child: Container(
               child: Row(
+mainAxisAlignment: MainAxisAlignment.start,
                 children: [
-                  Text(
-                    widget.header!,
+                  KText(
+                   text: widget.header!,
                     style: GoogleFonts.openSans(
                       fontSize: 14,
                       fontWeight: FontWeight.w600,
@@ -220,9 +223,9 @@ class _CustomTextFieldState extends State<CustomTextField> {
                     ),
                   ),
                   if (widget.showError != null && widget.showError! && (widget.validator != null))
-                    Text(
+                    KText(
                       // '  *Required this',
-                      widget.ErrorMsg == null ? '*Required' : widget.ErrorMsg.toString(),
+                      text: widget.ErrorMsg == null ? '*Required' : widget.ErrorMsg.toString(),
                       style: GoogleFonts.openSans(
                         fontStyle: FontStyle.italic,
                         fontSize: 10,

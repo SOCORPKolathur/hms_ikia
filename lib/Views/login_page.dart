@@ -1,3 +1,4 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
@@ -16,6 +17,23 @@ class LoginPage extends StatefulWidget {
 class _LoginPageState extends State<LoginPage> {
   TextEditingController username = new TextEditingController();
   TextEditingController password = new TextEditingController();
+
+  @override
+  void initState() {
+    getHostelDetails();
+    // TODO: implement initState
+    super.initState();
+  }
+  String hostellogo = '';
+  String hostelname = '';
+  getHostelDetails() async {
+    var hostel = await FirebaseFirestore.instance.collection('HostelDetails').get();
+    setState(() {
+      hostellogo = hostel.docs.first.get("logo");
+      hostelname = hostel.docs.first.get("hostelname");
+    });
+
+  }
   @override
   Widget build(BuildContext context) {
     double height=MediaQuery.of(context).size.height;
@@ -28,28 +46,50 @@ class _LoginPageState extends State<LoginPage> {
           Container(
               width: double.infinity,
               height: double.infinity,
-              child: Image.asset("assets/loginfinal.png",fit: BoxFit.cover,)),
+              child: Image.network("assets/Log In Page.png",fit: BoxFit.cover,)),
           Padding(
-            padding: const EdgeInsets.only(right: 80.0,top: 280),
+            padding: const EdgeInsets.only(right: 80.0,top: 50),
             child: Column(
+              crossAxisAlignment: CrossAxisAlignment.end,
               children: [
-                CustomTextField(
-                  width: 470,
-                  hint: "Enter username", controller: username, validator: (String? val ) {  }, header: "Username",),
+                
+                Padding(
+                  padding: const EdgeInsets.only(right: 120.0,bottom: 50),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.center,
+                    children: [
+                      Container(
+                          width:100,
+                          child: Image.network(hostellogo)),
+                      Text(hostelname,style: GoogleFonts.openSans(fontSize: 22,fontWeight: FontWeight.bold),),
+                      Text("Management Admin",style: GoogleFonts.openSans(fontSize: 22,fontWeight: FontWeight.bold),),
+                    ],
+                  ),
+                ),
+
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.end,
+                  children: [
+                    CustomTextField(
+                      width: 470,
+                      hint: "Enter username", controller: username, validator: (String? val ) {  }, header: "Username",),
+                  ],
+                ),
                 SizedBox(height: 20,),
-                CustomTextField(
-                  width: 470,
-                  hint: "Enter password", controller: password, validator: (String? val ) {  }, header: "Password",),
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.end,
+                  children: [
+                    CustomTextField(
+                      width: 470,
+                      hint: "Enter password", controller: password, validator: (String? val ) {  }, header: "Password",),
+                  ],
+                ),
                 SizedBox(height: 20,),
                 InkWell(
                   onTap: (){
-
                       _signInWithEmailAndPassword();
-
                   },
                   child: Container(
-
-
                     width: 470,
                     height: 50,
                     decoration: BoxDecoration (
@@ -133,4 +173,9 @@ class _LoginPageState extends State<LoginPage> {
         )
     ),
   );
+
+
+
+
+
 }

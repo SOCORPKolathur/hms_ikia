@@ -103,24 +103,21 @@ class _SMSPageState extends State<SMSPage> {
                       mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        ReusableDropdown4Commu(dropDownItems: ['Hostel', 'School', 'police'], hintText: 'Select Yours', onChanged: (value){
-                          print('Selected value: $value');
-                        }),
-                        ReusableDropdown4Commu(dropDownItems: ['Hostel', 'School', 'police'], hintText: 'Select Yours', onChanged: (value){}),
-                        ReusableDropdown4Commu(dropDownItems: ['Hostel', 'School', 'police'], hintText: 'Select Yours', onChanged: (value){}),
-                        ReusableDropdown4Commu(dropDownItems: ['Hostel', 'School', 'police'], hintText: 'Select Yours', onChanged: (value){}),
+                        ReusableDropdown4Commu(dropDownItems: ['Hostel', 'School', 'police'], hintText: 'Notify Type', onChanged: (value){}),
+                        ReusableDropdown4Commu(dropDownItems: ['Hostel', 'School', 'police'], hintText: 'Person', onChanged: (value){}),
+                        ReusableDropdown4Commu(dropDownItems: ['Hostel', 'School', 'police'], hintText: 'Block No', onChanged: (value){}),
+                        ReusableDropdown4Commu(dropDownItems: ['Hostel', 'School', 'police'], hintText: 'Room No', onChanged: (value){}),
                       ],),
-                    const SizedBox(height: 25,),
+                    const SizedBox(height: 20,),
                     Row(
                       mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        ReusableDropdown4Commu(dropDownItems: ['Hostel', 'School', 'police'], hintText: 'Select Yours', onChanged: (value){}),
-                        ReusableDropdown4Commu(dropDownItems: ['Hostel', 'School', 'police'], hintText: 'Select Yours', onChanged: (value){}),
-                        ReusableDropdown4Commu(dropDownItems: ['Hostel', 'School', 'police'], hintText: 'Select Yours', onChanged: (value){}),
-                        ReusableDropdown4Commu(dropDownItems: ['Hostel', 'School', 'police'], hintText: 'Select Yours', onChanged: (value){}),
+                        ReusableDropdown4Commu(dropDownItems: ['Hostel', 'School', 'police'], hintText: 'Gender', onChanged: (value){}),
+                        ReusableDropdown4Commu(dropDownItems: ['Hostel', 'School', 'police'], hintText: 'Blood Group', onChanged: (value){}),
+                        ReusableDropdown4Commu(dropDownItems: ['Hostel', 'School', 'police'], hintText: 'Phone Number', onChanged: (value){}),
+                        ReusableDropdown4Commu(dropDownItems: ['Hostel', 'School', 'police'], hintText: 'Pin Code', onChanged: (value){}),
                       ],),
-                    const SizedBox(height: 10,),
 
                     Container(
                       decoration: BoxDecoration(

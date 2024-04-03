@@ -7,6 +7,7 @@ import 'package:hms_ikia/widgets/customtextfield.dart';
 import 'package:intl/intl.dart';
 
 import '../Constants/constants.dart';
+import '../widgets/kText.dart';
 
 class AssetManagement extends StatefulWidget {
   const AssetManagement({super.key});
@@ -151,7 +152,7 @@ class _AssetManagementState extends State<AssetManagement> {
                                 }, child:
                             Row(
                               children: [
-                                const Text('Add Assets',
+                                const KText(text:'Add Assets',
                                   style: TextStyle(color: Colors.white),),
                                 SizedBox.fromSize(size: const Size(8, 0),),
                                 const CircleAvatar(radius: 12,
@@ -185,7 +186,7 @@ class _AssetManagementState extends State<AssetManagement> {
                                 }, child:
                             const Row(
                               children: [
-                                Text('Report Damage',
+                                KText(text:'Report Damage',
                                   style: TextStyle(color: Colors.white),),
                                 SizedBox(width: 10,),
                                 Icon(Icons.water_damage_rounded,
@@ -228,12 +229,12 @@ class _AssetManagementState extends State<AssetManagement> {
                             Column(
                               mainAxisAlignment: MainAxisAlignment.center,
                               children: [
-                                Text('Total', style: GoogleFonts.openSans(
+                                KText(text:'Total', style: GoogleFonts.openSans(
                                     color: const Color(0xff262626).withOpacity(
                                         0.8),
                                     fontWeight: FontWeight.w500,
                                     fontSize: 19)),
-                                Text('45,000', style: GoogleFonts.openSans(
+                                KText(text:'45,000', style: GoogleFonts.openSans(
                                     color: Colors.black,
                                     fontWeight: FontWeight.w700,
                                     fontSize: 19),)
@@ -248,12 +249,12 @@ class _AssetManagementState extends State<AssetManagement> {
                             child: Column(
                               mainAxisAlignment: MainAxisAlignment.center,
                               children: [
-                                Text('Utilized', style: GoogleFonts.openSans(
+                                KText(text:'Utilized', style: GoogleFonts.openSans(
                                     color: const Color(0xff262626).withOpacity(
                                         0.8),
                                     fontWeight: FontWeight.w500,
                                     fontSize: 19)),
-                                Text('24,000', style: GoogleFonts.openSans(
+                                KText(text:'24,000', style: GoogleFonts.openSans(
                                     fontWeight: FontWeight.w700,
                                     fontSize: 19,
                                     color: const Color(0xff37D1D3)),)
@@ -276,12 +277,12 @@ class _AssetManagementState extends State<AssetManagement> {
                             Column(
                               mainAxisAlignment: MainAxisAlignment.center,
                               children: [
-                                Text('Unutilized', style: GoogleFonts.openSans(
+                                KText(text:'Unutilized', style: GoogleFonts.openSans(
                                     color: const Color(0xff262626).withOpacity(
                                         0.8),
                                     fontWeight: FontWeight.w500,
                                     fontSize: 19)),
-                                Text('21,120', style: GoogleFonts.openSans(
+                                KText(text:'21,120', style: GoogleFonts.openSans(
                                     fontWeight: FontWeight.w700,
                                     color: const Color(0xffFD7E50),
                                     fontSize: 19),)
@@ -297,12 +298,12 @@ class _AssetManagementState extends State<AssetManagement> {
                             child: Column(
                               mainAxisAlignment: MainAxisAlignment.center,
                               children: [
-                                Text('Damaged', style: GoogleFonts.openSans(
+                                KText(text:'Damaged', style: GoogleFonts.openSans(
                                     color: const Color(0xff262626).withOpacity(
                                         0.8),
                                     fontWeight: FontWeight.w500,
                                     fontSize: 19)),
-                                Text('567', style: GoogleFonts.openSans(
+                                KText(text:'567', style: GoogleFonts.openSans(
                                     fontWeight: FontWeight.w700,
                                     color: const Color(0xffF12D2D),
                                     fontSize: 19))
@@ -327,13 +328,13 @@ class _AssetManagementState extends State<AssetManagement> {
                                 child: Column(
                                   crossAxisAlignment: CrossAxisAlignment.start,
                                   children: [
-                                    Text('Expense Monitor',
+                                    KText(text:'Expense Monitor',
                                       style: GoogleFonts.openSans(
                                           fontWeight: FontWeight.w700,
                                           fontSize: 19,
                                           color: const Color(0xff262626)),),
                                     const SizedBox(height: 40,),
-                                    Text('Total Expense',
+                                    KText(text:'Total Expense',
                                         style: GoogleFonts.openSans(
                                             fontWeight: FontWeight.w500,
                                             fontSize: 19,
@@ -346,7 +347,7 @@ class _AssetManagementState extends State<AssetManagement> {
                                             color: const Color(0xff37D1D3))),
                                     const SizedBox(height: 30,),
 
-                                    Text('Unpaid Payments',
+                                    KText(text:'Unpaid Payments',
                                         style: GoogleFonts.openSans(
                                             fontWeight: FontWeight.w500,
                                             fontSize: 19,
@@ -376,12 +377,12 @@ class _AssetManagementState extends State<AssetManagement> {
                                       mainAxisAlignment: MainAxisAlignment
                                           .spaceEvenly,
                                       children: [
-                                        Text('Highest Expense',
+                                        KText(text:'Highest Expense',
                                           style: GoogleFonts.openSans(
                                               color: Colors.black54,
                                               fontSize: 14,
                                               fontWeight: FontWeight.w600),),
-                                        Text('Beds',
+                                        KText(text:'Beds',
                                           style: GoogleFonts.openSans(
                                               fontWeight: FontWeight.w700,
                                               color: Colors.black,
@@ -407,12 +408,12 @@ class _AssetManagementState extends State<AssetManagement> {
                                       mainAxisAlignment: MainAxisAlignment
                                           .spaceEvenly,
                                       children: [
-                                        Text('Lowest Expense',
+                                        KText(text:'Lowest Expense',
                                           style: GoogleFonts.openSans(
                                               color: Colors.black54,
                                               fontSize: 14,
                                               fontWeight: FontWeight.w600),),
-                                        Text('Irons',
+                                        KText(text:'Irons',
                                           style: GoogleFonts.openSans(
                                               fontWeight: FontWeight.w700,
                                               color: Colors.black,
@@ -490,7 +491,7 @@ class _AssetManagementState extends State<AssetManagement> {
                                       textStyle: const TextStyle(fontSize: 20)),
                                   child: Row(
                                     children: [
-                                      const Text('Add Category',
+                                      const KText(text:'Add Category',
                                         style: TextStyle(
                                             color: Color(0xff37D1D3)),),
                                       SizedBox.fromSize(
@@ -534,7 +535,7 @@ class _AssetManagementState extends State<AssetManagement> {
                                               mainAxisAlignment: MainAxisAlignment
                                                   .center,
                                               children: [
-                                                Text('Bed',
+                                                KText(text:'Bed',
                                                     style: GoogleFonts.openSans(
                                                         fontWeight: FontWeight
                                                             .w500,
@@ -579,7 +580,7 @@ class _AssetManagementState extends State<AssetManagement> {
                           child: Column(
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
-                              Text('Recent Entry Records',
+                              KText(text:'Recent Entry Records',
                                 style: GoogleFonts.openSans(
                                     fontWeight: FontWeight.w700,
                                     fontSize: 20),),
@@ -615,7 +616,7 @@ class _AssetManagementState extends State<AssetManagement> {
                                                       mainAxisAlignment: MainAxisAlignment
                                                           .start,
                                                       children: [
-                                                        Text('Bed',
+                                                        KText(text:'Bed',
                                                           style: GoogleFonts
                                                               .openSans(
                                                               fontSize: 15,
@@ -627,10 +628,10 @@ class _AssetManagementState extends State<AssetManagement> {
                                                         Row(children: [
                                                           Container(
                                                               width: 100,
-                                                              child: Text(
-                                                                'Double Bed with kitchen',
-                                                                overflow: TextOverflow
-                                                                    .ellipsis,
+                                                              child: KText(
+                                                               text: 'Double Bed with kitchen',
+                                                                // overflow: TextOverflow
+                                                                //     .ellipsis,
                                                                 style: GoogleFonts
                                                                     .openSans(
                                                                     fontSize: 15,
@@ -667,7 +668,7 @@ class _AssetManagementState extends State<AssetManagement> {
                                                             fontSize: 20)),
                                                     child: Row(
                                                       children: [
-                                                        const Text('Details',
+                                                        const KText(text:'Details',
                                                           style: TextStyle(
                                                               color: Color(
                                                                   0xff37D1D3)),),
@@ -707,322 +708,6 @@ class _AssetManagementState extends State<AssetManagement> {
     );
   }
 
-//   Asset Damage
-//   Future<void> AssetDamagePopUp() async {
-//     return showDialog<void>(
-//       context: context,
-//       barrierDismissible: false,
-//       builder: (BuildContext context) {
-//         return AlertDialog(
-//           title: Row(
-//             mainAxisAlignment: MainAxisAlignment.spaceBetween,
-//             children: [
-//               const Text('Add Room'),
-//               InkWell(
-//                 onTap: () => Navigator.pop(context),
-//                 child: Icon(Icons.no_accounts),
-//               ),
-//             ],
-//           ),
-//           content: Container(
-//             width: 700,
-//             height: 250,
-//             child: Column(
-//               children: [
-//                 Divider(color: Colors.grey, thickness: 2, height: 0.5),
-//                 Row(
-//                   mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-//                   children: [
-//                     Padding(
-//                       padding: const EdgeInsets.only(top: 8.0),
-//                       child: Container(
-//                         width: 220,
-//                         height: 50,
-//                         decoration: BoxDecoration(
-//                           border: Border.all(color: const Color(0x7f262626),),
-//                           borderRadius: BorderRadius.circular(30),
-//                         ),
-//                         child: Padding(
-//                           padding: const EdgeInsets.only(left: 12.0, right: 6),
-//                           child: DropdownButtonHideUnderline(
-//                             child: DropdownButtonFormField<String>(
-//                               isExpanded: true,
-//                               hint: const Text(
-//                                 'Assets Catogory',
-//                                 style: TextStyle(
-//                                   fontSize: 12,
-//                                   fontWeight: FontWeight.w600,
-//                                   color: Color(0x7f262626),
-//                                 ),
-//                               ),
-//                               items: assetsCategory.map((String item) {
-//                                 return DropdownMenuItem<String>(
-//                                   value: item,
-//                                   child: Text(
-//                                     item,
-//                                     style: const TextStyle(
-//                                       fontSize: 12,
-//                                       fontWeight: FontWeight.w600,
-//                                     ),
-//                                   ),
-//                                 );
-//                               }).toList(),
-//                               value: selectedAssetsCategory,
-//                               onChanged: (String? value) {
-//                                 setState(() {
-//                                   selectedAssetsCategory = value!;
-//                                 });
-//                               },
-//                               decoration: const InputDecoration(
-//                                   border: InputBorder.none),
-//                             ),
-//                           ),
-//                         ),
-//                       ),
-//                     ),
-//
-//                     Padding(
-//                       padding: const EdgeInsets.only(top: 8.0),
-//                       child: Container(
-//                         width: 220,
-//                         height: 50,
-//                         decoration: BoxDecoration(
-//                           border: Border.all(color: const Color(0x7f262626),),
-//                           borderRadius: BorderRadius.circular(30),
-//                         ),
-//                         child: Padding(
-//                           padding: const EdgeInsets.only(left: 12.0, right: 6),
-//                           child: DropdownButtonHideUnderline(
-//                             child: DropdownButtonFormField<String>(
-//                               isExpanded: true,
-//                               hint: const Text(
-//                                 'Select Damage Level',
-//                                 style: TextStyle(
-//                                   fontSize: 12,
-//                                   fontWeight: FontWeight.w600,
-//                                   color: Color(0x7f262626),
-//                                 ),
-//                               ),
-//                               items: damageLevel.map((String item) {
-//                                 return DropdownMenuItem<String>(
-//                                   value: item,
-//                                   child: Text(
-//                                     item,
-//                                     style: const TextStyle(
-//                                       fontSize: 12,
-//                                       fontWeight: FontWeight.w600,
-//                                     ),
-//                                   ),
-//                                 );
-//                               }).toList(),
-//                               value: selectedDamageLevel,
-//                               onChanged: (String? value) {
-//                                 setState(() {
-//                                   selectedDamageLevel = value!;
-//                                 });
-//                               },
-//                               decoration: const InputDecoration(
-//                                   border: InputBorder.none),
-//                             ),
-//                           ),
-//                         ),
-//                       ),
-//                     ),
-//
-//                     Padding(
-//                       padding: const EdgeInsets.only(top: 8.0),
-//                       child: Container(
-//                         width: 220,
-//                         height: 50,
-//                         decoration: BoxDecoration(
-//                           border: Border.all(color: const Color(0x7f262626),),
-//                           borderRadius: BorderRadius.circular(30),
-//                         ),
-//                         child: Padding(
-//                           padding: const EdgeInsets.only(left: 12.0, right: 6),
-//                           child: DropdownButtonHideUnderline(
-//                             child: DropdownButtonFormField<String>(
-//                               isExpanded: true,
-//                               hint: const Text(
-//                                 'Assets Catogory',
-//                                 style: TextStyle(
-//                                   fontSize: 12,
-//                                   fontWeight: FontWeight.w600,
-//                                   color: Color(0x7f262626),
-//                                 ),
-//                               ),
-//                               items: selectProduct.map((String item) {
-//                                 return DropdownMenuItem<String>(
-//                                   value: item,
-//                                   child: Text(
-//                                     item,
-//                                     style: const TextStyle(
-//                                       fontSize: 12,
-//                                       fontWeight: FontWeight.w600,
-//                                     ),
-//                                   ),
-//                                 );
-//                               }).toList(),
-//                               value: selectedProduct,
-//                               onChanged: (String? value) {
-//                                 setState(() {
-//                                   selectedProduct = value!;
-//                                 });
-//                               },
-//                               decoration: const InputDecoration(
-//                                   border: InputBorder.none),
-//                             ),
-//                           ),
-//                         ),
-//                       ),
-//                     ),
-//                   ],
-//                 ),
-//                 SizedBox(height: 20),
-//                 Row(
-//                   mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-//                   children: [
-//                     Padding(
-//                       padding: const EdgeInsets.only(top: 8.0),
-//                       child: Container(
-//                         width: 220,
-//                         height: 50,
-//                         decoration: BoxDecoration(
-//                           border: Border.all(color: const Color(0x7f262626),),
-//                           borderRadius: BorderRadius.circular(30),
-//                         ),
-//                         child: Padding(
-//                           padding: const EdgeInsets.only(left: 12.0, right: 6),
-//                           child: DropdownButtonHideUnderline(
-//                             child: DropdownButtonFormField<String>(
-//                               isExpanded: true,
-//                               hint: const Text(
-//                                 'Assets Catogory',
-//                                 style: TextStyle(
-//                                   fontSize: 12,
-//                                   fontWeight: FontWeight.w600,
-//                                   color: Color(0x7f262626),
-//                                 ),
-//                               ),
-//                               items: selectProduct.map((String item) {
-//                                 return DropdownMenuItem<String>(
-//                                   value: item,
-//                                   child: Text(
-//                                     item,
-//                                     style: const TextStyle(
-//                                       fontSize: 12,
-//                                       fontWeight: FontWeight.w600,
-//                                     ),
-//                                   ),
-//                                 );
-//                               }).toList(),
-//                               value: selectedProduct,
-//                               onChanged: (String? value) {
-//                                 setState(() {
-//                                   selectedProduct = value!;
-//                                 });
-//                               },
-//                               decoration: const InputDecoration(
-//                                   border: InputBorder.none),
-//                             ),
-//                           ),
-//                         ),
-//                       ),
-//                     ),
-//                     Padding(
-//                       padding: const EdgeInsets.only(top: 8.0),
-//                       child: Container(
-//                         width: 420,
-//                         height: 50,
-//                         decoration: BoxDecoration(
-//                           border: Border.all(color: const Color(0x7f262626),),
-//                           borderRadius: BorderRadius.circular(30),
-//                         ),
-//                         child: Padding(
-//                           padding: const EdgeInsets.only(left: 12.0, right: 6),
-//                           child: DropdownButtonHideUnderline(
-//                             child: DropdownButtonFormField<String>(
-//                               isExpanded: true,
-//                               hint: const Text(
-//                                 'Assets Catogory',
-//                                 style: TextStyle(
-//                                   fontSize: 12,
-//                                   fontWeight: FontWeight.w600,
-//                                   color: Color(0x7f262626),
-//                                 ),
-//                               ),
-//                               items: selectProduct.map((String item) {
-//                                 return DropdownMenuItem<String>(
-//                                   value: item,
-//                                   child: Text(
-//                                     item,
-//                                     style: const TextStyle(
-//                                       fontSize: 12,
-//                                       fontWeight: FontWeight.w600,
-//                                     ),
-//                                   ),
-//                                 );
-//                               }).toList(),
-//                               value: selectedProduct,
-//                               onChanged: (String? value) {
-//                                 setState(() {
-//                                   selectedProduct = value!;
-//                                 });
-//                               },
-//                               decoration: const InputDecoration(
-//                                   border: InputBorder.none),
-//                             ),
-//                           ),
-//                         ),
-//                       ),
-//                     ),
-//                   ],
-//                 ),
-//
-//
-//                 Row(
-//                   mainAxisAlignment: MainAxisAlignment.end,
-//                   children: [
-//                     Container(
-//                       height: 40,
-//                       child: ElevatedButton(
-//                         style: ButtonStyle(
-//                             elevation: MaterialStatePropertyAll(0.4),
-//                             backgroundColor: MaterialStatePropertyAll(Color(0xfff5f6f7))),
-//                         onPressed: () {
-//                         },
-//                         child: Text('Cancle', style: GoogleFonts.openSans(fontWeight: FontWeight.w700, color: Color(0xff37d1d3)),),
-//                       ),
-//                     ),
-//                     SizedBox(width: 20,),
-//                     Container(
-//                       height: 40,
-//                       child: ElevatedButton(
-//                         style: ButtonStyle(backgroundColor: MaterialStatePropertyAll(Color(0xffF12D2D))),
-//                         onPressed: () {
-//                         },
-//                         child: Row(
-//                           children: [
-//                             Text('Report Damage', style: GoogleFonts.openSans(color: Color(0xffFFFFFF), fontWeight: FontWeight.w600),),
-//                             SizedBox(
-//                                 height: 20, width:20,
-//                                 child: Image.asset('assets/ui-design-/images/Factory Breakdown.png')),
-//
-//                           ],
-//                         ),
-//                       ),
-//                     ),
-//
-//                   ],
-//                 ),
-//               ],
-//             ),
-//           ),
-//         );
-//       },
-//     );
-//   }
-
   Future<void> AssetDamagePopUp() async {
     return showDialog<void>(
       context: context,
@@ -1034,7 +719,7 @@ class _AssetManagementState extends State<AssetManagement> {
           title: Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              Text('Add Room', style: GoogleFonts.openSans(fontWeight: FontWeight.w700, fontSize: 18),),
+              KText(text:'Add Room', style: GoogleFonts.openSans(fontWeight: FontWeight.w700, fontSize: 18),),
               InkWell(
                 onTap: () => Navigator.pop(context),
                 child: Container(
@@ -1091,7 +776,7 @@ class _AssetManagementState extends State<AssetManagement> {
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
                           // block name
-                          Text('Select Assets Category', style: GoogleFonts.openSans(color: const Color(0xff262626).withOpacity(0.6), fontSize: 16, fontWeight: FontWeight.w600),),
+                          KText(text:'Select Assets Category', style: GoogleFonts.openSans(color: const Color(0xff262626).withOpacity(0.6), fontSize: 16, fontWeight: FontWeight.w600),),
 
                           Padding(
                             padding: const EdgeInsets.only(bottom: 10, top: 10),
@@ -1113,8 +798,8 @@ class _AssetManagementState extends State<AssetManagement> {
                                     elevation: 1,
                                     focusColor: Colors.white,
                                     isExpanded: true,
-                                    hint: const Text(
-                                      'Select Category',
+                                    hint: const KText(
+                                      text:'Select Category',
                                       style: TextStyle(
                                         fontSize: 12,
                                         fontWeight: FontWeight.w600,
@@ -1124,8 +809,8 @@ class _AssetManagementState extends State<AssetManagement> {
                                     items: assetsCategory.map((String item) {
                                       return DropdownMenuItem<String>(
                                         value: item,
-                                        child: Text(
-                                          item,
+                                        child: KText(
+                                         text: item,
                                           style: const TextStyle(
                                             color: Color(0x7f262626),
                                             fontSize: 12,
@@ -1156,7 +841,7 @@ class _AssetManagementState extends State<AssetManagement> {
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
                           // block name
-                          Text('Select Damage Level', style: GoogleFonts.openSans(color: const Color(0xff262626).withOpacity(0.6), fontSize: 16, fontWeight: FontWeight.w600),),
+                          KText(text:'Select Damage Level', style: GoogleFonts.openSans(color: const Color(0xff262626).withOpacity(0.6), fontSize: 16, fontWeight: FontWeight.w600),),
 
                           Padding(
                             padding: const EdgeInsets.only(bottom: 10, top: 10),
@@ -1178,8 +863,8 @@ class _AssetManagementState extends State<AssetManagement> {
                                     elevation: 1,
                                     focusColor: Colors.white,
                                     isExpanded: true,
-                                    hint: const Text(
-                                      'Select Category',
+                                    hint: const KText(
+                                      text:'Select Category',
                                       style: TextStyle(
                                         fontSize: 12,
                                         fontWeight: FontWeight.w600,
@@ -1189,8 +874,8 @@ class _AssetManagementState extends State<AssetManagement> {
                                     items: damageLevel.map((String item) {
                                       return DropdownMenuItem<String>(
                                         value: item,
-                                        child: Text(
-                                          item,
+                                        child: KText(
+                                         text: item,
                                           style: const TextStyle(
                                             color: Color(0x7f262626),
                                             fontSize: 12,
@@ -1221,7 +906,7 @@ class _AssetManagementState extends State<AssetManagement> {
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
                           // block name
-                          Text('Select Product', style: GoogleFonts.openSans(color: const Color(0xff262626).withOpacity(0.6), fontSize: 16, fontWeight: FontWeight.w600),),
+                          KText(text:'Select Product', style: GoogleFonts.openSans(color: const Color(0xff262626).withOpacity(0.6), fontSize: 16, fontWeight: FontWeight.w600),),
                           Padding(
                             padding: const EdgeInsets.only(bottom: 10, top: 10),
                             child: Container(
@@ -1242,8 +927,8 @@ class _AssetManagementState extends State<AssetManagement> {
                                     elevation: 1,
                                     focusColor: Colors.white,
                                     isExpanded: true,
-                                    hint: const Text(
-                                      'Select Category',
+                                    hint: const KText(
+                                     text: 'Select Category',
                                       style: TextStyle(
                                         fontSize: 12,
                                         fontWeight: FontWeight.w600,
@@ -1253,8 +938,8 @@ class _AssetManagementState extends State<AssetManagement> {
                                     items: selectProduct.map((String item) {
                                       return DropdownMenuItem<String>(
                                         value: item,
-                                        child: Text(
-                                          item,
+                                        child: KText(
+                                         text: item,
                                           style: const TextStyle(
                                             color: Color(0x7f262626),
                                             fontSize: 12,
@@ -1291,7 +976,7 @@ class _AssetManagementState extends State<AssetManagement> {
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
                           // block name
-                          Text('Select Product', style: GoogleFonts.openSans(color: const Color(0xff262626).withOpacity(0.6), fontSize: 16, fontWeight: FontWeight.w600),),
+                          KText(text: 'Select Product', style: GoogleFonts.openSans(color: const Color(0xff262626).withOpacity(0.6), fontSize: 16, fontWeight: FontWeight.w600),),
                           Padding(
                             padding: const EdgeInsets.only(bottom: 10, top: 10),
                             child: Container(
@@ -1312,8 +997,8 @@ class _AssetManagementState extends State<AssetManagement> {
                                     elevation: 1,
                                     focusColor: Colors.white,
                                     isExpanded: true,
-                                    hint: const Text(
-                                      'Select Category',
+                                    hint: const KText(
+                                     text:'Select Category',
                                       style: TextStyle(
                                         fontSize: 12,
                                         fontWeight: FontWeight.w600,
@@ -1323,8 +1008,8 @@ class _AssetManagementState extends State<AssetManagement> {
                                     items: selectProduct.map((String item) {
                                       return DropdownMenuItem<String>(
                                         value: item,
-                                        child: Text(
-                                          item,
+                                        child: KText(
+                                          text: item,
                                           style: const TextStyle(
                                             color: Color(0x7f262626),
                                             fontSize: 12,
@@ -1354,7 +1039,7 @@ class _AssetManagementState extends State<AssetManagement> {
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
                           // block name
-                          Text('Select Product', style: GoogleFonts.openSans(color: const Color(0xff262626).withOpacity(0.6), fontSize: 16, fontWeight: FontWeight.w600),),
+                          KText(text: 'Select Product', style: GoogleFonts.openSans(color: const Color(0xff262626).withOpacity(0.6), fontSize: 16, fontWeight: FontWeight.w600),),
                           Padding(
                             padding: const EdgeInsets.only(bottom: 10, top: 10),
                             child: Container(
@@ -1375,8 +1060,8 @@ class _AssetManagementState extends State<AssetManagement> {
                                     elevation: 1,
                                     focusColor: Colors.white,
                                     isExpanded: true,
-                                    hint: const Text(
-                                      'Select Category',
+                                    hint: const KText(
+                                      text: 'Select Category',
                                       style: TextStyle(
                                         fontSize: 12,
                                         fontWeight: FontWeight.w600,
@@ -1386,8 +1071,8 @@ class _AssetManagementState extends State<AssetManagement> {
                                     items: selectProduct.map((String item) {
                                       return DropdownMenuItem<String>(
                                         value: item,
-                                        child: Text(
-                                          item,
+                                        child: KText(
+                                         text: item,
                                           style: const TextStyle(
                                             color: Color(0x7f262626),
                                             fontSize: 12,
@@ -1430,8 +1115,8 @@ class _AssetManagementState extends State<AssetManagement> {
                             elevation: MaterialStatePropertyAll(0),
                             backgroundColor: MaterialStatePropertyAll(Color(0xfff5f6f7))),
                         onPressed: (){}, child:
-                      Text(
-                        'Cancle',
+                      KText(
+                        text: 'Cancel',
                         style: GoogleFonts.openSans(
                           fontSize: 13,
                           fontWeight: FontWeight.w600,
@@ -1454,8 +1139,8 @@ class _AssetManagementState extends State<AssetManagement> {
                           children: [
                             Row(
                               children: [
-                                Text(
-                                  'Report Damage',
+                                KText(
+                                 text: 'Report Damage',
                                   style: GoogleFonts.openSans(
                                     fontSize: 13,
                                     fontWeight: FontWeight.w600,
@@ -1527,8 +1212,8 @@ class _AssetManagementState extends State<AssetManagement> {
                                       mainAxisAlignment: MainAxisAlignment.end,
                                       children: [
                                         // Text('                                                                            '),
-                                        Text(
-                                          'Add Asset Details',
+                                        KText(
+                                          text: 'Add Asset Details',
                                           style: GoogleFonts.openSans (
                                             fontSize: 24*ffem,
                                             fontWeight: FontWeight.w700,
@@ -1615,9 +1300,9 @@ class _AssetManagementState extends State<AssetManagement> {
                             children: [
                               Padding(
                                 padding: const EdgeInsets.only(left: 10.0),
-                                child: Text(
+                                child: KText(
                                   // addresidentdetailsvyb (87:1511)
-                                  'Asset Photo',
+                                 text: 'Asset Photo',
                                   style: GoogleFonts.openSans (
                                     fontSize: 21*ffem,
                                     fontWeight: FontWeight.w700,
@@ -1682,9 +1367,9 @@ class _AssetManagementState extends State<AssetManagement> {
                                             constraints: BoxConstraints (
                                               maxWidth: 155*fem,
                                             ),
-                                            child: Text(
-                                              'Upload Resident Photo\n( 150px * 150px)',
-                                              textAlign: TextAlign.center,
+                                            child: KText(
+                                              text:'Upload Resident Photo\n( 150px * 150px)',
+                                              // textAlign: TextAlign.center,
                                               style: GoogleFonts.openSans (
                                                 fontSize: 14*ffem,
                                                 fontWeight: FontWeight.w600,
@@ -1715,8 +1400,8 @@ class _AssetManagementState extends State<AssetManagement> {
                                             Container(
                                               // chooseimagebVP (87:1521)
                                               margin: EdgeInsets.fromLTRB(0*fem, 0*fem, 12*fem, 0*fem),
-                                              child: Text(
-                                                'Choose Image',
+                                              child: KText(
+                                                text:'Choose Image',
                                                 style: GoogleFonts.openSans (
                                                   fontSize: 16*ffem,
                                                   fontWeight: FontWeight.w700,
@@ -1747,8 +1432,8 @@ class _AssetManagementState extends State<AssetManagement> {
                                 padding: const EdgeInsets.only(left: 10),
                                 child: Container(
                                   width: double.infinity,
-                                  child: Text(
-                                    'Assets Details',
+                                  child: KText(
+                                   text:'Assets Details',
                                     style: GoogleFonts.openSans (
                                       fontSize: 20*ffem,
                                       fontWeight: FontWeight.w700,
@@ -1771,9 +1456,6 @@ class _AssetManagementState extends State<AssetManagement> {
                           children: [
                             const SizedBox(width: 18,),
                             CustomTextField(header: "Asset Name",hint: "Enter the Asset name",controller: AssetName,validator: null,),
-
-
-
                             const SizedBox(width: 18,),
           Column(
             crossAxisAlignment: CrossAxisAlignment.start,
@@ -1782,8 +1464,8 @@ class _AssetManagementState extends State<AssetManagement> {
               Padding(
                 padding: const EdgeInsets.only(left: 10),
                 child: Container(
-                  child: Text(
-                    '',
+                  child: KText(
+                    text:'',
                     style: GoogleFonts.openSans(
                       fontSize: 14,
                       fontWeight: FontWeight.w600,
@@ -1849,9 +1531,6 @@ class _AssetManagementState extends State<AssetManagement> {
                           mainAxisAlignment: MainAxisAlignment.start,
                           children: [
                             SizedBox(width: 18,),
-                            // CustomTextField(header: "AMC Date",hint: "Enter middle name",controller: amcDateController,validator: null,),
-                            //
-                            // AMC
                             Padding(
                               padding: EdgeInsets.only(),
                               child: Container(
@@ -1895,7 +1574,6 @@ class _AssetManagementState extends State<AssetManagement> {
                                 ),
                               ),
                             ),
-
                             SizedBox(width: 18,),
                             // Insurance
                             Padding(
@@ -1958,10 +1636,8 @@ class _AssetManagementState extends State<AssetManagement> {
                                   onTap: (){
                                     Navigator.pop(context);
                                   },
-                                  child: Text('Back', style: GoogleFonts.openSans(fontWeight: FontWeight.w600, color: Color(0xff37D1D3)),))
+                                  child: KText(text:'Back', style: GoogleFonts.openSans(fontWeight: FontWeight.w600, color: Color(0xff37D1D3)),))
                             ],),
-
-
                             Row(
                               mainAxisAlignment: MainAxisAlignment.end,
                               children: [
@@ -1974,8 +1650,8 @@ class _AssetManagementState extends State<AssetManagement> {
                                         backgroundColor: MaterialStatePropertyAll(Color(0xfff5f6f7))),
                                     onPressed: (){
                                     }, child:
-                                  Text(
-                                    'Cancle',
+                                  KText(
+                                    text:'Cancel',
                                     style: GoogleFonts.openSans(
                                       fontSize: 13,
                                       fontWeight: FontWeight.w600,
@@ -1998,8 +1674,8 @@ class _AssetManagementState extends State<AssetManagement> {
                                       children: [
                                         Row(
                                           children: [
-                                            Text(
-                                              'Add',
+                                            KText(
+                                              text: 'Add',
                                               style: GoogleFonts.openSans(
                                                 fontSize: 13,
                                                 fontWeight: FontWeight.w600,
@@ -2013,15 +1689,12 @@ class _AssetManagementState extends State<AssetManagement> {
                                           ],
                                         ),
                                         const SizedBox(width: 8),
-
                                       ],
                                     ),
                                   ),
                                 ),
                               ],
                             ),
-
-
                           ],
                         )
                       ],
@@ -2034,17 +1707,6 @@ class _AssetManagementState extends State<AssetManagement> {
       },
     );
   }
-
-
-
-
-
-
-
-
-
-
-
 // create a assets
   final CollectionReference assetsCollection =
   FirebaseFirestore.instance.collection('assets');

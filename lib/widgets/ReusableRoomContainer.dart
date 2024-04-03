@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:hms_ikia/widgets/kText.dart';
 
 class ReusableRoomContainer extends StatefulWidget {
   final Color firstColor;
@@ -58,7 +59,7 @@ class _ReusableRoomContainerState extends State<ReusableRoomContainer> {
           top: 40,
           child: Container(
               width: 60,
-              child: Text(widget.totalRooms, style: TextStyle(fontSize: 45,fontWeight: FontWeight.w900,color: Colors.white, letterSpacing: 2))
+              child: KText(text:widget.totalRooms, style: TextStyle(fontSize: 45,fontWeight: FontWeight.w900,color: Colors.white, letterSpacing: 2))
           ),
         ),
 
@@ -90,7 +91,7 @@ class _ReusableRoomContainerState extends State<ReusableRoomContainer> {
               SizedBox(height: 30,),
               SizedBox(
                   width: 170,
-                  child: Text(widget.title,style: GoogleFonts.openSans(fontWeight: FontWeight.w600, fontSize: 21,color: Colors.white, letterSpacing: 1),))
+                  child: KText(text: widget.title,style: GoogleFonts.openSans(fontWeight: FontWeight.w600, fontSize: 21,color: Colors.white, letterSpacing: 1),))
             ],
           ),
         )

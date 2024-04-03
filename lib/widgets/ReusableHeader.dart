@@ -1,6 +1,7 @@
 
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:hms_ikia/widgets/kText.dart';
 
 import 'ContainerIcon.dart';
 class ReusableHeader extends StatefulWidget {
@@ -22,26 +23,33 @@ class _ReusableHeaderState extends State<ReusableHeader> {
         Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Text(widget.Headertext,
+            KText(text:widget.Headertext,
               style: GoogleFonts.openSans(
                 fontSize: 28,
                 fontWeight: FontWeight.w700,
                 color: Colors.black,
               ),
             ),
+        //     KText(text: widget.Headertext, style: GoogleFonts.openSans(
+        //   fontSize: 28,
+        //   fontWeight: FontWeight.w700,
+        //   color: Colors.black,
+        // ),),
+
+
             const SizedBox(height: 8,),
-             Text(widget.SubHeadingtext),
+            KText(text:widget.SubHeadingtext, style: GoogleFonts.openSans(),),
           ],),
-         const SizedBox(
-          width: 150,
-          child: Row(
-            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-            children: [
-              ContainerIcon(imagePath: 'assets/ui-design-/images/doorbell-bg.png'),
-              ContainerIcon(imagePath: 'assets/ui-design-/images/translator.png'),
-              ContainerIcon(imagePath: 'assets/ui-design-/images/gear.png'),
-            ],),
-        )
+        //  const SizedBox(
+        //   width: 150,
+        //   child: Row(
+        //     mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+        //     children: [
+        //       ContainerIcon(imagePath: 'assets/ui-design-/images/doorbell-bg.png'),
+        //       ContainerIcon(imagePath: 'assets/ui-design-/images/translator.png'),
+        //       ContainerIcon(imagePath: 'assets/ui-design-/images/gear.png'),
+        //     ],),
+        // )
       ],);
   }
 }

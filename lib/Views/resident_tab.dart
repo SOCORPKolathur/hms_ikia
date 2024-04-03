@@ -26,11 +26,11 @@ class Resident_Tab extends StatefulWidget {
 }
 
 class _Resident_TabState extends State<Resident_Tab> {
+  // list for the export data
+
   // for the search one
   TextEditingController searchNamePhone = TextEditingController();
-
   bool adduser = false;
-
   void updateDisplay(bool newValue) {
     setState(() {
       adduser = newValue;
@@ -67,8 +67,8 @@ class _Resident_TabState extends State<Resident_Tab> {
                           Container(
                             // welcomeeswarane5s (41:666)
                             margin: EdgeInsets.fromLTRB(0*fem, 0*fem, 0*fem, 9*fem),
-                            child: Text(
-                              'Resident Management',
+                            child: KText(
+                              text:'Resident Management',
                               style: GoogleFonts.openSans (
                                 fontSize: 28*ffem,
                                 fontWeight: FontWeight.w700,
@@ -77,9 +77,9 @@ class _Resident_TabState extends State<Resident_Tab> {
                               ),
                             ),
                           ),
-                          Text(
+                          KText(
                             // effortlesslymanageyourusersx6Z (41:667)
-                            '“EFFORTLESSLY MANAGE YOUR USERS”',
+                            text: '“EFFORTLESSLY MANAGE YOUR USERS”',
                             style: GoogleFonts.openSans (
                               fontSize: 16*ffem,
                               fontWeight: FontWeight.w600,
@@ -145,8 +145,8 @@ class _Resident_TabState extends State<Resident_Tab> {
                             Container(
                               // addnewresidentVJm (55:1416)
                               margin: EdgeInsets.fromLTRB(0*fem, 0*fem, 10*fem, 0*fem),
-                              child: Text(
-                                'Add New Resident',
+                              child: KText(
+                                text: 'Add New Resident',
                                 style: GoogleFonts.openSans (
                                   fontSize: 16*ffem,
                                   fontWeight: FontWeight.w700,
@@ -174,55 +174,23 @@ class _Resident_TabState extends State<Resident_Tab> {
                           SizedBox(
                       width: 164*fem,
                     ),
-                    Container(
-                      // frame5090oXj (55:1430)
-                      padding: EdgeInsets.fromLTRB(24*fem, 16*fem, 24*fem, 16*fem),
-                      height: double.infinity,
-                      decoration: BoxDecoration (
-                        color: const Color(0xff37d1d3),
-                        borderRadius: BorderRadius.circular(99*fem),
-                        boxShadow: [
-                          BoxShadow(
-                            color: const Color(0x4c000000),
-                            offset: Offset(0*fem, 1*fem),
-                            blurRadius: 1.5*fem,
-                          ),
-                          BoxShadow(
-                            color: const Color(0x3f32325d),
-                            offset: Offset(0*fem, 2*fem),
-                            blurRadius: 2.5*fem,
-                          ),
-                        ],
-                      ),
-                      child: Row(
-                        crossAxisAlignment: CrossAxisAlignment.end,
-                        children: [
-                          Container(
-                            // exportdatag5j (55:1431)
-                            margin: EdgeInsets.fromLTRB(0*fem, 0*fem, 10*fem, 0*fem),
-                            child: Text(
-                              'Export Data',
-                              style: GoogleFonts.openSans (
-
-                                fontSize: 16*ffem,
-                                fontWeight: FontWeight.w700,
-                                height: 1.3625*ffem/fem,
-                                color: const Color(0xffffffff),
-                              ),
-                            ),
-                          ),
-                          SizedBox(
-                            // databaseexportbyP (59:1856)
-                            width: 24*fem,
-                            height: 24*fem,
-                            child: Image.asset(
-                              'assets/ui-design-/images/database-export.png',
-                              fit: BoxFit.contain,
-                            ),
-                          ),
-                        ],
-                      ),
-                    ),
+                Container(
+                  height: 60,
+                  child: ElevatedButton(
+                      style: const ButtonStyle(backgroundColor: MaterialStatePropertyAll(Color(0xff37D1D3))),
+                      onPressed: (){
+                    showPopup(context);
+                  }, child: Row(
+                    children: [
+                       Text('Export Data', style: GoogleFonts.openSans(fontSize: 17, fontWeight: FontWeight.w600, color: Colors.white),),
+                     SizedBox(width: 4,),
+                      SizedBox(
+                          width: 30,
+                          height: 30,
+                          child: Image.asset('assets/ui-design-/images/Database Export.png'))
+                    ],
+                  )),
+                )
                   ],
                 ),
               ),
@@ -241,7 +209,7 @@ class _Resident_TabState extends State<Resident_Tab> {
                   setState(() {
 
                 }
-                );},suffixIcon: Icons.search,controller: searchNamePhone, fillColor: Color(0xffF5F5F5),validator: (String) {
+                );},suffixIcon: Icons.search,controller: searchNamePhone, fillColor: const Color(0xffF5F5F5), validator: (String) {
               },)
               ),
               SingleChildScrollView(
@@ -268,7 +236,8 @@ class _Resident_TabState extends State<Resident_Tab> {
                             Container(
                               // no73s (55:1496)
                               margin: EdgeInsets.fromLTRB(0*fem, 0*fem, 88*fem, 0*fem),
-                              child: Text(
+                              child: KText(
+                                text:
                                 'No.',
                                 style: GoogleFonts.openSans (
                                   fontSize: 20*ffem,
@@ -281,7 +250,8 @@ class _Resident_TabState extends State<Resident_Tab> {
                             Container(
                               // profilepU5 (55:1497)
                               margin: EdgeInsets.fromLTRB(0*fem, 0*fem, 101*fem, 0*fem),
-                              child: Text(
+                              child: KText(
+                                text:
                                 'Profile',
                                 style: GoogleFonts.openSans (
                 
@@ -295,8 +265,8 @@ class _Resident_TabState extends State<Resident_Tab> {
                             Container(
                               // nameYQ5 (55:1498)
                               margin: EdgeInsets.fromLTRB(0*fem, 0*fem, 101*fem, 0*fem),
-                              child: Text(
-                                'Name',
+                              child: KText(
+                               text: 'Name',
                                 style: GoogleFonts.openSans (
                 
                                   fontSize: 20*ffem,
@@ -309,8 +279,8 @@ class _Resident_TabState extends State<Resident_Tab> {
                             Container(
                               // status47X (55:1499)
                               margin: EdgeInsets.fromLTRB(0*fem, 0*fem, 101*fem, 0*fem),
-                              child: Text(
-                                'Status',
+                              child: KText(
+                               text: 'Status',
                                 style: GoogleFonts.openSans (
                 
                                   fontSize: 20*ffem,
@@ -323,8 +293,8 @@ class _Resident_TabState extends State<Resident_Tab> {
                             Container(
                               // phonenoNtu (55:1500)
                               margin: EdgeInsets.fromLTRB(0*fem, 0*fem, 108*fem, 0*fem),
-                              child: Text(
-                                'Phone No',
+                              child: KText(
+                                text:'Phone No',
                                 style: GoogleFonts.openSans (
                                   fontSize: 20*ffem,
                                   fontWeight: FontWeight.w700,
@@ -336,8 +306,8 @@ class _Resident_TabState extends State<Resident_Tab> {
                             Container(
                               // pincodehwB (55:1501)
                               margin: EdgeInsets.fromLTRB(0*fem, 0*fem, 89*fem, 0*fem),
-                              child: Text(
-                                'Pin Code',
+                              child: KText(
+                               text: 'Pin Code',
                                 style: GoogleFonts.openSans (
                                   fontSize: 20*ffem,
                                   fontWeight: FontWeight.w700,
@@ -346,9 +316,9 @@ class _Resident_TabState extends State<Resident_Tab> {
                                 ),
                               ),
                             ),
-                            Text(
+                            KText(
                               // actionsdpq (55:1502)
-                              'Actions',
+                              text:'Actions',
                               style: GoogleFonts.openSans (
                 
                                 fontSize: 20*ffem,
@@ -430,7 +400,8 @@ class _Resident_TabState extends State<Resident_Tab> {
                                                 Container(
                                                   // Nvq (59:1635)
                                                   margin: EdgeInsets.fromLTRB(0*fem, 0*fem, 95*fem, 0*fem),
-                                                  child: Text(
+                                                  child: KText(
+                                                    text:
                                                     (index+1).toString(),
                                                     style: GoogleFonts.openSans (
                                                       fontSize: 16*ffem,
@@ -460,9 +431,9 @@ class _Resident_TabState extends State<Resident_Tab> {
                                                   margin: EdgeInsets.fromLTRB(0*fem, 0*fem, 10*fem, 0*fem),
                                                   child: Padding(
                                                     padding: const EdgeInsets.only(top: 8),
-                                                    child: Text(
+                                                    child: KText(
                                                       // snap.data!.docs[index]["firstName"],
-                                                      document["firstName"],
+                                                      text:document["firstName"],
                                                       style: GoogleFonts.openSans (
                                                         fontSize: 16*ffem,
                                                         fontWeight: FontWeight.w600,
@@ -482,8 +453,8 @@ class _Resident_TabState extends State<Resident_Tab> {
                                                     borderRadius: BorderRadius.circular(64*fem),
                                                   ),
                                                   child: Center(
-                                                    child: Text(
-                                                      'Active',
+                                                    child: KText(
+                                                     text: 'Active',
                                                       style: GoogleFonts.openSans (
                                                         fontSize: 16*ffem,
                                                         fontWeight: FontWeight.w600,
@@ -496,9 +467,9 @@ class _Resident_TabState extends State<Resident_Tab> {
                                                 Container(
                                                   // QFF (59:1641)
                                                   margin: EdgeInsets.fromLTRB(0*fem, 0*fem, 125*fem, 0*fem),
-                                                  child: Text(
+                                                  child: KText(
                                                     // snap.data!.docs[index]["phone"],
-                                                    document["phone"],
+                                                  text:  document["phone"],
                                                     style: GoogleFonts.openSans (
                                                       fontSize: 16*ffem,
                                                       fontWeight: FontWeight.w600,
@@ -509,10 +480,10 @@ class _Resident_TabState extends State<Resident_Tab> {
                                                 ),
                                                 Container(
                                                   margin: EdgeInsets.fromLTRB(0*fem, 0*fem, 30*fem, 0*fem),
-                                                  child: Text(
+                                                  child: KText(
                                                     // Kd7 (59:1642)
                                                     // snapshot.data!.docs[index]["pincode"],
-                                                    document["pincode"],
+                                                   text: document["pincode"],
                                                     style: GoogleFonts.openSans (
                                                       fontSize: 16*ffem,
                                                       fontWeight: FontWeight.w600,
@@ -666,8 +637,8 @@ class _Resident_TabState extends State<Resident_Tab> {
                                                   margin: EdgeInsets.fromLTRB(
                                                       0 * fem, 0 * fem,
                                                       95 * fem, 0 * fem),
-                                                  child: Text(
-                                                    (index + 1).toString(),
+                                                  child: KText(
+                                                    text: (index + 1).toString(),
                                                     style: GoogleFonts.openSans(
                                                       fontSize: 16 * ffem,
                                                       fontWeight: FontWeight
@@ -705,9 +676,9 @@ class _Resident_TabState extends State<Resident_Tab> {
                                                   child: Padding(
                                                     padding: const EdgeInsets
                                                         .only(top: 8),
-                                                    child: Text(
+                                                    child: KText(
                                                       // snap.data!.docs[index]["firstName"],
-                                                      document["firstName"],
+                                                    text:  document["firstName"],
                                                       style: GoogleFonts
                                                           .openSans(
                                                         fontSize: 16 * ffem,
@@ -735,8 +706,8 @@ class _Resident_TabState extends State<Resident_Tab> {
                                                         .circular(64 * fem),
                                                   ),
                                                   child: Center(
-                                                    child: Text(
-                                                      'Active',
+                                                    child: KText(
+                                                      text:'Active',
                                                       style: GoogleFonts
                                                           .openSans(
                                                         fontSize: 16 * ffem,
@@ -755,9 +726,9 @@ class _Resident_TabState extends State<Resident_Tab> {
                                                   margin: EdgeInsets.fromLTRB(
                                                       0 * fem, 0 * fem,
                                                       105 * fem, 0 * fem),
-                                                  child: Text(
+                                                  child: KText(
                                                     // snap.data!.docs[index]["phone"],
-                                                    document["phone"],
+                                                   text: document["phone"],
                                                     style: GoogleFonts.openSans(
                                                       fontSize: 16 * ffem,
                                                       fontWeight: FontWeight
@@ -769,9 +740,9 @@ class _Resident_TabState extends State<Resident_Tab> {
                                                     ),
                                                   ),
                                                 ),
-                                                Text(
+                                                KText(
                                                   // Kd7 (59:1642)
-                                                  snapshot.data!
+                                                  text:snapshot.data!
                                                       .docs[index]["pincode"],
                                                   style: GoogleFonts.openSans(
                                                     fontSize: 16 * ffem,
@@ -917,7 +888,7 @@ class _Resident_TabState extends State<Resident_Tab> {
 
 
                           } else {
-                            return CircularProgressIndicator(); // or any other loading indicator
+                            return const CircularProgressIndicator(); // or any other loading indicator
                           }
                         },
                       )
@@ -938,7 +909,6 @@ class _Resident_TabState extends State<Resident_Tab> {
 
 
   // For Update (Here is the UI)
-
   TextEditingController firstName = new TextEditingController();
   TextEditingController middleName = new TextEditingController();
   TextEditingController lastName = new TextEditingController();
@@ -958,19 +928,15 @@ class _Resident_TabState extends State<Resident_Tab> {
   TextEditingController parentOccupation = new TextEditingController();
   TextEditingController userid = new TextEditingController();
   TextEditingController roomnumber = new TextEditingController();
-
   TextEditingController blockname = new TextEditingController();
-
   List<String> prefix=["Select Prefix","Mr.","Ms.","Mrs"];
   List<String> gender=["Select Gender","Male","Female","Transgender"];
-
   String selectedprefix="Select Prefix";
   String selectedprefix2="Select Prefix";
   String selectedgender="Select Gender";
   File? Url;
   var Uploaddocument;
   String imgUrl = "";
-
   addImage() {
     InputElement input = FileUploadInputElement() as InputElement
       ..accept = 'image/*';
@@ -1035,9 +1001,9 @@ class _Resident_TabState extends State<Resident_Tab> {
                           children: [
                             Padding(
                               padding: const EdgeInsets.only(left: 35.0),
-                              child: Text(
+                              child: KText(
                                 // addresidentdetailsvyb (87:1511)
-                                'Update Resident Details',
+                                text:'Update Resident Details',
                                 style: GoogleFonts.openSans (
                                   fontSize: 24*ffem,
                                   fontWeight: FontWeight.w700,
@@ -1103,16 +1069,16 @@ class _Resident_TabState extends State<Resident_Tab> {
                                           constraints: BoxConstraints (
                                             maxWidth: 155*fem,
                                           ),
-                                          child: Text(
-                                            'Upload Resident Photo\n( 150px * 150px)',
-                                            textAlign: TextAlign.center,
+                                          child: KText(
+                                            text:'Upload Resident Photo\n( 150px * 150px)',
                                             style: GoogleFonts.openSans (
-
                                               fontSize: 14*ffem,
                                               fontWeight: FontWeight.w600,
                                               height: 1.3625*ffem/fem,
                                               color: const Color(0x7f262626),
                                             ),
+                                            // textAlign: TextAlign.center,
+
                                           ),
                                         ),
                                       ],
@@ -1137,8 +1103,8 @@ class _Resident_TabState extends State<Resident_Tab> {
                                           Container(
                                             // chooseimagebVP (87:1521)
                                             margin: EdgeInsets.fromLTRB(0*fem, 0*fem, 12*fem, 0*fem),
-                                            child: Text(
-                                              'Choose Image',
+                                            child: KText(
+                                             text: 'Choose Image',
                                               style: GoogleFonts.openSans (
                                                 fontSize: 16*ffem,
                                                 fontWeight: FontWeight.w700,
@@ -1166,8 +1132,8 @@ class _Resident_TabState extends State<Resident_Tab> {
                             ),
                             SizedBox(
                               width: double.infinity,
-                              child: Text(
-                                'Personal Details',
+                              child: KText(
+                               text: 'Personal Details',
                                 style: GoogleFonts.openSans (
                                   fontSize: 20*ffem,
                                   fontWeight: FontWeight.w700,
@@ -1187,8 +1153,8 @@ class _Resident_TabState extends State<Resident_Tab> {
                             children: [
                               Container(
                                 // firstnameSVK (87:1540)
-                                child: Text(
-                                  "Prefix",
+                                child: KText(
+                                  text: "Prefix",
                                   style: GoogleFonts.openSans (
                                     fontSize: 14,
                                     fontWeight: FontWeight.w600,
@@ -1212,8 +1178,8 @@ class _Resident_TabState extends State<Resident_Tab> {
                                       DropdownButtonFormField2<
                                           String>(
                                         isExpanded: true,
-                                        hint: Text(
-                                          'Prefix', style:
+                                        hint: KText(
+                                         text: 'Prefix', style:
                                         GoogleFonts.openSans (
                                           fontSize: 12,
                                           fontWeight: FontWeight.w600,
@@ -1226,8 +1192,8 @@ class _Resident_TabState extends State<Resident_Tab> {
                                             DropdownMenuItem<
                                                 String>(
                                               value: item,
-                                              child: Text(
-                                                item,
+                                              child: KText(
+                                               text: item,
                                                 style:
                                                 GoogleFonts.openSans (
                                                   fontSize: 12,
@@ -1280,8 +1246,8 @@ class _Resident_TabState extends State<Resident_Tab> {
                             children: [
                               Container(
                                 // firstnameSVK (87:1540)
-                                child: Text(
-                                  "Date of Birth",
+                                child: KText(
+                                 text: "Date of Birth",
                                   style: GoogleFonts.openSans (
                                     fontSize: 14,
                                     fontWeight: FontWeight.w600,
@@ -1339,7 +1305,6 @@ class _Resident_TabState extends State<Resident_Tab> {
                                         print("pickedDate");
                                         print(pickedDate);
                                         if (pickedDate != null) {
-
                                           //pickedDate output format => 2021-03-10 00:00:00.000
                                           String formattedDate = DateFormat('dd/MM/yyyy').format(pickedDate);
                                           //formatted date output using intl package =>  2021-03-16
@@ -1372,8 +1337,8 @@ class _Resident_TabState extends State<Resident_Tab> {
                               Container(
                                 // firstnameSVK (87:1540)
 
-                                child: Text(
-                                  "Gender",
+                                child: KText(
+                                  text:"Gender",
                                   style: GoogleFonts.openSans (
 
                                     fontSize: 14,
@@ -1402,8 +1367,8 @@ class _Resident_TabState extends State<Resident_Tab> {
                                       DropdownButtonFormField2<
                                           String>(
                                         isExpanded: true,
-                                        hint: Text(
-                                          'Select Gender', style:
+                                        hint: KText(
+                                         text: 'Select Gender', style:
                                         GoogleFonts.openSans (
 
                                           fontSize: 12,
@@ -1418,8 +1383,8 @@ class _Resident_TabState extends State<Resident_Tab> {
                                             DropdownMenuItem<
                                                 String>(
                                               value: item,
-                                              child: Text(
-                                                item,
+                                              child: KText(
+                                              text:  item,
                                                 style:
                                                 GoogleFonts.openSans (
 
@@ -1469,8 +1434,8 @@ class _Resident_TabState extends State<Resident_Tab> {
 
                       SizedBox(
                         width: double.infinity,
-                        child: Text(
-                          'Contact Details',
+                        child: KText(
+                          text:'Contact Details',
                           style: GoogleFonts.openSans (
 
                             fontSize: 20*ffem,
@@ -1523,8 +1488,8 @@ class _Resident_TabState extends State<Resident_Tab> {
 
                       SizedBox(
                         width: double.infinity,
-                        child: Text(
-                          'Parent/Guardian Details',
+                        child: KText(
+                          text: 'Parent/Guardian Details',
                           style: GoogleFonts.openSans (
 
                             fontSize: 20*ffem,
@@ -1549,8 +1514,8 @@ class _Resident_TabState extends State<Resident_Tab> {
                               Container(
                                 // firstnameSVK (87:1540)
 
-                                child: Text(
-                                  "Prefix",
+                                child: KText(
+                                 text: "Prefix",
                                   style: GoogleFonts.openSans (
 
                                     fontSize: 14,
@@ -1579,8 +1544,8 @@ class _Resident_TabState extends State<Resident_Tab> {
                                       DropdownButtonFormField2<
                                           String>(
                                         isExpanded: true,
-                                        hint: Text(
-                                          'Prefix', style:
+                                        hint: KText(
+                                          text: 'Prefix', style:
                                         GoogleFonts.openSans (
 
                                           fontSize: 12,
@@ -1595,8 +1560,8 @@ class _Resident_TabState extends State<Resident_Tab> {
                                             DropdownMenuItem<
                                                 String>(
                                               value: item,
-                                              child: Text(
-                                                item,
+                                              child: KText(
+                                               text: item,
                                                 style:
                                                 GoogleFonts.openSans (
 
@@ -1652,8 +1617,8 @@ class _Resident_TabState extends State<Resident_Tab> {
 
                       SizedBox(
                         width: double.infinity,
-                        child: Text(
-                          'Room Details',
+                        child: KText(
+                          text: 'Room Details',
                           style: GoogleFonts.openSans (
 
                             fontSize: 20*ffem,
@@ -1756,11 +1721,8 @@ class _Resident_TabState extends State<Resident_Tab> {
                               ],
                             ),
                           )
-
                         ],
                       )
-
-
                     ],
                   ),
                 )
@@ -1774,7 +1736,6 @@ class _Resident_TabState extends State<Resident_Tab> {
   }
   // Update UI stuff finished
   // for Update (Functionalities)
-
   setuserdata(id) async {
     // creating a variable to store the Users data dynamically... using thier ID
     var docu = await FirebaseFirestore.instance.collection("Users").doc(id).get();
@@ -1858,6 +1819,7 @@ class _Resident_TabState extends State<Resident_Tab> {
   getUserId(id) async{
     var docu = await FirebaseFirestore.instance.collection("Users").doc(id).get();
   }
+
   //  BuildContext con,id
   Future<void> ForDeleteDialog(BuildContext con,id) async {
     return showDialog<void>(
@@ -1886,7 +1848,7 @@ class _Resident_TabState extends State<Resident_Tab> {
                         onTap: (){
                           Navigator.pop(context);
                         },
-                        child: CircleAvatar(
+                        child: const CircleAvatar(
                           backgroundColor: Color(0xffF5F6F7), radius: 20, child: Padding(
                             padding: EdgeInsets.all(4),
                             child: Icon(Icons.close, color: Colors.grey, size: 18,),
@@ -1914,9 +1876,9 @@ class _Resident_TabState extends State<Resident_Tab> {
                   ],),
                   Padding(
                     padding: const EdgeInsets.only(left: 40, right: 20),
-                    child: Text('Are you sure you want to delete this asset record?', style: GoogleFonts.openSans(fontWeight: FontWeight.w600, fontSize: 17),),
+                    child: KText( text:'Are you sure you want to delete this asset record?', style: GoogleFonts.openSans(fontWeight: FontWeight.w600, fontSize: 17),),
                   ),
-                  Text('Once deleted, it cannot be recovered.', style: GoogleFonts.openSans(fontWeight: FontWeight.w600, fontSize: 17),),
+                    KText(text:'Once deleted, it cannot be recovered.', style: GoogleFonts.openSans(fontWeight: FontWeight.w600, fontSize: 17),),
                 const SizedBox(height: 25,),
 
                     Row(
@@ -1930,7 +1892,7 @@ class _Resident_TabState extends State<Resident_Tab> {
                         style: const ButtonStyle(backgroundColor: MaterialStatePropertyAll(Color(0xffF5F5F5))),
                         onPressed: (){
                           Navigator.pop(context);
-                        }, child: Text('Cancel', style: GoogleFonts.openSans(fontSize: 17, fontWeight: FontWeight.w700, color: const Color(0xff262626).withOpacity(0.8)),)),
+                        }, child: KText(text:'Cancel', style: GoogleFonts.openSans(fontSize: 17, fontWeight: FontWeight.w700, color: const Color(0xff262626).withOpacity(0.8)),)),
                   ),
                   const SizedBox(width: 20,),
                   Container(
@@ -1945,7 +1907,7 @@ class _Resident_TabState extends State<Resident_Tab> {
                         }, child: Row(
                       mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                       children: [
-                        Text('Delete',style: GoogleFonts.openSans(fontSize: 17, fontWeight: FontWeight.w700, color: const Color(0xffFFFFFF))),
+                        KText(text:'Delete',style: GoogleFonts.openSans(fontSize: 17, fontWeight: FontWeight.w700, color: const Color(0xffFFFFFF))),
                         const Icon(Icons.delete, size: 18, color: Color(0xffFFFFFF),)
                       ],
                     )),
@@ -2052,7 +2014,7 @@ class _Resident_TabState extends State<Resident_Tab> {
                                                         // )
 
                                                         CircleAvatar(
-                                                          backgroundColor: Color(0xffF5F6F7),
+                                                          backgroundColor: const Color(0xffF5F6F7),
                                                           radius: 62,
                                                           child: userData['imageUrl'] != null
                                                               ? Image.network(
@@ -2074,10 +2036,10 @@ class _Resident_TabState extends State<Resident_Tab> {
                                                               }
                                                             },
                                                             errorBuilder: (BuildContext context, Object error, StackTrace? stackTrace) {
-                                                              return Icon(Icons.error); // Placeholder icon for error case
+                                                              return const Icon(Icons.error); // Placeholder icon for error case
                                                             },
                                                           )
-                                                              : Placeholder(), // Use Placeholder widget if imageUrl is null
+                                                              : const Placeholder(), // Use Placeholder widget if imageUrl is null
                                                         ),
                                                     ),
                                                   ),
@@ -2120,7 +2082,7 @@ class _Resident_TabState extends State<Resident_Tab> {
                                           crossAxisAlignment: CrossAxisAlignment.center,
 
                                           children: [
-                                            Text('Resident Personal Details', style: GoogleFonts.openSans(fontWeight: FontWeight.w700, color: Colors.black, fontSize: 18),),
+                                            KText(text:'Resident Personal Details', style: GoogleFonts.openSans(fontWeight: FontWeight.w700, color: Colors.black, fontSize: 18),),
                                             const Padding(
                                               padding: EdgeInsets.only(left: 15, right: 15),
                                               child: Divider(thickness: 1, color: Colors.grey,),
@@ -2144,7 +2106,7 @@ class _Resident_TabState extends State<Resident_Tab> {
                                           mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                                           crossAxisAlignment: CrossAxisAlignment.center,
                                           children: [
-                                            Text('Resident Parent / Gaurdian   Details', style: GoogleFonts.openSans(fontWeight: FontWeight.w700, color: Colors.black, fontSize: 18),),
+                                            KText(text:'Resident Parent / Guardian Details', style: GoogleFonts.openSans(fontWeight: FontWeight.w700, color: Colors.black, fontSize: 18),),
                                             const Padding(
                                               padding: EdgeInsets.only(left: 20, right: 20),
                                               child: Divider(thickness: 1, color: Colors.grey,),
@@ -2175,14 +2137,14 @@ class _Resident_TabState extends State<Resident_Tab> {
                                       crossAxisAlignment: CrossAxisAlignment.center,
 
                                       children: [
-                                        Text('Resident Contact Details', style: GoogleFonts.openSans(fontWeight: FontWeight.w700, color: Colors.black, fontSize: 18),),
+                                        KText(text:'Resident Contact Details', style: GoogleFonts.openSans(fontWeight: FontWeight.w700, color: Colors.black, fontSize: 18),),
                                         const Padding(
                                           padding: EdgeInsets.only(left: 15, right: 15),
                                           child: Divider(thickness: 1, color: Colors.grey,),
                                         ),
                                          PersonalDetailsText(DHeading: 'Phone Number         :', UserData: '     ${userData['phone']}'),
                                          PersonalDetailsText(DHeading: 'Mobile Number        :', UserData:'     ${userData['mobile']}'),
-                                         PersonalDetailsText(DHeading: 'Adhaar Number        :', UserData: '     ${userData['aadhaar']}'),
+                                         PersonalDetailsText(DHeading: 'Aadhaar Number        :', UserData: '     ${userData['aadhaar']}'),
                                          PersonalDetailsText(DHeading: 'Email                           :', UserData: '     ${userData['email']}')
                                         // const PersonalDetailsText(DHeading: 'Email                           :', UserData: '       sample@gmail.com'),
                                       ]),
@@ -2214,6 +2176,32 @@ class _Resident_TabState extends State<Resident_Tab> {
     );
   }
 
+  showPopup(cxt) async {
+    double height=MediaQuery.of(cxt).size.height;
+    double width=MediaQuery.of(cxt).size.width;
+    await showMenu(
+        context: context,
+        color: const Color(0xffFFFFFF),
+        surfaceTintColor: const Color(0xffFFFFFF),
+        shadowColor: Colors.black12,
+        position:  const RelativeRect.fromLTRB(60, 190, 15, 55),
+        items: [
+          PopupMenuItem<String>(
+            value: 'print',
+            child:  const Text('Print'),
+            onTap: () {
+            },
+          ),
+          PopupMenuItem<String>(
+            value: 'excel',
+            child:  const Text('Excel'),
+            onTap: () {
+            },
+          ),
+        ],
+        elevation: 8.0,
+        useRootNavigator: true);
+  }
 
 
 

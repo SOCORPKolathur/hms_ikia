@@ -191,6 +191,7 @@ class _ResidentAddFormState extends State<ResidentAddForm> {
       }
       );
     });
+    getuserid();
     // TODO: implement initState
     super.initState();
   }
@@ -1073,6 +1074,9 @@ showError: _pincodeError,
                           CustomTextField(
                             key: _parentname,
                             header: "Parent/Guardian Name",hint: "Enter full name",controller: parentname,
+                            inputFormatters: [
+                              FilteringTextInputFormatter.allow(RegExp('[a-zA-Z]')),
+                            ],
                             onChanged: (value) {
 setState(() {
 // Update _firstNameError only if the value becomes empty
@@ -1092,6 +1096,10 @@ showError: _parentnameError,
                           const SizedBox(width: 18,),
                           CustomTextField(
                             key: _parentnum,
+                            inputFormatters: [
+                              LengthLimitingTextInputFormatter(10),
+                              FilteringTextInputFormatter.allow(RegExp(r'[0-9]')),
+                            ],
                             header: "*Mobile Number",hint: "Enter mobile number",controller: parentmobile,
                               onChanged: (value) {
 setState(() {
@@ -1131,6 +1139,7 @@ showError: _parentnumError,
                         mainAxisAlignment: MainAxisAlignment.start,
                         children: [
                           CustomTextField(
+                            readOrwrite: true,
                             key: _userid,
                             header: "*User ID",hint: "IKIA0001",controller: userid,
                               onChanged: (value) {
@@ -1406,6 +1415,19 @@ showError: _useridError,
     );
   }
   // To add details
+
+  int usercount = 0;
+
+  getuserid() async {
+    var docu = await FirebaseFirestore.instance.collection("Users").orderBy("timestamp",descending: true).get();
+    if(docu.docs.length > 0){
+      setState(() {
+        usercount = docu.docs[0]["usercount"] + 1;
+        userid.text="IKIA${usercount.toString().padLeft(4,"0")}";
+      });
+    }
+
+}
   adduser(){
     FirebaseFirestore.instance.collection("Users").doc().set({
       "prefix":selectedprefix,
@@ -1436,6 +1458,7 @@ showError: _useridError,
       "timestamp":DateTime.now().millisecondsSinceEpoch,
       "status" : false,
       "uid" : '',
+      "usercount" : usercount,
     });
     Successdialog();
   }

@@ -1,4 +1,5 @@
 import 'dart:html';
+import 'dart:math';
 
 import 'package:animate_do/animate_do.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
@@ -10,6 +11,7 @@ import 'package:hms_ikia/widgets/customtextfield.dart';
 import 'package:toggle_switch/toggle_switch.dart';
 import '../Constants/constants.dart';
 import '../widgets/ReusableIconName.dart';
+import '../widgets/kText.dart';
 import '../widgets/switch_button.dart';
 import '../widgets/userMiniDetails.dart';
 import 'package:intl/intl.dart';
@@ -27,6 +29,7 @@ class _EntryState extends State<Entry> {
   TextEditingController ResidentUid = TextEditingController();
   TextEditingController Search = TextEditingController();
   Map<String, dynamic>? selectedUser;
+  bool viewAllHistory = false;
 
   @override
   void initState() {
@@ -136,7 +139,7 @@ class _EntryState extends State<Entry> {
                         onPressed: () {},
                         child: const Row(
                           children: [
-                            Text('Search', style: TextStyle(color: Colors.white)),
+                            KText(text:'Search', style: TextStyle(color: Colors.white)),
                             SizedBox(width: 8),
                             Icon(Icons.search, color: Colors.white),
                           ],
@@ -165,7 +168,7 @@ class _EntryState extends State<Entry> {
                         },
                         child: const Row(
                           children: [
-                            Text('Reset', style: TextStyle(color: Color(0xff37D1D3))),
+                            KText(text:'Reset', style: TextStyle(color: Color(0xff37D1D3))),
                             SizedBox(width: 8),
                             Icon(Icons.restart_alt, color: Color(0xff37D1D3)),
                           ],
@@ -196,8 +199,8 @@ class _EntryState extends State<Entry> {
                                 leading: CircleAvatar(
                                   backgroundImage: NetworkImage(searchSuggestions[index]['profilePicture']),
                                 ),
-                                title: Text(
-                                  searchSuggestions[index]['name'],
+                                title: KText(
+                                 text: searchSuggestions[index]['name'],
                                   style: GoogleFonts.openSans(
                                     fontWeight: FontWeight.w700,
                                     fontSize: 15,
@@ -266,7 +269,10 @@ class _EntryState extends State<Entry> {
                                           Row(
                                             children: [
                                               const UserMiniDetails(IconName: Icons.downloading, iName: 'Status                  :     ',),
+
                                               getStatusButton(selectedUser!['status']),
+
+
                                             ],
                                           ),
                                           const SizedBox(height: 8,),
@@ -348,15 +354,36 @@ class _EntryState extends State<Entry> {
                                         crossAxisAlignment: CrossAxisAlignment.start,
                                         children: [
                                           Padding(
-                                            padding: const EdgeInsets.only(left: 50),
-                                            child: Text('History', style: GoogleFonts.openSans(fontWeight: FontWeight.w800),),
+                                            padding: const EdgeInsets.only(left: 50, right: 50),
+                                            child: Row(
+                                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                              children: [
+                                                KText(text:'History', style: GoogleFonts.openSans(fontWeight: FontWeight.w800, fontSize: 18),),
+
+                                              SizedBox(
+                                                width: 120,
+                                                height: 40,
+                                                child: ElevatedButton(
+                                                  style: ElevatedButton.styleFrom(
+                                                    backgroundColor: Color(0xff37D1D3),
+                                                    textStyle: GoogleFonts.openSans(
+                                                      fontWeight: FontWeight.w600, color: Colors.white, fontSize: 15
+                                                    )
+                                                  ),
+                                                    onPressed: (){
+                                                  setState(() {
+                                                    viewAllHistory = !viewAllHistory;
+                                                  });
+                                                }, child:  Text(
+                                                    viewAllHistory ? 'View Less' : 'View All')),
+                                              ),
+
+                                              ],
+                                            ),
                                           ),
                                           const SizedBox(height: 30,),
-                                          // IconWithName(PrDateIcon: Icons.date_range, PrTimeIcon: Icons.watch_later_outlined, PrStatusIcon: Icons.downloading, TPrDate: 'Date', TPrTime: 'Time', TStatus: 'Status',textColor:  const Color(0xff262626).withOpacity(0.7),),
-                                          //
                                           const SizedBox(height: 7,),
                                            Container(
-                                             // color: Colors.pink,
                                              child: Row(
                                                mainAxisAlignment: MainAxisAlignment.center,
                                                children: [
@@ -367,7 +394,7 @@ class _EntryState extends State<Entry> {
                                                   children: [
                                                     SizedBox(width: 20, child: Image.asset('assets/ui-design-/images/calendar.png'),),
                                                     SizedBox(width: 3,),
-                                                    Text('Date',
+                                                    KText(text: 'Date',
                                                       style: GoogleFonts.openSans(fontWeight: FontWeight.w700, fontSize: 16,color: Color(0xff262626).withOpacity(0.8)
                                                     )
                                                     )
@@ -381,7 +408,7 @@ class _EntryState extends State<Entry> {
                                                     // Icon(Icons.watch,color: Color(0xff262626).withOpacity(0.7),size: 20,),
                                                     SizedBox(width: 20, child: Image.asset('assets/ui-design-/images/time.png'),),
                                                     SizedBox(width: 3,),
-                                                    Text('Time',
+                                                    KText(text: 'Time',
                                                         style: GoogleFonts.openSans(fontWeight: FontWeight.w700, fontSize: 16,color: Color(0xff262626).withOpacity(0.8)
                                                         )
                                                     )
@@ -394,7 +421,7 @@ class _EntryState extends State<Entry> {
                                                   children: [
                                                   SizedBox(width: 20, child: Image.asset('assets/ui-design-/images/loading.png'),),
                                                     SizedBox(width: 3,),
-                                                    Text('Status',
+                                                    KText(text:'Status',
                                                   style: GoogleFonts.openSans(fontWeight: FontWeight.w700,fontSize: 16, color: Color(0xff262626).withOpacity(0.8)
                                               )
                                                     )
@@ -409,19 +436,22 @@ class _EntryState extends State<Entry> {
                                           stream: FirebaseFirestore.instance
                                               .collection('Users')
                                               .doc(selectedUser!['docId'])
-                                              .collection('entries').orderBy("timestamp", descending: true).snapshots(),
+                                              .collection('entries').orderBy("timestamp", descending: false).snapshots(),
                                           builder: (context, snapshot) {
                                             if (snapshot.connectionState == ConnectionState.waiting) {
                                               return CircularProgressIndicator();
                                             }
                                             if (snapshot.hasError) {
-                                              return Text('Error: ${snapshot.error}');
+                                              return KText(text:'Error: ${snapshot.error}', style: GoogleFonts.openSans(),);
                                             }
                                             if (snapshot.hasData) {
+                                              List<DocumentSnapshot> documents = snapshot.data!.docs;
+                                              int itemCount = viewAllHistory ? documents.length : min(documents.length, 10);
                                               return ListView.builder(
                                                 reverse: true,
                                                 shrinkWrap: true,
-                                                itemCount: snapshot.data!.docs.length,
+                                                // itemCount: snapshot.data!.docs.length,
+                                                itemCount: itemCount,
                                                 itemBuilder: (context, index) {
                                                   var entry = snapshot.data!.docs[index].data();
                                                   if (entry != null) {
@@ -439,24 +469,24 @@ class _EntryState extends State<Entry> {
                                                           //data
                                                           Container(
                                                             width: 200,
-                                child: Text(
-                                  formattedDate,style: GoogleFonts.openSans(color: Color(0xff262626), fontWeight: FontWeight.w700),
+                                child: KText(
+                                 text: formattedDate,style: GoogleFonts.openSans(color: Color(0xff262626), fontWeight: FontWeight.w700),
                                 ),),
                                                           Container(
                                 width: 200,
                                 child: Padding(
                                   padding: const EdgeInsets.only(left: 5),
-                                  child: Text(formattedTime,style: GoogleFonts.openSans(color: Color(0xff262626), fontWeight: FontWeight.w700),),
+                                  child: KText(text:formattedTime,style: GoogleFonts.openSans(color: Color(0xff262626), fontWeight: FontWeight.w700),),
                                 ),
                                                           ),
                                                            Container(
                                 width: 110,
                                 child: entry['status'] == 'true' ?  Padding(
                                   padding: const EdgeInsets.only(left: 5),
-                                  child: Text('Check In',style: GoogleFonts.openSans(color: Color(0xff1DA644), fontWeight: FontWeight.w700),),
+                                  child: KText(text:'Check In',style: GoogleFonts.openSans(color: Color(0xff1DA644), fontWeight: FontWeight.w700),),
                                 ) : Padding(
                                   padding: const EdgeInsets.only(left: 5),
-                                  child: Text('Check Out',style: GoogleFonts.openSans(color: Color(0xffF12D2D), fontWeight: FontWeight.w700),),
+                                  child: KText(text:'Check Out',style: GoogleFonts.openSans(color: Color(0xffF12D2D), fontWeight: FontWeight.w700),),
                                 ),
                                                           ),
                                                         ],
@@ -469,7 +499,7 @@ class _EntryState extends State<Entry> {
                                               );
 
                                             } else {
-                                              return Text('No data available');
+                                              return KText(text:'No data available', style: GoogleFonts.openSans(),);
                                             }
                                           },
                                         ),
@@ -535,19 +565,20 @@ class _EntryState extends State<Entry> {
       'time': Timestamp.fromDate(DateTime.now()),
       'timestamp' : millisecondsSinceEpoch
     });
+      setState(() {
+        selectedUser!['status'] = true;
+      });
     print('Subcollection created successfully');
   }
+
 
   void statusFalse() async {
     CollectionReference mainCollection =
     FirebaseFirestore.instance.collection('Users');
-
     DocumentReference documentRef =
     mainCollection.doc(selectedUser!['docId']);
-
     CollectionReference subcollectionRef =
     documentRef.collection('entries');
-
     int millisecondsSinceEpoch = Timestamp.now().millisecondsSinceEpoch;
 
     await subcollectionRef.add({
@@ -556,11 +587,39 @@ class _EntryState extends State<Entry> {
       'time': Timestamp.fromDate(DateTime.now()),
       'timestamp' : millisecondsSinceEpoch
     });
+    setState(() {
+      selectedUser!['status'] = false;
+    });
  }
+
+
+
+  // void statusTrue() async {
+  //   await FirebaseFirestore.instance
+  //       .collection('Users')
+  //       .doc(selectedUser!['docId'])
+  //       .update({'status': true});
+  //   setState(() {
+  //     selectedUser!['status'] = true;
+  //   });
+  // }
+
+  // void statusFalse() async {
+  //   await FirebaseFirestore.instance
+  //       .collection('Users')
+  //       .doc(selectedUser!['docId'])
+  //       .update({'status': false});
+  //   setState(() {
+  //     selectedUser!['status'] = false;
+  //   });
+  // }
+
+
 
   Widget getStatusButton(bool status) {
     return status
-        ? SizedBox(
+        ?
+    SizedBox(
       width: 100,
       height: 29,
       child: ElevatedButton(
@@ -569,9 +628,9 @@ class _EntryState extends State<Entry> {
           MaterialStateProperty.all<Color>(Color(0xffDDFFE7)),
         ),
         onPressed: () {},
-        child: const Text(
-          'In Room',
-          style: TextStyle(
+        child: KText(
+          text:'In Room',
+          style: GoogleFonts.openSans(
             fontSize: 12,
             fontWeight: FontWeight.w600,
             color: Color(0xff1DA644),
@@ -588,9 +647,9 @@ class _EntryState extends State<Entry> {
           MaterialStateProperty.all<Color>(Color(0xffFFD3D3)),
         ),
         onPressed: () {},
-        child: const Text(
-          'Out Room',
-          style: TextStyle(
+        child: KText(
+          text:'Out Room',
+          style: GoogleFonts.openSans(
             fontSize: 11,
             fontWeight: FontWeight.w600,
             color: Color(0xffF12D2D),
@@ -599,8 +658,5 @@ class _EntryState extends State<Entry> {
       ),
     );
   }
-
-
-
 
 }

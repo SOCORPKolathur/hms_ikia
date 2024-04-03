@@ -7,6 +7,8 @@ import 'package:hms_ikia/widgets/ReusableHeader.dart';
 import 'package:hms_ikia/widgets/ReusableRoomContainer.dart';
 import 'package:hms_ikia/widgets/customtextfield.dart';
 
+import '../widgets/kText.dart';
+
 class Rooms extends StatefulWidget {
   const Rooms({Key? key}) : super(key: key);
   @override
@@ -17,13 +19,16 @@ class _RoomsState extends State<Rooms> {
   final TextEditingController SelectedRoom = TextEditingController();
   final TextEditingController SelectedBedCount = TextEditingController();
   int roomCount = 0;
-  int totalVacant = 0;
+  int roomVacancy = 0;
+  int roomOccupied = 0;
+
   List<String> BlockNames = [];
   String selectedBlockName = "Select Block Name";
   @override
   void initState() {
     super.initState();
     getRoomsLength();
+    fetchBedCounts();
     getBlockNames().then((names) {
       setState(() {
         BlockNames.addAll(names);
@@ -64,21 +69,21 @@ class _RoomsState extends State<Rooms> {
                   ReusableRoomContainer(
                     firstColor: Color(0xff04267d),
                     secondColor: Color(0xff6085e5),
-                    totalRooms: roomCount.toString(),
+                    totalRooms: roomCount.toString().padLeft(2, '0'),
                     title: 'Rooms',
                     waveImg: 'assets/ui-design-/images/wave.png', roomImg: 'assets/ui-design-/images/Group 90.png',
                   ),
                   ReusableRoomContainer(
                     firstColor: Color(0xffd39617),
                     secondColor: Color(0xffffd57c),
-                    totalRooms: '20',
+                    totalRooms: '${roomVacancy.toString().padLeft(2,"0")}',
                     title: 'Rooms Vacancy',
                     waveImg: 'assets/ui-design-/images/yellow.png', roomImg: 'assets/ui-design-/images/Group 95.png',
                   ),
                   ReusableRoomContainer(
                     firstColor: Color(0xffbe0e73),
                     secondColor: Color(0xfff946a6),
-                    totalRooms: '20',
+                    totalRooms: '${roomOccupied.toString().padLeft(2,'0')}',
                     title: 'Rooms Occupied',
                     waveImg: 'assets/ui-design-/images/pink.png', roomImg: 'assets/ui-design-/images/Group 92.png',
                   ),
@@ -110,6 +115,11 @@ class _RoomsState extends State<Rooms> {
                           fillColor: const Color(0xffF5F5F5),
                           validator: null,
                           header: '',
+                          onChanged: (value){
+                            setState(() {
+
+                            });
+                          },
                           width: 335,
                           preffixIcon: Icons.search,
                           height: 45,
@@ -127,8 +137,8 @@ class _RoomsState extends State<Rooms> {
                           },
                           child: Row(
                             children: [
-                              Text(
-                                'Add Room',
+                              KText(
+                                text:'Add Room',
                                 style: GoogleFonts.openSans(
                                   fontSize: 13,
                                   fontWeight: FontWeight.w600,
@@ -410,7 +420,6 @@ class _RoomsState extends State<Rooms> {
                         itemCount: combinedData.length,
                         itemBuilder: (BuildContext context, index) {
                           final documents = combinedData[index];
-
                           var data = documents.data() as Map<String, dynamic>?;
                           if (snapshot.hasData) {
                             final document = combinedData[index];
@@ -439,37 +448,42 @@ class _RoomsState extends State<Rooms> {
                             }
                             return Padding(
                               padding: const EdgeInsets.all(10),
-                              child: Container(
-                                height: 40,
-                                width: 40,
-                                decoration: BoxDecoration(
-                                  border: Border.all(color: homeColor), // Change border color dynamically
-                                  borderRadius: BorderRadius.circular(20),
-                                ),
-                                child: Column(
-                                  mainAxisAlignment: MainAxisAlignment.center,
-                                  children: [
-                                    Text(
-                                      'Room No: ${document['roomnumber']}',
-                                      style: TextStyle(
-                                        color: const Color(0xff595959),
-                                        fontWeight: FontWeight.w600,
+                              child: InkWell(
+                                onTap: (){
+                                  roomDetail(document);
+                                },
+                                child: Container(
+                                  height: 40,
+                                  width: 40,
+                                  decoration: BoxDecoration(
+                                    border: Border.all(color: homeColor), // Change border color dynamically
+                                    borderRadius: BorderRadius.circular(20),
+                                  ),
+                                  child: Column(
+                                    mainAxisAlignment: MainAxisAlignment.center,
+                                    children: [
+                                      KText(
+                                        text: 'Room No: ${document['roomnumber']}',
+                                        style: TextStyle(
+                                          color: const Color(0xff595959),
+                                          fontWeight: FontWeight.w600,
+                                        ),
                                       ),
-                                    ),
-                                    Icon(
-                                      Icons.home_work,
-                                      size: 40,
-                                      color: homeColor, // Change color dynamically
-                                    ),
-                                    Text(
-                                      occupancyStatus,
-                                      style: TextStyle(
-                                        fontWeight: FontWeight.w700,
-                                        fontSize: 16,
-                                        color: homeColor,
+                                      Icon(
+                                        Icons.home_work,
+                                        size: 40,
+                                        color: homeColor, // Change color dynamically
                                       ),
-                                    ),
-                                  ],
+                                      KText(
+                                        text: occupancyStatus,
+                                        style: TextStyle(
+                                          fontWeight: FontWeight.w700,
+                                          fontSize: 16,
+                                          color: homeColor,
+                                        ),
+                                      ),
+                                    ],
+                                  ),
                                 ),
                               ),
                             );
@@ -510,8 +524,8 @@ class _RoomsState extends State<Rooms> {
                                 child: Column(
                                   mainAxisAlignment: MainAxisAlignment.center,
                                   children: [
-                                    Text(
-                                      'Room No: ${document['roomnumber']}',
+                                    KText(
+                                     text: 'Room No: ${document['roomnumber']}',
                                       style: TextStyle(
                                         color: const Color(0xff595959),
                                         fontWeight: FontWeight.w600,
@@ -522,8 +536,8 @@ class _RoomsState extends State<Rooms> {
                                       size: 40,
                                       color: homeColor, // Change color dynamically
                                     ),
-                                    Text(
-                                      document['occupancyStatus'],
+                                    KText(
+                                      text:document['occupancyStatus'],
                                       style: TextStyle(
                                         fontWeight: FontWeight.w700,
                                         fontSize: 16,
@@ -538,7 +552,7 @@ class _RoomsState extends State<Rooms> {
                         },
                       );
                     } else if (snapshot.hasError) {
-                      return Text('Error: ${snapshot.error}');
+                      return KText(text:'Error: ${snapshot.error}', style: GoogleFonts.openSans(),);
                     } else {
                       return CircularProgressIndicator();
                     }
@@ -564,7 +578,7 @@ class _RoomsState extends State<Rooms> {
           title: Row(
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
-           Text('Add Room', style: GoogleFonts.openSans(fontWeight: FontWeight.w700, fontSize: 18),),
+            KText(text:'Add Room', style: GoogleFonts.openSans(fontWeight: FontWeight.w700, fontSize: 18),),
     InkWell(
     onTap: () => Navigator.pop(context),
     child: Container(
@@ -620,7 +634,7 @@ class _RoomsState extends State<Rooms> {
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         // block name
-        Text('Block Name', style: GoogleFonts.openSans(color: const Color(0xff262626).withOpacity(0.6), fontSize: 16, fontWeight: FontWeight.w600),),
+        KText(text:'Block Name', style: GoogleFonts.openSans(color: const Color(0xff262626).withOpacity(0.6), fontSize: 16, fontWeight: FontWeight.w600),),
         Padding(
           padding: const EdgeInsets.only(bottom: 10, top: 10),
           child: Container(
@@ -641,8 +655,8 @@ class _RoomsState extends State<Rooms> {
                   elevation: 1,
                   focusColor: Colors.white,
                   isExpanded: true,
-                  hint: const Text(
-                    'Select Block Name',
+                  hint: const KText(
+                    text:'Select Block Name',
                     style: TextStyle(
                       fontSize: 12,
                       fontWeight: FontWeight.w600,
@@ -652,8 +666,8 @@ class _RoomsState extends State<Rooms> {
                   items: BlockNames.map((String item) {
                     return DropdownMenuItem<String>(
                       value: item,
-                      child: Text(
-                        item,
+                      child: KText(
+                       text: item,
                         style: const TextStyle(
 
                           color: Color(0x7f262626),
@@ -684,7 +698,7 @@ class _RoomsState extends State<Rooms> {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Text('Bed Count', style: GoogleFonts.openSans(color: const Color(0xff262626).withOpacity(0.6), fontSize: 16, fontWeight: FontWeight.w600),),
+                KText(text: 'Bed Count', style: GoogleFonts.openSans(color: const Color(0xff262626).withOpacity(0.6), fontSize: 16, fontWeight: FontWeight.w600),),
                 Padding(
                 padding: const EdgeInsets.only(bottom: 10, top: 10),
                 child: CustomTextField(
@@ -706,7 +720,7 @@ class _RoomsState extends State<Rooms> {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Text('Room Number', style: GoogleFonts.openSans(color: const Color(0xff262626).withOpacity(0.6), fontSize: 16, fontWeight: FontWeight.w600),),
+                KText(text:'Room Number', style: GoogleFonts.openSans(color: const Color(0xff262626).withOpacity(0.6), fontSize: 16, fontWeight: FontWeight.w600),),
                 Padding(
                   padding: const EdgeInsets.only(bottom: 10, top: 10),
                   child: CustomTextField(
@@ -760,8 +774,8 @@ class _RoomsState extends State<Rooms> {
                 onPressed: (){
                   Navigator.pop(context);
                 }, child:
-              Text(
-                'Cancle',
+              KText(
+                text:'Cancel',
                 style: GoogleFonts.openSans(
                   fontSize: 13,
                   fontWeight: FontWeight.w600,
@@ -787,8 +801,8 @@ class _RoomsState extends State<Rooms> {
                 },
                 child: Row(
                   children: [
-                    Text(
-                      'Add Room',
+                    KText(
+                      text:'Add Room',
                       style: GoogleFonts.openSans(
                         fontSize: 13,
                         fontWeight: FontWeight.w600,
@@ -827,14 +841,12 @@ class _RoomsState extends State<Rooms> {
           selectedRoom.isNotEmpty &&
           selectedBlockName != null &&
           selectedBlockName.isNotEmpty) {
-        // Query Firestore to check for existing room with the same block name and room number
         QuerySnapshot existingRooms = await FirebaseFirestore.instance
             .collection('Room')
             .where('blockname', isEqualTo: selectedBlockName)
             .where('roomnumber', isEqualTo: selectedRoom)
             .get();
         if (existingRooms.docs.isEmpty) {
-          // No existing room found, so create a new one
           await FirebaseFirestore.instance.collection('Room').add({
             'blockname': selectedBlockName,
             'roomnumber': selectedRoom,
@@ -850,10 +862,9 @@ class _RoomsState extends State<Rooms> {
           SelectedRoom.text == '';
           Navigator.pop(context);
         } else {
-          // Room with same block name and room number already exists
           ScaffoldMessenger.of(context).showSnackBar(
-            const SnackBar(
-              content: Text('Room with the same block name and room number already exists.'),
+            SnackBar(
+              content: KText(text:'Room with the same block name and room number already exists.', style: GoogleFonts.openSans(),),
               duration: Duration(seconds: 2),
             ),
           );
@@ -883,6 +894,292 @@ class _RoomsState extends State<Rooms> {
       return [];
     }
   }
+  Future<void> fetchBedCounts() async {
+    try {
+      QuerySnapshot querySnapshot = await FirebaseFirestore.instance.collection('Room').get();
+      print("Number of documents: ${querySnapshot.size}");
+      roomCount =  querySnapshot.size;
+      querySnapshot.docs.forEach((DocumentSnapshot document) {
+        Map<String, dynamic> data = document.data() as Map<String, dynamic>;
+        print("Data fetched: $data");
+        int bedCount = data['bedcount'] ?? 0;
+        int vacantCount = data['vacant'] ?? 0;
+
+        // Calculate occupied rooms count
+        if (vacantCount == 0) {
+          roomOccupied++;
+        }
+      });
+      roomVacancy = roomCount - roomOccupied;
+      print("Total Bed Count: $roomVacancy");
+      print("Room Occupied: $roomOccupied");
+      print("Room Vacancy");
+      setState(() {});
+    } catch (e) {
+      print('Error fetching bed counts: $e');
+    }
+  }
+//   show users in popo up
+
+  // Future<void> roomDetail(DocumentSnapshot<Object?> document) async {
+  //   return showDialog<void>(
+  //     context: context,
+  //     barrierDismissible: false,
+  //     builder: (BuildContext context) {
+  //       return AlertDialog(
+  //         elevation: 0,
+  //         backgroundColor: const Color(0xffFFFFFF),
+  //         title: Row(
+  //           mainAxisAlignment: MainAxisAlignment.spaceBetween,
+  //           children: [
+  //             Text('Room Details', style: GoogleFonts.openSans(fontWeight: FontWeight.w700, fontSize: 18),),
+  //             InkWell(
+  //               onTap: () => Navigator.pop(context),
+  //               child: Container(
+  //                 height: 30, width: 30,
+  //                 // here the Cross Icon
+  //                 child:  Stack(
+  //                   alignment: Alignment.center,
+  //                   children: [
+  //                     Container(
+  //                       height: 38,
+  //                       width: 38,
+  //                       decoration: const BoxDecoration(
+  //                         color: Colors.white,
+  //                         borderRadius: BorderRadius.all(Radius.circular(50)),
+  //                         boxShadow:[
+  //                           BoxShadow(
+  //                               color: Color(0xfff5f6f7),
+  //                               blurRadius: 5,
+  //                               spreadRadius: 1,
+  //                               offset: Offset(4,4)
+  //                           )
+  //                         ],
+  //                       ),
+  //                     ),
+  //                     ClipRRect(
+  //                       borderRadius: const BorderRadius.all(Radius.circular(50)),
+  //                       child: Container(
+  //                         height: 20,
+  //                         width: 20,
+  //                         child: Image.asset('assets/ui-design-/images/Multiply.png', fit: BoxFit.contain,scale: 0.5,),
+  //                       ),
+  //                     )
+  //                   ],
+  //                 ),
+  //               ),
+  //             ),
+  //           ],
+  //         ),
+  //         content:
+  //         Container(
+  //           width: 700,
+  //           height: 250,
+  //          child: Column(children: [
+  //            Container(color: Colors.pink,),
+  //           Text('Room No: ${document['roomnumber']}'),
+  //            Text('Room Bedcount: ${document['bedcount']}'),
+  //            Text('Room Block Name: ${document['blockname']}'),
+  //            Text('Available Vacant: ${document['vacant']}'),
+  //          ],),
+  //         ),
+  //       );
+  //     },
+  //   );
+  // }
+
+
+
+  Future<void> roomDetail(DocumentSnapshot<Object?> document) async {
+    try {
+      // Fetch resident documents associated with the room
+      QuerySnapshot residentSnapshot = await FirebaseFirestore.instance
+          .collection("Room")
+          .doc(document.id)
+          .collection('resident')
+          .get();
+
+      List<String> residentNames = [];
+      List<String> residentNumbers = [];
+      // for name
+      residentSnapshot.docs.forEach((resDoc) {
+        String residentName = resDoc['firstName'];
+        String residentNumber = resDoc['phone'];
+        if (residentName != null && residentName.isNotEmpty &&
+        residentNumber != null && residentNumber.isNotEmpty
+        )
+        {
+          residentNames.add(residentName);
+          residentNumbers.add(residentNumber);
+        }
+      });
+      // for number
+      // residentSnapshot.docs.forEach((resDoc) {
+      //   String residentNumber = resDoc['phone'];
+      //   if (residentNumber != null && residentNumber.isNotEmpty) {
+      //     residentNumber.add(residentNumber);
+      //   }
+      // });
+
+      // Show dialog with resident details
+      showDialog<void>(
+        context: context,
+        barrierDismissible: false,
+        builder: (BuildContext context) {
+          return AlertDialog(
+            elevation: 0,
+            backgroundColor: const Color(0xffFFFFFF),
+            title: Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                KText(text:'Details Of Room', style: GoogleFonts.openSans(fontWeight: FontWeight.w700, fontSize: 18),),
+                InkWell(
+                  onTap: () => Navigator.pop(context),
+                  child: Container(
+                    height: 30, width: 30,
+                    child:  Stack(
+                      alignment: Alignment.center,
+                      children: [
+                        Container(
+                          height: 38,
+                          width: 38,
+                          decoration: const BoxDecoration(
+                            color: Colors.white,
+                            borderRadius: BorderRadius.all(Radius.circular(50)),
+                            boxShadow:[
+                              BoxShadow(
+                                  color: Color(0xfff5f6f7),
+                                  blurRadius: 5,
+                                  spreadRadius: 1,
+                                  offset: Offset(4,4)
+                              )
+                            ],
+                          ),
+                        ),
+                        ClipRRect(
+                          borderRadius: const BorderRadius.all(Radius.circular(50)),
+                          child: Container(
+                            height: 20,
+                            width: 20,
+                            child: Image.asset('assets/ui-design-/images/Multiply.png', fit: BoxFit.contain,scale: 0.5,),
+                          ),
+                        )
+                      ],
+                    ),
+                  ),
+                ),
+              ],
+            ),
+
+            content: SingleChildScrollView(
+              child: Container(
+                width: 380,
+                height: 330,
+                // color: Colors.redAccent,
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Divider(color: Colors.grey, height: 10,),
+                    Row(
+                      children: [
+                        Container(
+                            width: 150,
+                            child: KText(text:'Room Number', style: GoogleFonts.openSans(fontWeight: FontWeight.w600),)),
+                        Container(
+                            width: 70,
+                            child: Center(child: Text(':', style: GoogleFonts.openSans(fontWeight: FontWeight.w600),))),
+                        Container(
+
+                            width: 150,
+                            child: KText(text:'${document['roomnumber']}',style: GoogleFonts.openSans(fontWeight: FontWeight.w600, color: Color(0xff262626).withOpacity(0.8)),)),
+                      ],
+                    ),
+                    SizedBox(height: 4,),
+                    Row(
+                      children: [
+                        Container(
+                            width: 150,
+                            child: KText(text:'Block Name', style: GoogleFonts.openSans(fontWeight: FontWeight.w600),)),
+                        Container(
+                            width: 70,
+                            child: Center(child: KText(text:':', style: GoogleFonts.openSans(fontWeight: FontWeight.w600),))),
+                        Container(
+                            width: 150,
+                            child: KText(text:'${document['blockname']}',style: GoogleFonts.openSans(fontWeight: FontWeight.w600, color: Color(0xff262626).withOpacity(0.8)),)),
+                      ],
+                    ),
+                    SizedBox(height: 4,),
+                    Row(
+                      children: [
+                        Container(
+                            width: 150,
+                            child: KText(text:'Total Bed', style: GoogleFonts.openSans(fontWeight: FontWeight.w600),)),
+                        Container(
+                            width: 70,
+                            child: Center(child: KText(text:':', style: GoogleFonts.openSans(fontWeight: FontWeight.w600),))),
+                        Container(
+                            width: 150,
+                            child: KText(text:'${document['bedcount']}',style: GoogleFonts.openSans(fontWeight: FontWeight.w600, color: Color(0xff262626).withOpacity(0.8)),)),
+                      ],
+                    ),
+                    SizedBox(height: 4,),
+                    Row(
+                      children: [
+                        Container(
+                            width: 150,
+                            child: KText(text:'Vacant', style: GoogleFonts.openSans(fontWeight: FontWeight.w600),)),
+                        Container(
+                            width: 70,
+                            child: Center(child: KText(text:':', style: GoogleFonts.openSans(fontWeight: FontWeight.w600),))),
+                        Container(
+
+                            width: 150,
+                            child: KText(text:'${document['vacant']}',style: GoogleFonts.openSans(fontWeight: FontWeight.w600, color: Color(0xff262626).withOpacity(0.8)),)),
+                      ],
+                    ),
+                    SizedBox(height: 20,),
+                    SizedBox(height: 10,),
+
+                    Text('Residents List', style: TextStyle(fontWeight: FontWeight.w700, fontSize: 18)),
+                    Divider(color: Colors.grey, height: 10,),
+
+                            Padding(
+                              padding: const EdgeInsets.only(left: 10, right: 10),
+                              child: Row(
+                                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                children: [
+                                  Padding(
+                                    padding: const EdgeInsets.all(4),
+                                    child: Column(
+                                      crossAxisAlignment: CrossAxisAlignment.start,
+                                      children: residentNames.map((residentName) => Text('${residentName}', style: GoogleFonts.openSans(fontWeight: FontWeight.w600, fontSize: 15),)).toList(),
+                                    ),
+                                  ),
+
+                                  Padding(
+                                    padding: const EdgeInsets.all(4),
+                                    child: Column(
+                                      crossAxisAlignment: CrossAxisAlignment.start,
+                                      children: residentNumbers.map((residentNumber) => Text(residentNumber)).toList(),
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            )
+                  ],
+                ),
+              ),
+            ),
+          );
+
+
+        },
+      );
+    } catch (e) {
+      print('Error fetching resident details: $e');
+    }
+  }
+  
 }
 
 

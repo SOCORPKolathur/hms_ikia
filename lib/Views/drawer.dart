@@ -20,6 +20,7 @@ import 'package:hms_ikia/Views/login_page.dart';
 import 'package:hms_ikia/Views/records.dart';
 import 'package:hms_ikia/Views/resident_tab.dart';
 import 'package:hms_ikia/Views/rooms.dart';
+import 'package:hms_ikia/Views/userPermission.dart';
 import 'package:hms_ikia/Views/vistor.dart';
 import 'package:hms_ikia/widgets/kText.dart';
 import 'package:local_session_timeout/local_session_timeout.dart';
@@ -105,11 +106,13 @@ class _HomeDrawerState extends State<HomeDrawer> {
   }
 
 
-  String churchLogo = '';
+  String hostellogo = '';
+  String hostelname = '';
   getHostelDetails() async {
-    var church = await FirebaseFirestore.instance.collection('AdminDetails').get();
+    var hostel = await FirebaseFirestore.instance.collection('HostelDetails').get();
     setState(() {
-      churchLogo = church.docs.first.get("logo");
+      hostellogo = hostel.docs.first.get("logo");
+      hostelname = hostel.docs.first.get("hostelname");
     });
 
   }
@@ -164,14 +167,14 @@ class _HomeDrawerState extends State<HomeDrawer> {
                                         child: Container(
                                             width: 55,
 
-                                            child: CachedNetworkImage(imageUrl: churchLogo)
+                                            child: CachedNetworkImage(imageUrl: hostellogo)
 
                                         ),
                                       ),
                                       SizedBox(width:10),
 
                                       KText(text:
-                                      " IKIA Hostel",
+                                      hostelname,
                                         style: GoogleFonts.kanit(
                                             fontSize: 23,
                                             fontWeight: FontWeight.w600,
@@ -1072,7 +1075,8 @@ class _HomeDrawerState extends State<HomeDrawer> {
                                     InkWell(
                                       onTap: () {
                                         setState(() {
-                                          //pages = Dashboard2(currentRole: widget.currentRole, sessionStateStream: widget.sessionStateStream);
+                                          // pages = Dashboard2(currentRole: widget.currentRole, sessionStateStream: widget.sessionStateStream);
+                                          pages = userPermission();
                                           dawer=11;
                                           col1=false;
                                           col2=false;

@@ -315,20 +315,20 @@ class _FeesPageState extends State<FeesPage> {
                          Row(
                            mainAxisAlignment: MainAxisAlignment.end,
                            children: [
-                             SizedBox(
-                               height: 40,
-                               child: ElevatedButton(
-                                 style:  const ButtonStyle(
-                                     elevation: MaterialStatePropertyAll(3),
-                                     backgroundColor: MaterialStatePropertyAll(Color(0xff37D1D3))),
-                                 onPressed: () {
-                                 },
-                                 child: Row(children: [
-                                   Text('Export Data', style: GoogleFonts.openSans(color: Colors.white),),
-                                    const Icon(Icons.downloading, color: Colors.white,)
-                                 ],),
-                               ),
-                             )
+                             // SizedBox(
+                             //   height: 40,
+                             //   child: ElevatedButton(
+                             //     style:  const ButtonStyle(
+                             //         elevation: MaterialStatePropertyAll(3),
+                             //         backgroundColor: MaterialStatePropertyAll(Color(0xff37D1D3))),
+                             //     onPressed: () {
+                             //     },
+                             //     child: Row(children: [
+                             //       Text('Export Data', style: GoogleFonts.openSans(color: Colors.white),),
+                             //        const Icon(Icons.downloading, color: Colors.white,)
+                             //     ],),
+                             //   ),
+                             // )
                            ],),
                         SizedBox(height: 20,),
                           Row(children: [
@@ -541,7 +541,7 @@ class _FeesPageState extends State<FeesPage> {
                                      children: [
                                         Text('Submit', style: GoogleFonts.openSans(color: Colors.white)),
                                        SizedBox.fromSize(size: const Size(8, 0)),
-                                       const Icon(Icons.slideshow_rounded, size: 18, color: Colors.white),
+                                       const Icon(Icons.save, size: 18, color: Colors.white),
                                      ],
                                    ),
                                  ),
@@ -641,7 +641,7 @@ class _FeesPageState extends State<FeesPage> {
 
   void Resident(String paymentMethod, String paymentFor, double fees) async {
       DateTime now = DateTime.now();
-      String formattedDate = DateFormat('yyyy-MM-dd').format(now);
+      String formattedDate = DateFormat('dd-MM-yyyy').format(now);
     // main collection
     CollectionReference mainCollection =
     FirebaseFirestore.instance.collection('Users');

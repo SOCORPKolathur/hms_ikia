@@ -5,6 +5,7 @@ import 'package:hms_ikia/widgets/RUsableCommunication.dart';
 import 'package:hms_ikia/widgets/customtextfield.dart';
 
 import '../widgets/ReusableHeader.dart';
+import '../widgets/kText.dart';
 
 class EmailPage extends StatefulWidget {
   const EmailPage({super.key});
@@ -17,9 +18,9 @@ class _EmailPageState extends State<EmailPage> {
   final TextEditingController SubjectCont = TextEditingController();
   static const IconData keyboard_arrow_down_outlined = IconData(0xf13d, fontFamily: 'MaterialIcons');
   List <String> NotifyType = [
-    'Inter',
-    'Binter',
-    'Cinter'
+    'Emergency',
+    'Alert',
+    'Other'
   ];
 
   String? selectedNotify;
@@ -91,20 +92,20 @@ class _EmailPageState extends State<EmailPage> {
                         mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
-                        ReusableDropdown4Commu(dropDownItems: const ['Hostel', 'School', 'police'], hintText: 'Select Yours', onChanged: (value){}),
-                        ReusableDropdown4Commu(dropDownItems: const ['Hostel', 'School', 'police'], hintText: 'Select Yours', onChanged: (value){}),
-                        ReusableDropdown4Commu(dropDownItems: const ['Hostel', 'School', 'police'], hintText: 'Select Yours', onChanged: (value){}),
-                        ReusableDropdown4Commu(dropDownItems: const ['Hostel', 'School', 'police'], hintText: 'Select Yours', onChanged: (value){}),
+                        ReusableDropdown4Commu(dropDownItems: const ['Hostel', 'School', 'police'], hintText: 'Notify Type', onChanged: (value){}),
+                        ReusableDropdown4Commu(dropDownItems: const ['Hostel', 'School', 'police'], hintText: 'Person', onChanged: (value){}),
+                        ReusableDropdown4Commu(dropDownItems: const ['Hostel', 'School', 'police'], hintText: 'Block No', onChanged: (value){}),
+                        ReusableDropdown4Commu(dropDownItems: const ['Hostel', 'School', 'police'], hintText: 'Room No', onChanged: (value){}),
                       ],),
                       const SizedBox(height: 20,),
                       Row(
                         mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
-                          ReusableDropdown4Commu(dropDownItems: const ['Hostel', 'School', 'police'], hintText: 'Select Yours', onChanged: (value){}),
-                          ReusableDropdown4Commu(dropDownItems: const ['Hostel', 'School', 'police'], hintText: 'Select Yours', onChanged: (value){}),
-                          ReusableDropdown4Commu(dropDownItems: const ['Hostel', 'School', 'police'], hintText: 'Select Yours', onChanged: (value){}),
-                          ReusableDropdown4Commu(dropDownItems: const ['Hostel', 'School', 'police'], hintText: 'Select Yours', onChanged: (value){}),
+                          ReusableDropdown4Commu(dropDownItems: const ['Hostel', 'School', 'police'], hintText: 'Gender', onChanged: (value){}),
+                          ReusableDropdown4Commu(dropDownItems: const ['Hostel', 'School', 'police'], hintText: 'Blood Group', onChanged: (value){}),
+                          ReusableDropdown4Commu(dropDownItems: const ['Hostel', 'School', 'police'], hintText: 'Email', onChanged: (value){}),
+                          ReusableDropdown4Commu(dropDownItems: const ['Hostel', 'School', 'police'], hintText: 'Pin Code', onChanged: (value){}),
                         ],),
                       const SizedBox(height: 10,),
 
@@ -155,7 +156,7 @@ class _EmailPageState extends State<EmailPage> {
                                   backgroundColor: MaterialStatePropertyAll(Color(0xffFFFFFF))),
                               onPressed: (){}, child: Row(
                             children: [
-                              Text('Cancle', style: GoogleFonts.openSans(fontSize: 13, fontWeight: FontWeight.w600, color: const Color(0xff37D1D3)),),
+                              Text('Cancel', style: GoogleFonts.openSans(fontSize: 13, fontWeight: FontWeight.w600, color: const Color(0xff37D1D3)),),
 
 
 
@@ -169,7 +170,9 @@ class _EmailPageState extends State<EmailPage> {
                               style:  const ButtonStyle(
                                   elevation: MaterialStatePropertyAll(3),
                                   backgroundColor: MaterialStatePropertyAll(Color(0xff37D1D3))),
-                              onPressed: (){}, child: Row(
+                              onPressed: (){
+                                AlertSuccessPopUp();
+                              }, child: Row(
                             children: [
                               Text('Send', style: GoogleFonts.openSans(fontSize: 13, fontWeight: FontWeight.w600, color: Colors.white),),
                               const SizedBox(width: 8,),
@@ -190,4 +193,114 @@ class _EmailPageState extends State<EmailPage> {
     );
 
   }
+  Future<void> AlertSuccessPopUp() async {
+    return showDialog<void>(
+      context: context,
+      barrierDismissible: false,
+      builder: (BuildContext context) {
+        return AlertDialog(
+            elevation: 0,
+            backgroundColor: const Color(0xffFFFFFF),
+            title: Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                KText(text:'', style: GoogleFonts.openSans(fontWeight: FontWeight.w700, fontSize: 18),),
+                InkWell(
+                  onTap: () => Navigator.pop(context),
+                  child: Container(
+                    height: 30, width: 30,
+                    // here the Cross Icon
+                    child:  Stack(
+                      alignment: Alignment.center,
+                      children: [
+                        Container(
+                          height: 38,
+                          width: 38,
+                          decoration: const BoxDecoration(
+                            color: Colors.white,
+                            borderRadius: BorderRadius.all(Radius.circular(50)),
+                            boxShadow:[
+                              BoxShadow(
+                                  color: Color(0xfff5f6f7),
+                                  blurRadius: 5,
+                                  spreadRadius: 1,
+                                  offset: Offset(4,4)
+                              )
+                            ],
+                          ),
+                        ),
+                        ClipRRect(
+                          borderRadius: const BorderRadius.all(Radius.circular(50)),
+                          child: Container(
+                            height: 20,
+                            width: 20,
+                            child: Image.asset('assets/ui-design-/images/Multiply.png', fit: BoxFit.contain,scale: 0.5,),
+                          ),
+                        )
+                      ],
+                    ),
+                  ),
+                ),
+              ],
+            ),
+
+            content: Container(
+              height: 330,
+              width: 500,
+              child: Column(
+                children: [
+                  Stack(
+                    alignment: Alignment.center,
+                    children: [
+                      // SizedBox(
+                      //     width: 200,
+                      //     child: Image.asset('assets/ui-design-/images/Messaging-cuate .png')),
+                      // Positioned(
+                      //   left:-20,
+                      //   child: SizedBox(
+                      //       width: 100,
+                      //       child: Image.asset('assets/ui-design-/images/frameL.png')),
+                      // ),
+                      // Positioned(
+                      //   right: -20,
+                      //   child: SizedBox(
+                      //       width: 100,
+                      //       child: Image.asset('assets/ui-design-/images/FrameR.png')),
+                      // ),
+                      SizedBox(width: 400,
+                        child: Image.asset('assets/ui-design-/images/FrameFull.png'),
+                      )
+                    ],
+                  ),
+                  KText(text: 'Message Sent Successfully ! ', style: GoogleFonts.openSans(fontWeight: FontWeight.w700, fontSize: 16))
+                  ,SizedBox(height: 8,),
+                  SizedBox(child:
+
+                  KText(text: 'Your message has been successfully sent.', style: GoogleFonts.openSans(fontWeight: FontWeight.w600, fontSize: 16, color: Color(0xff262626).withOpacity(0.8))),
+
+                  ),
+                  SizedBox(height: 20,),
+                  SizedBox(
+                    height: 40,
+                    width: 120,
+                    child: ElevatedButton(
+                        style: ButtonStyle(backgroundColor: MaterialStatePropertyAll(Color(0xff1DA644))),
+                        onPressed: (){
+                          Navigator.pop(context);
+                        }, child: Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                      children: [
+                        KText(text:'Done', style: GoogleFonts.openSans(fontWeight: FontWeight.w700, color: Colors.white),),
+                        CircleAvatar(backgroundColor: Colors.transparent,radius: 13,backgroundImage: AssetImage('assets/ui-design-/images/Ok.png',),)
+                      ],
+                    )),
+                  )
+                ],
+              ),
+            )
+        );
+      },
+    );
+  }
+
 }
