@@ -4,7 +4,6 @@ import 'dart:collection';
 import 'dart:convert';
 import 'dart:html';
 import 'dart:typed_data';
-import 'package:dropdown_button2/dropdown_button2.dart';
 import 'package:firebase_storage/firebase_storage.dart';
 import 'package:hms_ikia/Views/block_name.dart';
 import 'package:hms_ikia/Views/resident_tab.dart';
@@ -27,7 +26,6 @@ import 'package:hms_ikia/Views/setting.dart';
 import 'package:hms_ikia/widgets/event_calender.dart';
 import 'package:hms_ikia/widgets/kText.dart';
 
-import 'package:table_calendar/table_calendar.dart';
 
 import '../Constants/constants.dart';
 import '../widgets/customtextfield.dart';
@@ -153,6 +151,7 @@ class _DashboardState extends State<Dashboard> {
   bool isDataAvailable = true;
 
   int roomCount = 0;
+  int blockCount = 0;
   int Hostellers = 0;
 
   int totalBedCount = 0;
@@ -182,6 +181,18 @@ class _DashboardState extends State<Dashboard> {
     }
   }
 
+//   get block count
+  Future<void> getBlockCounts() async {
+    try {
+      QuerySnapshot querySnapshot = await FirebaseFirestore.instance.collection('Block').get();
+      int length = querySnapshot.docs.length;
+      setState(() {
+        blockCount = length;
+      });
+    } catch (e) {
+      print("Error getting block length: $e");
+    }
+  }
 
   // Future<void> getTotalBedCount() async {
   //   try {
@@ -210,7 +221,6 @@ class _DashboardState extends State<Dashboard> {
   _showPopupMenu(cxt) async {
     double height=MediaQuery.of(cxt).size.height;
     double width=MediaQuery.of(cxt).size.width;
-
     await showMenu(
         context: cxt,
         color: const Color(0xffFFFFFF),
@@ -361,6 +371,7 @@ class _DashboardState extends State<Dashboard> {
   @override
   void initState() {
     super.initState();
+    getBlockCounts();
     getRoomsLength();
     fetchBedCounts();
     getHostellersLength();
@@ -545,7 +556,7 @@ class _DashboardState extends State<Dashboard> {
                           onTap:(){
                             _showPopupMenu(context);
                           },
-                          child: Container(
+                          child: SizedBox(
                             width:width/9.9,
                             // margin: EdgeInsets.fromLTRB(0*fem, 16.5*fem, 58*fem, 16.5*fem),
                             // padding: EdgeInsets.fromLTRB(0*fem, 0*fem, 7.06*fem, 0*fem),
@@ -678,7 +689,7 @@ class _DashboardState extends State<Dashboard> {
                                             ),
                                             Padding(
                                               padding: const EdgeInsets.only(left: 15.0,top: 10),
-                                              child: Text("05",
+                                              child: Text(blockCount.toString().padLeft(2,"0"),
                                                 style: GoogleFonts.openSans (
                                                   fontSize: 40,
                                                   fontWeight: FontWeight.w700,
@@ -725,13 +736,13 @@ class _DashboardState extends State<Dashboard> {
                                         ),
                                         Padding(
                                           padding: const EdgeInsets.only(left: 180.0,top: 10),
-                                          child: Container(
+                                          child: SizedBox(
                                               width: 140,
                                               child: Image.asset("assets/dashbg.png")),
                                         ),
                                         Padding(
                                           padding: const EdgeInsets.only(left: 180.0,top: 10),
-                                          child: Container(
+                                          child: SizedBox(
                                               width: 140,
                                               child: Image.asset("assets/d1.png")),
                                         ),
@@ -813,13 +824,13 @@ class _DashboardState extends State<Dashboard> {
                                         ),
                                         Padding(
                                           padding: const EdgeInsets.only(left: 180.0,top: 10),
-                                          child: Container(
+                                          child: SizedBox(
                                               width: 140,
                                               child: Image.asset("assets/dashbg.png")),
                                         ),
                                         Padding(
                                           padding: const EdgeInsets.only(left: 130.0,top: 30),
-                                          child: Container(
+                                          child: SizedBox(
                                               width: 500,
 
 
@@ -914,13 +925,13 @@ class _DashboardState extends State<Dashboard> {
                                         ),
                                         Padding(
                                           padding: const EdgeInsets.only(left: 180.0,top: 10),
-                                          child: Container(
+                                          child: SizedBox(
                                               width: 140,
                                               child: Image.asset("assets/dashbg.png")),
                                         ),
                                         Padding(
                                           padding: const EdgeInsets.only(left: 160.0,top: 50),
-                                          child: Container(
+                                          child: SizedBox(
                                               width: 200,
                                               child: Image.asset("assets/d3.png")),
                                         ),
@@ -1001,13 +1012,13 @@ class _DashboardState extends State<Dashboard> {
                                         ),
                                         Padding(
                                           padding: const EdgeInsets.only(left: 180.0,top: 10),
-                                          child: Container(
+                                          child: SizedBox(
                                               width: 140,
                                               child: Image.asset("assets/dashbg.png")),
                                         ),
                                         Padding(
                                           padding: const EdgeInsets.only(left: 170.0,top: 10),
-                                          child: Container(
+                                          child: SizedBox(
                                               width: 500,
                                               height: 200,
 
@@ -1023,7 +1034,7 @@ class _DashboardState extends State<Dashboard> {
                             ),
                           ),
 
-                          SizedBox(height: 20,),
+                          const SizedBox(height: 20,),
                           Container(
                             width: 700,
                             decoration: BoxDecoration(border: Border.all(color: const Color(0xff262626).withOpacity(0.10)), borderRadius: BorderRadius.circular(30) ),
@@ -1036,19 +1047,19 @@ class _DashboardState extends State<Dashboard> {
                                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                                   // mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                                   children: [
-                                    Container(
+                                    SizedBox(
                                         width: 70,
                                         child: KText(text:'S.No', style: GoogleFonts.openSans(fontWeight: FontWeight.w700, fontSize: 18),)),
-                                    Container(
+                                    SizedBox(
                                         width: 70,
                                         child: KText(text:'User ID', style: GoogleFonts.openSans(fontWeight: FontWeight.w700, fontSize: 18),)),
-                                    Container(
+                                    SizedBox(
                                         width: 120,
                                         child: KText(text:'Name', style: GoogleFonts.openSans(fontWeight: FontWeight.w700, fontSize: 18),)),
-                                    Container(
+                                    SizedBox(
                                         width: 130,
                                         child: KText(text: 'Phone No', style: GoogleFonts.openSans(fontWeight: FontWeight.w700, fontSize: 18),)),
-                                    Container(
+                                    SizedBox(
                                         width: 110,
                                         child: Center(child: KText(text:'Status', style: GoogleFonts.openSans(fontWeight: FontWeight.w700, fontSize: 18),))),
                                   ],),
@@ -1062,7 +1073,7 @@ class _DashboardState extends State<Dashboard> {
                             print(snapshot);
                             if (snapshot.hasData) {
                               // var documents = snapshot.data!.docs;
-                              return Container(
+                              return SizedBox(
                                 height: 800,
                                 width: 700,
                                 child: ListView.builder(
@@ -1072,37 +1083,37 @@ class _DashboardState extends State<Dashboard> {
                                       final document = snapshot.data!.docs[index];
                                       int serialNumber = index + 1;
                                       String status = 'Absent';
-                                      Color Tcolor = Color(0xffF12D2D);
-                                      Color Bcolor = Color(0xffFFD3D3);
+                                      Color Tcolor = const Color(0xffF12D2D);
+                                      Color Bcolor = const Color(0xffFFD3D3);
                                       document['attendanceStatus'] == true ?
                                       status = 'Present' : status = 'Absent';
                                       document['attendanceStatus'] == true ?
-                                      Tcolor = Color(0xff1DA644) : Tcolor = Color(0xffF12D2D);
+                                      Tcolor = const Color(0xff1DA644) : Tcolor = const Color(0xffF12D2D);
                                       document['attendanceStatus'] == true ?
-                                      Bcolor = Color(0xffDDFFE7): Bcolor = Color(0xffFFD3D3);
+                                      Bcolor = const Color(0xffDDFFE7): Bcolor = const Color(0xffFFD3D3);
                                       return Container(
                                         child: Padding(
                                           padding: const EdgeInsets.only(left: 10, right: 10),
                                           child: Row(
                                             mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                                             children: [
-                                              Container(
+                                              SizedBox(
                                                   width: 70,
                                                   child: Text(serialNumber.toString(),
                                                     style: GoogleFonts.openSans(fontSize: 18),)),
-                                              Container(
+                                              SizedBox(
                                                   width: 70,
                                                   child: Padding(
                                                     padding: const EdgeInsets.only(left: 0),
                                                     child: Text(document['userid'],
                                                       style: GoogleFonts.openSans(fontSize: 18),),
                                                   )),
-                                              Container(
+                                              SizedBox(
                                                   width: 120,
                                                   child: Text(document['name'],
                                                     style: GoogleFonts.openSans(fontSize: 18),)
                                               ),
-                                              Container(
+                                              SizedBox(
                                                 // color: Colors.grey,
                                                   width: 130,
                                                   child: Text('${document['phone']}',
@@ -1110,7 +1121,7 @@ class _DashboardState extends State<Dashboard> {
                                                         fontSize: 18),)),
                                               Padding(
                                                 padding: const EdgeInsets.only(left: 15),
-                                                child: Container(
+                                                child: SizedBox(
                                                     height: 50,
                                                     width: 110,
                                                     child: Center(child: ElevatedButton(
@@ -1130,7 +1141,7 @@ class _DashboardState extends State<Dashboard> {
                             }
                             else {
                               return Center(
-                                child: Container(
+                                child: SizedBox(
                                   width: 200,
                                   height: 230,
                                   child: Center(
@@ -1143,8 +1154,8 @@ class _DashboardState extends State<Dashboard> {
                           )
                         ],
                       ),
-                      SizedBox(width: 20,),
-                      Container(
+                      const SizedBox(width: 20,),
+                      SizedBox(
                         width: 350,
                         child: Column(children: [
                           Container(
@@ -1163,7 +1174,7 @@ class _DashboardState extends State<Dashboard> {
                             child: TableCalendar(
                               calendarStyle: CalendarStyle(
                                 isTodayHighlighted: true,
-                                selectedDecoration: BoxDecoration(), todayDecoration: BoxDecoration(color: Color(0xff37D1D3), borderRadius: BorderRadius.circular(50)), ),
+                                selectedDecoration: const BoxDecoration(), todayDecoration: BoxDecoration(color: const Color(0xff37D1D3), borderRadius: BorderRadius.circular(50)), ),
                               firstDay: DateTime.utc(2010, 10, 16),
                               lastDay: DateTime.utc(2030, 3, 14),
                               focusedDay: DateTime.now(),
@@ -1227,7 +1238,7 @@ class _DashboardState extends State<Dashboard> {
                                                     stops: <double>[0.4, 1.0],
                                                   ),
                                                   borderRadius: BorderRadius.all(Radius.circular(50))),),
-                                            SizedBox(width: 10,),
+                                            const SizedBox(width: 10,),
                                             KText(text: 'Present', style: GoogleFonts.openSans(fontWeight: FontWeight.w600,fontSize: 16, color: const Color(0xff262626).withOpacity(0.8) ))
                                           ],)
                                         ],
@@ -1252,7 +1263,7 @@ class _DashboardState extends State<Dashboard> {
                                                   ),
                                                   // color: Color(0xffB344F6),
                                                   borderRadius: BorderRadius.all(Radius.circular(50))),),
-                                            SizedBox(width: 10,),
+                                            const SizedBox(width: 10,),
                                             KText(text: 'Absent', style: GoogleFonts.openSans(fontWeight: FontWeight.w600,fontSize: 16, color: const Color(0xff262626).withOpacity(0.8) ))
                                           ],)
                                         ],
@@ -1270,7 +1281,7 @@ class _DashboardState extends State<Dashboard> {
                 ]
             ),
           ),
-        ) : pagetype == "Blocks"? BlockName() : pagetype == "Rooms"? Rooms(): Resident_Tab(),
+        ) : pagetype == "Blocks"? const BlockName() : pagetype == "Rooms"? const Rooms(): const Resident_Tab(),
         pagetype != ""?  BounceInDown(
           child: Padding(
             padding: const EdgeInsets.only(top:10.0),
@@ -1288,14 +1299,14 @@ class _DashboardState extends State<Dashboard> {
                 decoration: BoxDecoration(
                   borderRadius: BorderRadius.circular(50)
                 ),
-                  child: Center(child: Icon(Icons.clear))
+                  child: const Center(child: Icon(Icons.clear))
           
           
                 ),
               ),
             ),
           ),
-        ) : SizedBox()
+        ) : const SizedBox()
       ],
     );
   }
@@ -1308,7 +1319,7 @@ class _DashboardState extends State<Dashboard> {
   Future<void> AttendaceDatePicker(BuildContext context) async {
     final DateTime? picked = await showDatePicker(
       context: context,
-      firstDate: DateTime.now().subtract(Duration(days: 365)),
+      firstDate: DateTime.now().subtract(const Duration(days: 365)),
       lastDate: DateTime.now(),
       initialDate: selectedAttDate ?? DateTime.now(),
     );
@@ -1380,7 +1391,7 @@ class _DashboardState extends State<Dashboard> {
   Widget _buildAttendanceInfo(int count, double percentage) {
     return Column(
       children: [
-        SizedBox(height: 10),
+        const SizedBox(height: 10),
         CircularPercentIndicator(
           radius: 70,
           lineWidth: 25,
@@ -1390,10 +1401,10 @@ class _DashboardState extends State<Dashboard> {
             '${percentage.toStringAsFixed(1)}%',
             style: GoogleFonts.openSans(fontWeight: FontWeight.w700, fontSize: 14),
           ),
-          progressColor: Color(0xff1982FD),
+          progressColor: const Color(0xff1982FD),
           // progressColor: status == 'Present' ? Color(0xff1982FD) : Color(0xffB344F6),
           circularStrokeCap: CircularStrokeCap.round,
-          backgroundColor: Color(0xffB344F6),
+          backgroundColor: const Color(0xffB344F6),
         ),
       ],
     );
@@ -1729,7 +1740,7 @@ class _DashboardState extends State<Dashboard> {
       "weblink": weblink.text,
     });
 
-    ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('Hostel details updated')));
+    ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Hostel details updated')));
   }
 
   Future<void> setHostelDetails(String id, BuildContext context) async {
@@ -1752,7 +1763,7 @@ class _DashboardState extends State<Dashboard> {
       weblink.text = val["weblink"];
     } else {
       // If document not found or data is null, show an error message
-      ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('Hostel details not found')));
+      ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Hostel details not found')));
     }
   }
   // for update passing (id to get the EXACT person)
@@ -1788,7 +1799,7 @@ class _DashboardState extends State<Dashboard> {
                 KText(text:'', style: GoogleFonts.openSans(fontWeight: FontWeight.w700, fontSize: 18),),
                 InkWell(
                   onTap: () => Navigator.pop(context),
-                  child: Container(
+                  child: SizedBox(
                     height: 30, width: 30,
                     // Cross Icon
                     child:  Stack(
@@ -1812,7 +1823,7 @@ class _DashboardState extends State<Dashboard> {
                         ),
                         ClipRRect(
                           borderRadius: const BorderRadius.all(Radius.circular(50)),
-                          child: Container(
+                          child: SizedBox(
                             height: 20,
                             width: 20,
                             child: Image.asset('assets/ui-design-/images/Multiply.png', fit: BoxFit.contain,scale: 0.5,),
@@ -1825,7 +1836,7 @@ class _DashboardState extends State<Dashboard> {
               ],
             ),
 
-            content: Container(
+            content: SizedBox(
               height: 360,
               width: 500,
               child: Column(
@@ -1839,17 +1850,17 @@ class _DashboardState extends State<Dashboard> {
                     ],
                   ),
                   KText(text: 'LogOut', style: GoogleFonts.openSans(fontWeight: FontWeight.w700, fontSize: 16)),
-                  SizedBox(height: 8,),
+                  const SizedBox(height: 8,),
                   SizedBox(
-                    child: KText(text: 'Are you sure you want to logout?', style: GoogleFonts.openSans(fontWeight: FontWeight.w600, fontSize: 16, color: Color(0xff262626).withOpacity(0.8))),
+                    child: KText(text: 'Are you sure you want to logout?', style: GoogleFonts.openSans(fontWeight: FontWeight.w600, fontSize: 16, color: const Color(0xff262626).withOpacity(0.8))),
                   ),
-                  SizedBox(height: 20,),
+                  const SizedBox(height: 20,),
 
                   SizedBox(
                     height: 40,
                     width: 140,
                     child: ElevatedButton(
-                      style: ButtonStyle(backgroundColor: MaterialStatePropertyAll(Color(0xffF12D2D))),
+                      style: const ButtonStyle(backgroundColor: MaterialStatePropertyAll(Color(0xffF12D2D))),
                       onPressed: (){
                         _signOut();
                         Navigator.pop(context);
@@ -1858,7 +1869,7 @@ class _DashboardState extends State<Dashboard> {
                         mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                         children: [
                           KText(text: 'Confirm', style: GoogleFonts.openSans(fontWeight: FontWeight.w700, color: Colors.white)),
-                          CircleAvatar(backgroundColor: Colors.transparent,radius: 13,backgroundImage: AssetImage('assets/ui-design-/images/Ok.png',),)
+                          const CircleAvatar(backgroundColor: Colors.transparent,radius: 13,backgroundImage: AssetImage('assets/ui-design-/images/Ok.png',),)
                         ],
                       ),
                     ),
@@ -1870,6 +1881,8 @@ class _DashboardState extends State<Dashboard> {
       },
     );
   }
+
+
 
 }
 

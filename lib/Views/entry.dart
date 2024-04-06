@@ -1,16 +1,11 @@
-import 'dart:html';
 import 'dart:math';
 
 import 'package:animate_do/animate_do.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:hms_ikia/widgets/ReusableHeader.dart';
 import 'package:hms_ikia/widgets/customtextfield.dart';
-import 'package:toggle_switch/toggle_switch.dart';
-import '../Constants/constants.dart';
-import '../widgets/ReusableIconName.dart';
 import '../widgets/kText.dart';
 import '../widgets/switch_button.dart';
 import '../widgets/userMiniDetails.dart';
@@ -21,7 +16,6 @@ class Entry extends StatefulWidget {
   @override
   State<Entry> createState() => _EntryState();
 }
-
 class _EntryState extends State<Entry> {
   List<Map<String, dynamic>> searchSuggestions = [];
   // var noSuggestion;
@@ -30,13 +24,11 @@ class _EntryState extends State<Entry> {
   TextEditingController Search = TextEditingController();
   Map<String, dynamic>? selectedUser;
   bool viewAllHistory = false;
-
   @override
   void initState() {
     super.initState();
     fetchUsers();
   }
-
   // Fetching the user data here...
   void fetchUsers() async {
     QuerySnapshot snapshot = await FirebaseFirestore.instance.collection('Users').get();
@@ -52,11 +44,7 @@ class _EntryState extends State<Entry> {
     }
     );
   }
-
-
-
   bool ChangeValue = false;
-
   @override
   Widget build(BuildContext context) {
     double listViewHeight = calculateListViewHeight();
@@ -86,15 +74,14 @@ class _EntryState extends State<Entry> {
                       hint: 'Search Resident Name',
                       onChanged: (value) {
                         setState(() {
-                          if(value.isEmpty){
+                          if (value.isEmpty) {
                             fetchUsers();
                             print('values Emp');
+                          } else {
+                            searchSuggestions = searchSuggestions.where((user) =>
+                                user['name'].toLowerCase().startsWith(value.toLowerCase())).toList();
+                            print(value);
                           }
-                          else{
-                            searchSuggestions = searchSuggestions.where((user) => user['name'].toLowerCase().startsWith(value.toLowerCase()) ||
-                                user['userid'].toLowerCase().startsWith(value.toLowerCase())
-                            ).toList();
-                          print(value);}
                           print(searchSuggestions);
                           print('ide');
                         });
@@ -104,7 +91,8 @@ class _EntryState extends State<Entry> {
                       header: '',
                       width: 335,
                       preffixIcon: Icons.search,
-                      height: 45, validator:  null,
+                      height: 45,
+                      validator: null,
                     ),
                     SizedBox.fromSize(size: const Size(23, 0)),
                     CustomTextField(
@@ -120,7 +108,8 @@ class _EntryState extends State<Entry> {
                             searchSuggestions = searchSuggestions.where((user) => user['name'].toLowerCase().startsWith(value.toLowerCase())  ||
                                 user['userId'].toLowerCase().startsWith(value.toLowerCase())
                             ).toList();
-                            print(value);}
+                            print(value);
+                          }
                           print(searchSuggestions);
                           print('ide');
                         });
@@ -222,7 +211,10 @@ class _EntryState extends State<Entry> {
                     ),
                   ),
                 ) : const SizedBox(),
-              if (selectedUser != null && ResidentName.text.isNotEmpty || ResidentUid.text.isNotEmpty ) ...[
+
+              if (selectedUser != null && ResidentName.text.isNotEmpty
+                  ||
+                  ResidentUid.text.isNotEmpty ) ...[
                 ClipRRect(
                   child: Container(
                       height: 450,
@@ -269,10 +261,7 @@ class _EntryState extends State<Entry> {
                                           Row(
                                             children: [
                                               const UserMiniDetails(IconName: Icons.downloading, iName: 'Status                  :     ',),
-
                                               getStatusButton(selectedUser!['status']),
-
-
                                             ],
                                           ),
                                           const SizedBox(height: 8,),
@@ -359,7 +348,6 @@ class _EntryState extends State<Entry> {
                                               mainAxisAlignment: MainAxisAlignment.spaceBetween,
                                               children: [
                                                 KText(text:'History', style: GoogleFonts.openSans(fontWeight: FontWeight.w800, fontSize: 18),),
-
                                               SizedBox(
                                                 width: 120,
                                                 height: 40,
@@ -377,7 +365,6 @@ class _EntryState extends State<Entry> {
                                                 }, child:  Text(
                                                     viewAllHistory ? 'View Less' : 'View All')),
                                               ),
-
                                               ],
                                             ),
                                           ),
@@ -428,8 +415,7 @@ class _EntryState extends State<Entry> {
                                                   ],
                                                 ),
                                               ),
-
-                                                                                       ],),
+                                               ],),
                                            ),
                                           const SizedBox(height: 30,),
                                           StreamBuilder(
@@ -497,7 +483,6 @@ class _EntryState extends State<Entry> {
                                                   }
                                                 },
                                               );
-
                                             } else {
                                               return KText(text:'No data available', style: GoogleFonts.openSans(),);
                                             }
@@ -526,10 +511,8 @@ class _EntryState extends State<Entry> {
                           )
                         ],),
                       )
-
                   ),
                 ),
-
               ],
             ],
           ),
@@ -537,6 +520,7 @@ class _EntryState extends State<Entry> {
       ),
     );
   }
+
   double calculateListViewHeight() {
     // Calculate the total height of the ListView
     double itemHeight = 60; // Height of each item
@@ -544,7 +528,6 @@ class _EntryState extends State<Entry> {
     double totalHeight = itemHeight * itemCount;
     return totalHeight;
   }
-
   // creating sub collection (entries)
   void statusTrue() async {
     // main collection
@@ -570,8 +553,6 @@ class _EntryState extends State<Entry> {
       });
     print('Subcollection created successfully');
   }
-
-
   void statusFalse() async {
     CollectionReference mainCollection =
     FirebaseFirestore.instance.collection('Users');
@@ -580,7 +561,6 @@ class _EntryState extends State<Entry> {
     CollectionReference subcollectionRef =
     documentRef.collection('entries');
     int millisecondsSinceEpoch = Timestamp.now().millisecondsSinceEpoch;
-
     await subcollectionRef.add({
       'status': 'false',
       'date': Timestamp.fromDate(DateTime.now()),
@@ -591,31 +571,6 @@ class _EntryState extends State<Entry> {
       selectedUser!['status'] = false;
     });
  }
-
-
-
-  // void statusTrue() async {
-  //   await FirebaseFirestore.instance
-  //       .collection('Users')
-  //       .doc(selectedUser!['docId'])
-  //       .update({'status': true});
-  //   setState(() {
-  //     selectedUser!['status'] = true;
-  //   });
-  // }
-
-  // void statusFalse() async {
-  //   await FirebaseFirestore.instance
-  //       .collection('Users')
-  //       .doc(selectedUser!['docId'])
-  //       .update({'status': false});
-  //   setState(() {
-  //     selectedUser!['status'] = false;
-  //   });
-  // }
-
-
-
   Widget getStatusButton(bool status) {
     return status
         ?
@@ -658,5 +613,4 @@ class _EntryState extends State<Entry> {
       ),
     );
   }
-
 }

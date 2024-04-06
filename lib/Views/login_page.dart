@@ -1,9 +1,11 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:hms_ikia/Views/drawer.dart';
 import 'package:hms_ikia/widgets/customtextfield.dart';
+import 'package:hms_ikia/widgets/kText.dart';
 
 import '../Constants/constants.dart';
 
@@ -34,6 +36,7 @@ class _LoginPageState extends State<LoginPage> {
     });
 
   }
+  bool passwordview = true;
   @override
   Widget build(BuildContext context) {
     double height=MediaQuery.of(context).size.height;
@@ -70,18 +73,160 @@ class _LoginPageState extends State<LoginPage> {
                 Row(
                   mainAxisAlignment: MainAxisAlignment.end,
                   children: [
-                    CustomTextField(
+                    Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+
+                          Padding(
+                            padding: const EdgeInsets.only(left: 10),
+                            child: Container(
+                              child: Row(
+                                mainAxisAlignment: MainAxisAlignment.start,
+                                children: [
+                                  KText(
+                                    text: "Username",
+                                    style: GoogleFonts.openSans(
+                                      fontSize: 14,
+                                      fontWeight: FontWeight.w600,
+                                      color: Color(0xff262626),
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            ),
+                          ),
+                        Padding(
+                          padding: EdgeInsets.only(top: 8.0 ),
+                          child: Container(
+                            width: 470,
+                            height: 50,
+                            decoration: BoxDecoration(
+                              color: Colors.white,
+                              borderRadius: BorderRadius.circular(30),
+                              border: Border.all(color: Color(0x7f262626)),
+                            ),
+                            child: Padding(
+                              padding: const EdgeInsets.only(left: 15, right: 20),
+                              child: TextFormField(
+                                onTap: () {},
+                                autofillHints: [AutofillHints.username],
+                                cursorColor: Constants().primaryAppColor,
+                                onChanged: (val){
+
+                                },
+                                controller: username,
+                                onFieldSubmitted: (val){
+
+                                },
+                                decoration: InputDecoration(
+                                 // suffixIcon: Icon(widget.suffixIcon, color: widget.suffixColor),
+                                  border: InputBorder.none,
+                                  hintText: "Enter username",
+                                  hintStyle: GoogleFonts.openSans(
+                                    fontSize: 12,
+                                    fontWeight: FontWeight.w600,
+                                    color: Color(0x7f262626),
+                                  ),
+                                ),
+                                style: GoogleFonts.openSans(
+                                  fontSize: 13,
+                                  fontWeight: FontWeight.w600,
+                                  color: Colors.black,
+                                ),
+                              ),
+                            ),
+                          ),
+                        ),
+                      ],
+                    ),
+                  /*  CustomTextField(
                       width: 470,
-                      hint: "Enter username", controller: username, validator: (String? val ) {  }, header: "Username",),
+                      hint: "Enter username", controller: username, validator: (String? val ) {  }, header: "Username",),*/
                   ],
                 ),
                 SizedBox(height: 20,),
                 Row(
                   mainAxisAlignment: MainAxisAlignment.end,
                   children: [
-                    CustomTextField(
+                    Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+
+                        Padding(
+                          padding: const EdgeInsets.only(left: 10),
+                          child: Container(
+                            child: Row(
+                              mainAxisAlignment: MainAxisAlignment.start,
+                              children: [
+                                KText(
+                                  text: "Password",
+                                  style: GoogleFonts.openSans(
+                                    fontSize: 14,
+                                    fontWeight: FontWeight.w600,
+                                    color: Color(0xff262626),
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ),
+                        ),
+                        Padding(
+                          padding: EdgeInsets.only(top: 8.0 ),
+                          child: Container(
+                            width: 470,
+                            height: 50,
+                            decoration: BoxDecoration(
+                              color: Colors.white,
+                              borderRadius: BorderRadius.circular(30),
+                              border: Border.all(color: Color(0x7f262626)),
+                            ),
+                            child: Padding(
+                              padding: const EdgeInsets.only(left: 15, right: 20),
+                              child: TextFormField(
+                                onTap: () {},
+                                obscureText: passwordview,
+                                cursorColor: Constants().primaryAppColor,
+                                onChanged: (val){
+
+                                },
+                                autofillHints: [AutofillHints.password],
+                                controller: password,
+                                onFieldSubmitted: (val){
+
+                                },
+                                decoration: InputDecoration(
+                                   suffixIcon: InkWell(child: Icon(passwordview == true?Icons.remove_red_eye : Icons.remove_red_eye_outlined,),
+                                     onTap: (){
+                                     setState(() {
+                                       passwordview=!passwordview;
+                                     });
+                                     },
+
+                                   ),
+                                  border: InputBorder.none,
+                                  hintText: "Enter password",
+                                  hintStyle: GoogleFonts.openSans(
+                                    fontSize: 12,
+                                    fontWeight: FontWeight.w600,
+                                    color: Color(0x7f262626),
+                                  ),
+                                ),
+                                style: GoogleFonts.openSans(
+                                  fontSize: 13,
+                                  fontWeight: FontWeight.w600,
+                                  color: Colors.black,
+                                ),
+                              ),
+                            ),
+                          ),
+                        ),
+                      ],
+                    ),
+                    /*  CustomTextField(
                       width: 470,
-                      hint: "Enter password", controller: password, validator: (String? val ) {  }, header: "Password",),
+                      hint: "Enter username", controller: username, validator: (String? val ) {  }, header: "Username",),*/
                   ],
                 ),
                 SizedBox(height: 20,),
@@ -126,6 +271,7 @@ class _LoginPageState extends State<LoginPage> {
       ScaffoldMessenger.of(context).showSnackBar(snackBar);
     })).user;
     if (user != null) {
+      TextInput.finishAutofillContext();
       setState(() {
         _success = true;
         result = true;
@@ -173,9 +319,4 @@ class _LoginPageState extends State<LoginPage> {
         )
     ),
   );
-
-
-
-
-
 }

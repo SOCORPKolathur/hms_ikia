@@ -124,7 +124,7 @@ class _AssetManagementState extends State<AssetManagement> {
                     // SizedBox(width: 20,),
                     Padding(
                       padding: const EdgeInsets.only(left: 20),
-                      child: CustomTextField(hint: 'Search Resident Name',
+                      child: CustomTextField(hint: 'Search assets here',
                         controller: AssetsNameSearch,
                         validator: null,
                         fillColor: const Color(0xffF5F5F5),
@@ -1521,7 +1521,7 @@ class _AssetManagementState extends State<AssetManagement> {
           ),
 
           const SizedBox(width: 18,),
-                            CustomTextField(header: "Approximate Vale",hint: "Enter the Amount",controller: ApproximateVal,validator: null,),
+                            CustomTextField(header: "Approximate Value",hint: "Enter the Amount",controller: ApproximateVal,validator: null,),
                             const SizedBox(width: 18,),
                             CustomTextField(header: "Verifier",hint: "Enter Gender",controller: gender,validator: null,),
                           ],
@@ -1649,6 +1649,7 @@ class _AssetManagementState extends State<AssetManagement> {
                                         elevation: MaterialStatePropertyAll(0),
                                         backgroundColor: MaterialStatePropertyAll(Color(0xfff5f6f7))),
                                     onPressed: (){
+                                      Navigator.pop(context);
                                     }, child:
                                   KText(
                                     text:'Cancel',

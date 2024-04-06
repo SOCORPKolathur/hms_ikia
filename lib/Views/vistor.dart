@@ -1,12 +1,16 @@
 import 'package:animate_do/animate_do.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:csv/csv.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:hms_ikia/widgets/kText.dart';
 import 'package:intl/intl.dart';
+import 'package:pdf/pdf.dart';
+import 'package:printing/printing.dart';
 import 'package:top_snackbar_flutter/custom_snack_bar.dart';
 import 'package:top_snackbar_flutter/top_snack_bar.dart';
-
+import 'package:pdf/widgets.dart' as pw;
+import 'dart:html' as html;
 import '../Constants/constants.dart';
 import '../widgets/ReusableHeader.dart';
 import '../widgets/ReusableRoomContainer.dart';
@@ -172,6 +176,21 @@ class _Visitor_PageState extends State<Visitor_Page> {
     }
   }
 
+  // String _getFormattedDate() {
+  //   final now = DateTime.now();
+  //   final formattedDate = "${now.year}-${now.month}-${now.day}";
+  //   return formattedDate;
+  // }
+
+  String _getFormattedDate() {
+    final now = DateTime.now();
+    final formattedDate = "${now.year}-${now.month.toString().padLeft(2, '0')}-${now.day.toString().padLeft(2, '0')}";
+    return formattedDate;
+  }
+
+
+
+
   @override
   void initState() {
     setState(() {
@@ -198,35 +217,101 @@ class _Visitor_PageState extends State<Visitor_Page> {
           child: Column(
             children: [
               // Image.asset("assets/Visitor Management.png"),
-              const ReusableHeader(Headertext: 'Fees Register ', SubHeadingtext: '"Manage Easily Residents Records"'),
+              const ReusableHeader(Headertext: 'Visitor Management ', SubHeadingtext: '"Manage Easily Visitors Records"'),
               const SizedBox(height: 20,),
-               Row(
-                mainAxisAlignment: MainAxisAlignment.spaceAround,
-                children: [
-                  ReusableRoomContainer(
-                    firstColor: Color(0xff034d7f),
-                    secondColor: Color(0xff058be5),
-                    // totalRooms: getTodaysVisitors.toString(),
-                    title: 'Today Total Visitors',
-                    totalRooms: '05',
-                    waveImg: 'assets/ui-design-/images/Vector 38 (1).png', roomImg: 'assets/ui-design-/images/Group 70.png',
-                  ),
-                  ReusableRoomContainer(
-                    firstColor: Color(0xff0e4d1f),
-                    secondColor: Color(0xff1b9a3f),
-                    totalRooms: '20',
-                    title: 'Today Visitors  Check In',
-                    waveImg: 'assets/ui-design-/images/Vector 37 (3).png', roomImg: 'assets/ui-design-/images/Group 71.png',
-                  ),
-                  ReusableRoomContainer(
-                    firstColor: Color(0xff971c1c),
-                    secondColor: Color(0xffe22a2a),
-                    totalRooms: '20',
-                    title: 'Today Visitors Check Out',
-                    waveImg: 'assets/ui-design-/images/Vector 36 (3).png', roomImg: 'assets/ui-design-/images/Group 72.png',
-                  ),
-                ],
+
+              StreamBuilder(
+                stream: FirebaseFirestore.instance.collection('Visitors')
+                    .where('checkinDate', isEqualTo: _getFormattedDate())
+                    .snapshots(),
+                builder: (context, checkInSnapshot) {
+                  if (checkInSnapshot.hasData) {
+                    final checkInDocs = checkInSnapshot.data!.docs;
+
+                    // Count the number of check-ins
+                    final numberOfCheckIns = checkInDocs.length;
+
+                    // Sum up the total visitors from all documents
+                    int totalVisitors = 0;
+                    for (var doc in checkInDocs) {
+                      // Parse 'totalvisitors' field and add to totalVisitors
+                      String totalVisitorsString = doc['totalvisitors'] ?? '';
+                      List<String> visitorsList = totalVisitorsString.split(',');
+                      for (var visitor in visitorsList) {
+                        totalVisitors += int.tryParse(visitor.trim()) ?? 0;
+                      }
+                    }
+
+                    return StreamBuilder(
+                      stream: FirebaseFirestore.instance.collection('Visitors')
+                          .where('checkoutDate', isEqualTo: _getFormattedDate())
+                          .snapshots(),
+                      builder: (context, checkOutSnapshot) {
+                        if (checkOutSnapshot.hasData) {
+                          final checkOutDocs = checkOutSnapshot.data!.docs;
+
+                          Set<String> checkIns = {};
+                          Set<String> checkOuts = {};
+
+                          // Add unique identifiers for check-ins
+                          for (var doc in checkInDocs) {
+                            checkIns.add(doc['name']);
+                          }
+
+                          for (var doc in checkOutDocs) {
+                            // Assuming 'name' is a field uniquely identifying visitors
+                            checkOuts.add(doc['name']);
+                          }
+
+                          // Count the number of unique visitors
+                          final numberOfVisitors = (checkIns.union(checkOuts)).length;
+
+                          // Count the number of check-outs
+                          final numberOfCheckOuts = checkOuts.length;
+
+                          return Row(
+                            mainAxisAlignment: MainAxisAlignment.spaceAround,
+                            children: [
+                              ReusableRoomContainer(
+                                firstColor: const Color(0xff034d7f),
+                                secondColor: const Color(0xff058be5),
+                                title: 'Today Total Visitors',
+                                totalRooms: totalVisitors.toString(),
+                                waveImg: 'assets/ui-design-/images/Vector 38 (1).png',
+                                roomImg: 'assets/ui-design-/images/Group 70.png',
+                              ),
+                              ReusableRoomContainer(
+                                firstColor: const Color(0xff0e4d1f),
+                                secondColor: const Color(0xff1b9a3f),
+                                totalRooms: numberOfCheckIns.toString(),
+                                title: 'Today Visitors Check In',
+                                waveImg: 'assets/ui-design-/images/Vector 37 (3).png',
+                                roomImg: 'assets/ui-design-/images/Group 71.png',
+                              ),
+                              ReusableRoomContainer(
+                                firstColor: const Color(0xff971c1c),
+                                secondColor: const Color(0xffe22a2a),
+                                totalRooms: numberOfCheckOuts.toString(),
+                                title: 'Visitors Check Out',
+                                waveImg: 'assets/ui-design-/images/Vector 36 (3).png',
+                                roomImg: 'assets/ui-design-/images/Group 72.png',
+                              ),
+                            ],
+                          );
+                        } else {
+                          return const CircularProgressIndicator();
+                        }
+                      },
+                    );
+                  } else {
+                    return const CircularProgressIndicator();
+                  }
+                },
               ),
+
+
+
+
 
               const SizedBox(height: 20,),
               Container(
@@ -281,8 +366,8 @@ class _Visitor_PageState extends State<Visitor_Page> {
                                   showPopup(context);
                                 }, child: Row(
                               children: [
-                                Text('Export Data', style: GoogleFonts.openSans(fontSize: 17, fontWeight: FontWeight.w600, color: Colors.white),),
-                                SizedBox(width: 4,),
+                                KText(text:'Export Data', style: GoogleFonts.openSans(fontSize: 17, fontWeight: FontWeight.w600, color: Colors.white),),
+                                const SizedBox(width: 4,),
                                 SizedBox(
                                     width: 30,
                                     height: 30,
@@ -298,9 +383,9 @@ class _Visitor_PageState extends State<Visitor_Page> {
            child: Container(
              decoration: BoxDecoration(borderRadius: const BorderRadius.all(Radius.circular(20)
              ),
-               border: Border.all(color: Color(0xff262626).withOpacity(0.1))
+               border: Border.all(color: const Color(0xff262626).withOpacity(0.1))
              ),
-             constraints: BoxConstraints(
+             constraints: const BoxConstraints(
                minHeight: 100,
                maxHeight: 1000,
              ),
@@ -318,35 +403,38 @@ class _Visitor_PageState extends State<Visitor_Page> {
                    Container(
                        height: 50,
                        width: 100,
-                       child: Center(child: Text('S.No', style: GoogleFonts.openSans(fontWeight: FontWeight.w700, fontSize: 18),
+                       child: Center(child: KText(text:'S.No', style: GoogleFonts.openSans(fontWeight: FontWeight.w700, fontSize: 18),
                        )
                        )),
                      Container(
                          height: 50,
                          width: 150,
-                         child: Center(child: Text('Visitor Name', style: GoogleFonts.openSans(fontWeight: FontWeight.w700, fontSize: 18),))),
+                         child: Center(child: KText(text:'Visitor Name', style: GoogleFonts.openSans(fontWeight: FontWeight.w700, fontSize: 18),))),
                      Container(
                          height: 50,
                          width: 100,
-                         child: Center(child: Text('Phone No', style: GoogleFonts.openSans(fontWeight: FontWeight.w700, fontSize: 18),))),
+                         child: Center(child: KText(text:'Phone No', style: GoogleFonts.openSans(fontWeight: FontWeight.w700, fontSize: 18),))),
                      Container(
                          height: 50,
                          width: 100,
-                         child: Center(child: Text('Purpose', style: GoogleFonts.openSans(fontWeight: FontWeight.w700, fontSize: 18),))),
+                         child: Center(child: KText(text:'Purpose', style: GoogleFonts.openSans(fontWeight: FontWeight.w700, fontSize: 18),))),
                      Container(
                          height: 50,
                          width: 200,
-                         child: Center(child: Text('Check In/Check Out', style: GoogleFonts.openSans(fontWeight: FontWeight.w700, fontSize: 18),))),
+                         child: Center(child: KText(text:'Check In/Check Out', style: GoogleFonts.openSans(fontWeight: FontWeight.w700, fontSize: 18),))),
                      Container(
                          height: 50,
                          width: 130,
-                         child: Center(child: Text('Status', style: GoogleFonts.openSans(fontWeight: FontWeight.w700, fontSize: 18),))),
+                         child: Center(child: KText(text:'Status', style: GoogleFonts.openSans(fontWeight: FontWeight.w700, fontSize: 18),))),
                      Container(
                          height: 50,
                          width: 100,
-                         child: Center(child: Text('Actions', style: GoogleFonts.openSans(fontWeight: FontWeight.w700, fontSize: 18),))),
+                         child: Center(child: KText(text:'Actions', style: GoogleFonts.openSans(fontWeight: FontWeight.w700, fontSize: 18),))),
                  ],),
                  Container(color: const Color(0xff262626).withOpacity(0.1), width: double.infinity, height: 2,),
+
+
+
               StreamBuilder(stream: FirebaseFirestore.instance.collection('Visitors').snapshots(), builder: (context, snapshot) {
                 if(snapshot.hasData){
                   // this is matched one with the search
@@ -403,29 +491,29 @@ class _Visitor_PageState extends State<Visitor_Page> {
                                       Container(
                                           height: 50,
                                           width: 150,
-                                          child: Center(child: Text(document['name'], style: GoogleFonts.openSans(fontWeight: FontWeight.w600, fontSize: 16, color: const Color(0xff262626).withOpacity(0.8)),))),
+                                          child: Center(child: KText(text:document['name'], style: GoogleFonts.openSans(fontWeight: FontWeight.w600, fontSize: 16, color: const Color(0xff262626).withOpacity(0.8)),))),
                                       Container(
 
                                           height: 50,
                                           width: 100,
-                                          child: Center(child: Text(document['number'],style: GoogleFonts.openSans(fontWeight: FontWeight.w600, fontSize: 16, color: const Color(0xff262626).withOpacity(0.8)),))),
+                                          child: Center(child: KText(text:document['number'],style: GoogleFonts.openSans(fontWeight: FontWeight.w600, fontSize: 16, color: const Color(0xff262626).withOpacity(0.8)),))),
 
                                       Container(
                                           height: 50,
                                           width: 100,
-                                          child: Center(child: Text(document['reason'], style: GoogleFonts.openSans(fontWeight: FontWeight.w600, fontSize: 16, color: const Color(0xff262626).withOpacity(0.8)),))),
+                                          child: Center(child: KText(text:document['reason'], style: GoogleFonts.openSans(fontWeight: FontWeight.w600, fontSize: 16, color: const Color(0xff262626).withOpacity(0.8)),))),
 
                                       Container(
                                           height: 50,
                                           width: 200,
-                                          child: Center(child: Text( '${document['checkinTime']} - ${document['checkoutTime']}', style: GoogleFonts.openSans(fontWeight: FontWeight.w600, fontSize: 16, color: const Color(0xff262626).withOpacity(0.8)),))),
+                                          child: Center(child: KText( text:'${document['checkinTime']} - ${document['checkoutTime']}', style: GoogleFonts.openSans(fontWeight: FontWeight.w600, fontSize: 16, color: const Color(0xff262626).withOpacity(0.8)),))),
                                       document['checkoutTime'] == '' ?
                                       Container(
                                           height: 50,
                                           width: 130,
                                           child: Center(child: ElevatedButton(
                                             style: const ButtonStyle(backgroundColor: MaterialStatePropertyAll(Color(0xffDDFFE7))),
-                                            onPressed: () {}, child: Text('Check In', style: GoogleFonts.openSans(color: const Color(0xff1DA644), fontSize: 15),),)
+                                            onPressed: () {}, child: KText(text:'Check In', style: GoogleFonts.openSans(color: const Color(0xff1DA644), fontSize: 15),),)
                                           )
                                       ) :
                                       Container(
@@ -433,7 +521,7 @@ class _Visitor_PageState extends State<Visitor_Page> {
                                           width: 130,
                                           child: Center(child: ElevatedButton(
                                             style: const ButtonStyle(backgroundColor: MaterialStatePropertyAll(Color(0xffFFD3D3))),
-                                            onPressed: () {}, child: Text('Check out', style: GoogleFonts.openSans(color: const Color(0xffF12D2D), fontSize: 15),),)
+                                            onPressed: () {}, child: KText(text:'Check out', style: GoogleFonts.openSans(color: const Color(0xffF12D2D), fontSize: 15),),)
                                           )
                                       ),
 
@@ -486,7 +574,7 @@ class _Visitor_PageState extends State<Visitor_Page> {
 
                       }, itemCount: snapshot.data!.docs.length );
                   }else{
-                  return CircularProgressIndicator();
+                  return const CircularProgressIndicator();
                 }
               },)
                ],
@@ -520,8 +608,8 @@ class _Visitor_PageState extends State<Visitor_Page> {
                 children: [
                   Column(
                     children: [
-                      Text('Add Visitor or Guest', style: GoogleFonts.openSans(fontWeight: FontWeight.w700, fontSize: 18),),
-                      Text('Enter Visitor Details', style: GoogleFonts.openSans(fontWeight: FontWeight.w500, fontSize: 15),),
+                      KText(text:'Add Visitor or Guest', style: GoogleFonts.openSans(fontWeight: FontWeight.w700, fontSize: 18),),
+                      KText(text:'Enter Visitor Details', style: GoogleFonts.openSans(fontWeight: FontWeight.w500, fontSize: 15),),
                     ],
                   ),
                   InkWell(
@@ -579,7 +667,7 @@ class _Visitor_PageState extends State<Visitor_Page> {
                             child: Column(
                               crossAxisAlignment: CrossAxisAlignment.start,
                               children: [
-                                Text('Visitor Name', style: GoogleFonts.openSans(color: const Color(0xff262626).withOpacity(0.6), fontSize: 16, fontWeight: FontWeight.w600),),
+                                KText(text:'Visitor Name', style: GoogleFonts.openSans(color: const Color(0xff262626).withOpacity(0.6), fontSize: 16, fontWeight: FontWeight.w600),),
                                 Padding(
                                   padding: const EdgeInsets.only(bottom: 10, top: 10),
                                   child: CustomTextField(
@@ -600,7 +688,7 @@ class _Visitor_PageState extends State<Visitor_Page> {
                             child: Column(
                               crossAxisAlignment: CrossAxisAlignment.start,
                               children: [
-                                Text('Visitor Phone Number', style: GoogleFonts.openSans(color: const Color(0xff262626).withOpacity(0.6), fontSize: 16, fontWeight: FontWeight.w600),),
+                                KText(text:'Visitor Phone Number', style: GoogleFonts.openSans(color: const Color(0xff262626).withOpacity(0.6), fontSize: 16, fontWeight: FontWeight.w600),),
                                 Padding(
                                   padding: const EdgeInsets.only(bottom: 10, top: 10),
                                   child: CustomTextField(
@@ -621,7 +709,7 @@ class _Visitor_PageState extends State<Visitor_Page> {
                             child: Column(
                               crossAxisAlignment: CrossAxisAlignment.start,
                               children: [
-                                Text('No of Visitors', style: GoogleFonts.openSans(color: const Color(0xff262626).withOpacity(0.6), fontSize: 16, fontWeight: FontWeight.w600),),
+                                KText(text:'No of Visitors', style: GoogleFonts.openSans(color: const Color(0xff262626).withOpacity(0.6), fontSize: 16, fontWeight: FontWeight.w600),),
                                 Padding(
                                   padding: const EdgeInsets.only(bottom: 10, top: 10),
                                   child: CustomTextField(
@@ -648,16 +736,16 @@ class _Visitor_PageState extends State<Visitor_Page> {
                             child: Column(
                               crossAxisAlignment: CrossAxisAlignment.start,
                               children: [
-                                Text('From Time', style: GoogleFonts.openSans(color: const Color(0xff262626).withOpacity(0.6), fontSize: 16, fontWeight: FontWeight.w600),),
+                                KText(text:'From Time', style: GoogleFonts.openSans(color: const Color(0xff262626).withOpacity(0.6), fontSize: 16, fontWeight: FontWeight.w600),),
                                 Padding(
-                                  padding: EdgeInsets.only(top: 10, bottom: 20),
+                                  padding: const EdgeInsets.only(top: 10, bottom: 20),
                                   child: Container(
                                     width: 220,
                                     height: 50,
                                     decoration: BoxDecoration(
                                       color: Colors.white,
                                       borderRadius: BorderRadius.circular(30),
-                                      border: Border.all(color: Color(0x7f262626)),
+                                      border: Border.all(color: const Color(0x7f262626)),
                                     ),
                                     child: Padding(
                                       padding: const EdgeInsets.only(left: 0.0, right: 0),
@@ -670,14 +758,14 @@ class _Visitor_PageState extends State<Visitor_Page> {
                                             onPressed: () {
                                               CheckInTime(context);
                                             },
-                                            icon: Icon(Icons.watch_later_outlined),
+                                            icon: const Icon(Icons.watch_later_outlined),
                                           ),
                                           border: InputBorder.none,
-                                          hintText: "From Time", // Default hint
+                                          hintText: "From Time",
                                           hintStyle: GoogleFonts.openSans(
                                             fontSize: 12,
                                             fontWeight: FontWeight.w600,
-                                            color: Color(0x7f262626),
+                                            color: const Color(0x7f262626),
                                           ),
                                         ),
                                         style: GoogleFonts.openSans(
@@ -698,16 +786,16 @@ class _Visitor_PageState extends State<Visitor_Page> {
                             child: Column(
                               crossAxisAlignment: CrossAxisAlignment.start,
                               children: [
-                                Text('To Time', style: GoogleFonts.openSans(color: const Color(0xff262626).withOpacity(0.6), fontSize: 16, fontWeight: FontWeight.w600),),
+                                KText(text:'To Time', style: GoogleFonts.openSans(color: const Color(0xff262626).withOpacity(0.6), fontSize: 16, fontWeight: FontWeight.w600),),
                                 Padding(
-                                  padding: EdgeInsets.only(top: 10, bottom: 10),
+                                  padding: const EdgeInsets.only(top: 10, bottom: 10),
                                   child: Container(
                                     width: 220,
                                     height: 50,
                                     decoration: BoxDecoration(
                                       color: Colors.white,
                                       borderRadius: BorderRadius.circular(30),
-                                      border: Border.all(color: Color(0x7f262626)),
+                                      border: Border.all(color: const Color(0x7f262626)),
                                     ),
                                     child: Padding(
                                       padding: const EdgeInsets.only(left: 0.0, right: 0),
@@ -723,14 +811,14 @@ class _Visitor_PageState extends State<Visitor_Page> {
                                             onPressed: () {
                                               CheckOutTime(context);
                                             },
-                                            icon: Icon(Icons.watch_later_outlined, size: 20,),
+                                            icon: const Icon(Icons.watch_later_outlined, size: 20,),
                                           ),
                                           border: InputBorder.none,
                                           hintText: "Out Time", // Default hint
                                           hintStyle: GoogleFonts.openSans(
                                             fontSize: 12,
                                             fontWeight: FontWeight.w600,
-                                            color: Color(0x7f262626),
+                                            color: const Color(0x7f262626),
                                           ),
                                         ),
                                         style: GoogleFonts.openSans(
@@ -751,7 +839,7 @@ class _Visitor_PageState extends State<Visitor_Page> {
                             child: Column(
                               crossAxisAlignment: CrossAxisAlignment.start,
                               children: [
-                                Text('Reason For', style: GoogleFonts.openSans(color: const Color(0xff262626).withOpacity(0.6), fontSize: 16, fontWeight: FontWeight.w600),),
+                                KText(text:'Reason For', style: GoogleFonts.openSans(color: const Color(0xff262626).withOpacity(0.6), fontSize: 16, fontWeight: FontWeight.w600),),
                                 Padding(
                                   padding: const EdgeInsets.only(bottom: 10, top: 10),
                                   child: CustomTextField(
@@ -779,16 +867,16 @@ class _Visitor_PageState extends State<Visitor_Page> {
                             child: Column(
                               crossAxisAlignment: CrossAxisAlignment.start,
                               children: [
-                                Text('Checkin Date', style: GoogleFonts.openSans(color: const Color(0xff262626).withOpacity(0.6), fontSize: 16, fontWeight: FontWeight.w600),),
+                                KText(text:'Check In Date', style: GoogleFonts.openSans(color: const Color(0xff262626).withOpacity(0.6), fontSize: 16, fontWeight: FontWeight.w600),),
                                 Padding(
-                                  padding: EdgeInsets.only(top: 10, bottom: 10),
+                                  padding: const EdgeInsets.only(top: 10, bottom: 10),
                                   child: Container(
                                     width: 220,
                                     height: 50,
                                     decoration: BoxDecoration(
                                       color: Colors.white,
                                       borderRadius: BorderRadius.circular(30),
-                                      border: Border.all(color: Color(0x7f262626)),
+                                      border: Border.all(color: const Color(0x7f262626)),
                                     ),
                                     child: Padding(
                                       padding: const EdgeInsets.only(left: 0.0, right: 0),
@@ -803,14 +891,14 @@ class _Visitor_PageState extends State<Visitor_Page> {
                                             onPressed: () {
                                               CheckInDate(context);
                                             },
-                                            icon: Icon(Icons.calendar_month),
+                                            icon: const Icon(Icons.calendar_month),
                                           ),
                                           border: InputBorder.none,
                                           hintText: "CheckIn Date",
                                           hintStyle: GoogleFonts.openSans(
                                             fontSize: 12,
                                             fontWeight: FontWeight.w600,
-                                            color: Color(0x7f262626),
+                                            color: const Color(0x7f262626),
                                           ),
                                         ),
                                         style: GoogleFonts.openSans(
@@ -831,16 +919,16 @@ class _Visitor_PageState extends State<Visitor_Page> {
                             child: Column(
                               crossAxisAlignment: CrossAxisAlignment.start,
                               children: [
-                                Text('Checkout Date', style: GoogleFonts.openSans(color: const Color(0xff262626).withOpacity(0.6), fontSize: 16, fontWeight: FontWeight.w600),),
+                                KText(text:'Checkout Date', style: GoogleFonts.openSans(color: const Color(0xff262626).withOpacity(0.6), fontSize: 16, fontWeight: FontWeight.w600),),
                                 Padding(
-                                  padding: EdgeInsets.only(top: 10, bottom: 10),
+                                  padding: const EdgeInsets.only(top: 10, bottom: 10),
                                   child: Container(
                                     width: 220,
                                     height: 50,
                                     decoration: BoxDecoration(
                                       color: Colors.white,
                                       borderRadius: BorderRadius.circular(30),
-                                      border: Border.all(color: Color(0x7f262626)),
+                                      border: Border.all(color: const Color(0x7f262626)),
                                     ),
                                     child: Padding(
                                       padding: const EdgeInsets.only(left: 0.0, right: 0),
@@ -855,14 +943,14 @@ class _Visitor_PageState extends State<Visitor_Page> {
                                             onPressed: () {
                                               CheckOutDate(context);
                                             },
-                                            icon: Icon(Icons.calendar_month),
+                                            icon: const Icon(Icons.calendar_month),
                                           ),
                                           border: InputBorder.none,
                                           hintText: "CheckOut Date", // Default hint
                                           hintStyle: GoogleFonts.openSans(
                                             fontSize: 12,
                                             fontWeight: FontWeight.w600,
-                                            color: Color(0x7f262626),
+                                            color: const Color(0x7f262626),
                                           ),
                                         ),
                                         style: GoogleFonts.openSans(
@@ -883,7 +971,7 @@ class _Visitor_PageState extends State<Visitor_Page> {
                             child: Column(
                               crossAxisAlignment: CrossAxisAlignment.start,
                               children: [
-                                Text('Resident Name', style: GoogleFonts.openSans(color: const Color(0xff262626).withOpacity(0.6), fontSize: 16, fontWeight: FontWeight.w600),),
+                                KText(text:'Resident Name', style: GoogleFonts.openSans(color: const Color(0xff262626).withOpacity(0.6), fontSize: 16, fontWeight: FontWeight.w600),),
                                 Padding(
                                   padding: const EdgeInsets.only(bottom: 10, top: 10),
                                   child: CustomTextField(
@@ -909,7 +997,7 @@ class _Visitor_PageState extends State<Visitor_Page> {
                             child: Column(
                               crossAxisAlignment: CrossAxisAlignment.start,
                               children: [
-                                Text('Resident User ID', style: GoogleFonts.openSans(color: const Color(0xff262626).withOpacity(0.6), fontSize: 16, fontWeight: FontWeight.w600),),
+                                KText(text:'Resident User ID', style: GoogleFonts.openSans(color: const Color(0xff262626).withOpacity(0.6), fontSize: 16, fontWeight: FontWeight.w600),),
                                 Padding(
                                   padding: const EdgeInsets.only(bottom: 10, top: 10),
                                   child: CustomTextField(
@@ -931,7 +1019,7 @@ class _Visitor_PageState extends State<Visitor_Page> {
                             child: Column(
                               crossAxisAlignment: CrossAxisAlignment.start,
                               children: [
-                                Text('Visitor Name', style: GoogleFonts.openSans(color: const Color(0xff262626).withOpacity(0.6), fontSize: 16, fontWeight: FontWeight.w600),),
+                                KText(text:'Visitor Name', style: GoogleFonts.openSans(color: const Color(0xff262626).withOpacity(0.6), fontSize: 16, fontWeight: FontWeight.w600),),
                                 Padding(
                                   padding: const EdgeInsets.only(top: 10.0, bottom: 10.0),
                                   child: Container(
@@ -946,7 +1034,7 @@ class _Visitor_PageState extends State<Visitor_Page> {
                                       child: DropdownButtonHideUnderline(
                                         child: DropdownButtonFormField<String>(
                                           isExpanded: true,
-                                          hint: const Text(
+                                          hint: const KText(text:
                                             'Select Block Name',
                                             style: TextStyle(
                                               fontSize: 12,
@@ -957,7 +1045,7 @@ class _Visitor_PageState extends State<Visitor_Page> {
                                           items: BlockNames.map((String item) {
                                             return DropdownMenuItem<String>(
                                               value: item,
-                                              child: Text(
+                                              child: KText(text:
                                                 item,
                                                 style: const TextStyle(
                                                   fontSize: 12,
@@ -1008,7 +1096,7 @@ class _Visitor_PageState extends State<Visitor_Page> {
                           Column(
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
-                              Text('Room', style: GoogleFonts.openSans(color: const Color(0xff262626).withOpacity(0.6), fontSize: 16, fontWeight: FontWeight.w600),),
+                              KText(text:'Room', style: GoogleFonts.openSans(color: const Color(0xff262626).withOpacity(0.6), fontSize: 16, fontWeight: FontWeight.w600),),
                               Padding(
                                 padding: const EdgeInsets.only(top: 8.0),
                                 child: Container(
@@ -1023,7 +1111,7 @@ class _Visitor_PageState extends State<Visitor_Page> {
                                     child: DropdownButtonHideUnderline(
                                       child: DropdownButtonFormField<String>(
                                         isExpanded: true,
-                                        hint: const Text(
+                                        hint: const KText(text:
                                           'Select Room Name',
                                           style: TextStyle(
                                             fontSize: 12,
@@ -1034,7 +1122,8 @@ class _Visitor_PageState extends State<Visitor_Page> {
                                         items: blockRoomNames.map((String item) {
                                           return DropdownMenuItem<String>(
                                             value: item,
-                                            child: Text(
+                                            child: KText(
+                                              text:
                                               item,
                                               style: const TextStyle(
                                                 fontSize: 12,
@@ -1084,9 +1173,8 @@ class _Visitor_PageState extends State<Visitor_Page> {
                                     checkInDate.clear();
                                     checkOutTime.clear();
                                     checkOutDate.clear();
-                                    // Navigator.pop(context);
                                   }, child:
-                                Text(
+                                KText(text:
                                   'Clear All',
                                   style: GoogleFonts.openSans(
                                     fontSize: 13,
@@ -1111,7 +1199,7 @@ class _Visitor_PageState extends State<Visitor_Page> {
                                   onPressed: (){
                                     Navigator.pop(context);
                                   }, child:
-                                Text(
+                                KText(text:
                                   'Cancel',
                                   style: GoogleFonts.openSans(
                                     fontSize: 13,
@@ -1121,7 +1209,7 @@ class _Visitor_PageState extends State<Visitor_Page> {
                                 ),
                                 ),
                               ),
-                              SizedBox(width: 6,),
+                              const SizedBox(width: 6,),
                               SizedBox(
                                 height: 40,
                                 child: ElevatedButton(
@@ -1139,15 +1227,17 @@ class _Visitor_PageState extends State<Visitor_Page> {
                                         reasonFor.text.isNotEmpty &&
                                         checkInTime.text.isNotEmpty &&
                                         checkInDate.text.isNotEmpty
-                                    // checkOutDate.text.isNotEmpty
                                     ) {
                                       final visitorname = visitorName.text;
                                       final residentid = residentId.text;
                                       final visitornumber = visitorNumber.text;
+
                                       final checkinTime = checkInTime.text;
                                       final checkoutTime = checkOutTime.text;
-                                      final checkinDate = checkOutDate.text;
+
+                                      final checkinDate = checkInDate.text;
                                       final checkoutDate = checkOutDate.text;
+
                                       final residentname = residentName.text;
                                       final totalvisitors = totalVisitors.text;
                                       final blockname = selectedBlockName;
@@ -1169,7 +1259,7 @@ class _Visitor_PageState extends State<Visitor_Page> {
                                           .then((_) {
                                         showTopSnackBar(
                                           Overlay.of(context),
-                                          CustomSnackBar.success(
+                                          const CustomSnackBar.success(
                                             backgroundColor: Color(0xff3ac6cf),
                                             message:
                                             "Added successfully!",
@@ -1188,7 +1278,7 @@ class _Visitor_PageState extends State<Visitor_Page> {
                                       }).catchError((error) {
                                         // Provide feedback to the user
                                         ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-                                          content: Text('Error adding visitor: $error'),
+                                          content: KText(text:'Error adding visitor: $error', style: GoogleFonts.openSans(),),
                                         ));
                                       });
                                     } else {
@@ -1196,13 +1286,13 @@ class _Visitor_PageState extends State<Visitor_Page> {
                                       print('All fields needed');
                                       // Provide feedback to the user
                                       ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-                                        content: Text('All fields are required'),
+                                        content: KText(text:'All fields are required', style: GoogleFonts.openSans(),),
                                       ));
                                     }
                                   },
                                   child: Row(
                                     children: [
-                                      Text(
+                                      KText(text:
                                         'Allow',
                                         style: GoogleFonts.openSans(
                                           fontSize: 13,
@@ -1286,8 +1376,8 @@ class _Visitor_PageState extends State<Visitor_Page> {
                   children: [
                     Column(
                       children: [
-                        Text('Update Visitor or Guest', style: GoogleFonts.openSans(fontWeight: FontWeight.w700, fontSize: 18),),
-                        Text('Enter Visitor Details', style: GoogleFonts.openSans(fontWeight: FontWeight.w500, fontSize: 15),),
+                        KText(text:'Update Visitor or Guest', style: GoogleFonts.openSans(fontWeight: FontWeight.w700, fontSize: 18),),
+                        KText(text:'Enter Visitor Details', style: GoogleFonts.openSans(fontWeight: FontWeight.w500, fontSize: 15),),
                       ],
                     ),
                     InkWell(
@@ -1345,7 +1435,7 @@ class _Visitor_PageState extends State<Visitor_Page> {
                               child: Column(
                                 crossAxisAlignment: CrossAxisAlignment.start,
                                 children: [
-                                  Text('Visitor Name', style: GoogleFonts.openSans(color: const Color(0xff262626).withOpacity(0.6), fontSize: 16, fontWeight: FontWeight.w600),),
+                                  KText(text:'Visitor Name', style: GoogleFonts.openSans(color: const Color(0xff262626).withOpacity(0.6), fontSize: 16, fontWeight: FontWeight.w600),),
                                   Padding(
                                     padding: const EdgeInsets.only(bottom: 10, top: 10),
                                     child: CustomTextField(
@@ -1366,7 +1456,7 @@ class _Visitor_PageState extends State<Visitor_Page> {
                               child: Column(
                                 crossAxisAlignment: CrossAxisAlignment.start,
                                 children: [
-                                  Text('Visitor Phone Number', style: GoogleFonts.openSans(color: const Color(0xff262626).withOpacity(0.6), fontSize: 16, fontWeight: FontWeight.w600),),
+                                  KText(text:'Visitor Phone Number', style: GoogleFonts.openSans(color: const Color(0xff262626).withOpacity(0.6), fontSize: 16, fontWeight: FontWeight.w600),),
                                   Padding(
                                     padding: const EdgeInsets.only(bottom: 10, top: 10),
                                     child: CustomTextField(
@@ -1387,7 +1477,7 @@ class _Visitor_PageState extends State<Visitor_Page> {
                               child: Column(
                                 crossAxisAlignment: CrossAxisAlignment.start,
                                 children: [
-                                  Text('No of Visitors', style: GoogleFonts.openSans(color: const Color(0xff262626).withOpacity(0.6), fontSize: 16, fontWeight: FontWeight.w600),),
+                                  KText(text:'No of Visitors', style: GoogleFonts.openSans(color: const Color(0xff262626).withOpacity(0.6), fontSize: 16, fontWeight: FontWeight.w600),),
                                   Padding(
                                     padding: const EdgeInsets.only(bottom: 10, top: 10),
                                     child: CustomTextField(
@@ -1414,16 +1504,16 @@ class _Visitor_PageState extends State<Visitor_Page> {
                               child: Column(
                                 crossAxisAlignment: CrossAxisAlignment.start,
                                 children: [
-                                  Text('From Time', style: GoogleFonts.openSans(color: const Color(0xff262626).withOpacity(0.6), fontSize: 16, fontWeight: FontWeight.w600),),
+                                  KText(text:'From Time', style: GoogleFonts.openSans(color: const Color(0xff262626).withOpacity(0.6), fontSize: 16, fontWeight: FontWeight.w600),),
                                   Padding(
-                                    padding: EdgeInsets.only(top: 10, bottom: 20),
+                                    padding: const EdgeInsets.only(top: 10, bottom: 20),
                                     child: Container(
                                       width: 220,
                                       height: 50,
                                       decoration: BoxDecoration(
                                         color: Colors.white,
                                         borderRadius: BorderRadius.circular(30),
-                                        border: Border.all(color: Color(0x7f262626)),
+                                        border: Border.all(color: const Color(0x7f262626)),
                                       ),
                                       child: Padding(
                                         padding: const EdgeInsets.only(left: 0.0, right: 0),
@@ -1436,14 +1526,14 @@ class _Visitor_PageState extends State<Visitor_Page> {
                                               onPressed: () {
                                                 CheckInTime(context);
                                               },
-                                              icon: Icon(Icons.watch_later_outlined),
+                                              icon: const Icon(Icons.watch_later_outlined),
                                             ),
                                             border: InputBorder.none,
                                             hintText: "From Time", // Default hint
                                             hintStyle: GoogleFonts.openSans(
                                               fontSize: 12,
                                               fontWeight: FontWeight.w600,
-                                              color: Color(0x7f262626),
+                                              color: const Color(0x7f262626),
                                             ),
                                           ),
                                           style: GoogleFonts.openSans(
@@ -1464,16 +1554,16 @@ class _Visitor_PageState extends State<Visitor_Page> {
                               child: Column(
                                 crossAxisAlignment: CrossAxisAlignment.start,
                                 children: [
-                                  Text('To Time', style: GoogleFonts.openSans(color: const Color(0xff262626).withOpacity(0.6), fontSize: 16, fontWeight: FontWeight.w600),),
+                                  KText(text:'To Time', style: GoogleFonts.openSans(color: const Color(0xff262626).withOpacity(0.6), fontSize: 16, fontWeight: FontWeight.w600),),
                                   Padding(
-                                    padding: EdgeInsets.only(top: 10, bottom: 10),
+                                    padding: const EdgeInsets.only(top: 10, bottom: 10),
                                     child: Container(
                                       width: 220,
                                       height: 50,
                                       decoration: BoxDecoration(
                                         color: Colors.white,
                                         borderRadius: BorderRadius.circular(30),
-                                        border: Border.all(color: Color(0x7f262626)),
+                                        border: Border.all(color: const Color(0x7f262626)),
                                       ),
                                       child: Padding(
                                         padding: const EdgeInsets.only(left: 0.0, right: 0),
@@ -1489,14 +1579,14 @@ class _Visitor_PageState extends State<Visitor_Page> {
                                               onPressed: () {
                                                 CheckOutTime(context);
                                               },
-                                              icon: Icon(Icons.watch_later_outlined, size: 20,),
+                                              icon: const Icon(Icons.watch_later_outlined, size: 20,),
                                             ),
                                             border: InputBorder.none,
                                             hintText: "Out Time", // Default hint
                                             hintStyle: GoogleFonts.openSans(
                                               fontSize: 12,
                                               fontWeight: FontWeight.w600,
-                                              color: Color(0x7f262626),
+                                              color: const Color(0x7f262626),
                                             ),
                                           ),
                                           style: GoogleFonts.openSans(
@@ -1517,7 +1607,7 @@ class _Visitor_PageState extends State<Visitor_Page> {
                               child: Column(
                                 crossAxisAlignment: CrossAxisAlignment.start,
                                 children: [
-                                  Text('Reason For', style: GoogleFonts.openSans(color: const Color(0xff262626).withOpacity(0.6), fontSize: 16, fontWeight: FontWeight.w600),),
+                                  KText(text:'Reason For', style: GoogleFonts.openSans(color: const Color(0xff262626).withOpacity(0.6), fontSize: 16, fontWeight: FontWeight.w600),),
                                   Padding(
                                     padding: const EdgeInsets.only(bottom: 10, top: 10),
                                     child: CustomTextField(
@@ -1545,16 +1635,16 @@ class _Visitor_PageState extends State<Visitor_Page> {
                               child: Column(
                                 crossAxisAlignment: CrossAxisAlignment.start,
                                 children: [
-                                  Text('Checkin Date', style: GoogleFonts.openSans(color: const Color(0xff262626).withOpacity(0.6), fontSize: 16, fontWeight: FontWeight.w600),),
+                                  KText(text:'Checkin Date', style: GoogleFonts.openSans(color: const Color(0xff262626).withOpacity(0.6), fontSize: 16, fontWeight: FontWeight.w600),),
                                   Padding(
-                                    padding: EdgeInsets.only(top: 10, bottom: 10),
+                                    padding: const EdgeInsets.only(top: 10, bottom: 10),
                                     child: Container(
                                       width: 220,
                                       height: 50,
                                       decoration: BoxDecoration(
                                         color: Colors.white,
                                         borderRadius: BorderRadius.circular(30),
-                                        border: Border.all(color: Color(0x7f262626)),
+                                        border: Border.all(color: const Color(0x7f262626)),
                                       ),
                                       child: Padding(
                                         padding: const EdgeInsets.only(left: 0.0, right: 0),
@@ -1569,14 +1659,14 @@ class _Visitor_PageState extends State<Visitor_Page> {
                                               onPressed: () {
                                                 CheckInDate(context);
                                               },
-                                              icon: Icon(Icons.calendar_month),
+                                              icon: const Icon(Icons.calendar_month),
                                             ),
                                             border: InputBorder.none,
                                             hintText: "CheckIn Date",
                                             hintStyle: GoogleFonts.openSans(
                                               fontSize: 12,
                                               fontWeight: FontWeight.w600,
-                                              color: Color(0x7f262626),
+                                              color: const Color(0x7f262626),
                                             ),
                                           ),
                                           style: GoogleFonts.openSans(
@@ -1597,16 +1687,16 @@ class _Visitor_PageState extends State<Visitor_Page> {
                               child: Column(
                                 crossAxisAlignment: CrossAxisAlignment.start,
                                 children: [
-                                  Text('Checkout Date', style: GoogleFonts.openSans(color: const Color(0xff262626).withOpacity(0.6), fontSize: 16, fontWeight: FontWeight.w600),),
+                                  KText(text:'Checkout Date', style: GoogleFonts.openSans(color: const Color(0xff262626).withOpacity(0.6), fontSize: 16, fontWeight: FontWeight.w600),),
                                   Padding(
-                                    padding: EdgeInsets.only(top: 10, bottom: 10),
+                                    padding: const EdgeInsets.only(top: 10, bottom: 10),
                                     child: Container(
                                       width: 220,
                                       height: 50,
                                       decoration: BoxDecoration(
                                         color: Colors.white,
                                         borderRadius: BorderRadius.circular(30),
-                                        border: Border.all(color: Color(0x7f262626)),
+                                        border: Border.all(color: const Color(0x7f262626)),
                                       ),
                                       child: Padding(
                                         padding: const EdgeInsets.only(left: 0.0, right: 0),
@@ -1621,14 +1711,14 @@ class _Visitor_PageState extends State<Visitor_Page> {
                                               onPressed: () {
                                                 CheckOutDate(context);
                                               },
-                                              icon: Icon(Icons.calendar_month),
+                                              icon: const Icon(Icons.calendar_month),
                                             ),
                                             border: InputBorder.none,
                                             hintText: "CheckOut Date", // Default hint
                                             hintStyle: GoogleFonts.openSans(
                                               fontSize: 12,
                                               fontWeight: FontWeight.w600,
-                                              color: Color(0x7f262626),
+                                              color: const Color(0x7f262626),
                                             ),
                                           ),
                                           style: GoogleFonts.openSans(
@@ -1649,7 +1739,7 @@ class _Visitor_PageState extends State<Visitor_Page> {
                               child: Column(
                                 crossAxisAlignment: CrossAxisAlignment.start,
                                 children: [
-                                  Text('Resident Name', style: GoogleFonts.openSans(color: const Color(0xff262626).withOpacity(0.6), fontSize: 16, fontWeight: FontWeight.w600),),
+                                  KText(text:'Resident Name', style: GoogleFonts.openSans(color: const Color(0xff262626).withOpacity(0.6), fontSize: 16, fontWeight: FontWeight.w600),),
                                   Padding(
                                     padding: const EdgeInsets.only(bottom: 10, top: 10),
                                     child: CustomTextField(
@@ -1675,7 +1765,7 @@ class _Visitor_PageState extends State<Visitor_Page> {
                               child: Column(
                                 crossAxisAlignment: CrossAxisAlignment.start,
                                 children: [
-                                  Text('Resident User ID', style: GoogleFonts.openSans(color: const Color(0xff262626).withOpacity(0.6), fontSize: 16, fontWeight: FontWeight.w600),),
+                                  KText(text:'Resident User ID', style: GoogleFonts.openSans(color: const Color(0xff262626).withOpacity(0.6), fontSize: 16, fontWeight: FontWeight.w600),),
                                   Padding(
                                     padding: const EdgeInsets.only(bottom: 10, top: 10),
                                     child: CustomTextField(
@@ -1697,7 +1787,7 @@ class _Visitor_PageState extends State<Visitor_Page> {
                               child: Column(
                                 crossAxisAlignment: CrossAxisAlignment.start,
                                 children: [
-                                  Text('Visitor Name', style: GoogleFonts.openSans(color: const Color(0xff262626).withOpacity(0.6), fontSize: 16, fontWeight: FontWeight.w600),),
+                                  KText(text:'Visitor Name', style: GoogleFonts.openSans(color: const Color(0xff262626).withOpacity(0.6), fontSize: 16, fontWeight: FontWeight.w600),),
                                   Padding(
                                     padding: const EdgeInsets.only(top: 10.0, bottom: 10.0),
                                     child: Container(
@@ -1712,7 +1802,7 @@ class _Visitor_PageState extends State<Visitor_Page> {
                                         child: DropdownButtonHideUnderline(
                                           child: DropdownButtonFormField<String>(
                                             isExpanded: true,
-                                            hint: const Text(
+                                            hint: const KText(text:
                                               'Select Block Name',
                                               style: TextStyle(
                                                 fontSize: 12,
@@ -1723,7 +1813,7 @@ class _Visitor_PageState extends State<Visitor_Page> {
                                             items: BlockNames.map((String item) {
                                               return DropdownMenuItem<String>(
                                                 value: item,
-                                                child: Text(
+                                                child: KText(text:
                                                   item,
                                                   style: const TextStyle(
                                                     fontSize: 12,
@@ -1774,7 +1864,7 @@ class _Visitor_PageState extends State<Visitor_Page> {
                             Column(
                               crossAxisAlignment: CrossAxisAlignment.start,
                               children: [
-                                Text('Room', style: GoogleFonts.openSans(color: const Color(0xff262626).withOpacity(0.6), fontSize: 16, fontWeight: FontWeight.w600),),
+                                KText(text:'Room', style: GoogleFonts.openSans(color: const Color(0xff262626).withOpacity(0.6), fontSize: 16, fontWeight: FontWeight.w600),),
                                 Padding(
                                   padding: const EdgeInsets.only(top: 8.0),
                                   child: Container(
@@ -1789,7 +1879,7 @@ class _Visitor_PageState extends State<Visitor_Page> {
                                       child: DropdownButtonHideUnderline(
                                         child: DropdownButtonFormField<String>(
                                           isExpanded: true,
-                                          hint: const Text(
+                                          hint: const KText(text:
                                             'Select Room Name',
                                             style: TextStyle(
                                               fontSize: 12,
@@ -1800,7 +1890,7 @@ class _Visitor_PageState extends State<Visitor_Page> {
                                           items: blockRoomNames.map((String item) {
                                             return DropdownMenuItem<String>(
                                               value: item,
-                                              child: Text(
+                                              child: KText(text:
                                                 item,
                                                 style: const TextStyle(
                                                   fontSize: 12,
@@ -1848,7 +1938,7 @@ class _Visitor_PageState extends State<Visitor_Page> {
                                   checkOutDate.clear();
                                   // Navigator.pop(context);
                                 }, child:
-                              Text(
+                              KText(text:
                                 'Clear All',
                                 style: GoogleFonts.openSans(
                                   fontSize: 13,
@@ -1868,7 +1958,7 @@ class _Visitor_PageState extends State<Visitor_Page> {
                                 onPressed: (){
                                   Navigator.pop(context);
                                 }, child:
-                              Text(
+                              KText(text:
                                 'Cancel',
                                 style: GoogleFonts.openSans(
                                   fontSize: 13,
@@ -1899,7 +1989,7 @@ class _Visitor_PageState extends State<Visitor_Page> {
                                   updateuser(id,Status);
                                   showTopSnackBar(
                                     Overlay.of(context),
-                                    CustomSnackBar.success(
+                                    const CustomSnackBar.success(
                                       backgroundColor: Color(0xff3ac6cf),
                                       message:
                                       "Added successfully!",
@@ -1919,7 +2009,7 @@ class _Visitor_PageState extends State<Visitor_Page> {
                                 },
                                 child: Row(
                                   children: [
-                                    Text(
+                                    KText(text:
                                       'Allow',
                                       style: GoogleFonts.openSans(
                                         fontSize: 13,
@@ -2009,7 +2099,7 @@ class _Visitor_PageState extends State<Visitor_Page> {
                 title: Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
-                    Text('Details Of Visitors', style: GoogleFonts.openSans(fontWeight: FontWeight.w700, fontSize: 18),),
+                    KText(text:'Details Of Visitors', style: GoogleFonts.openSans(fontWeight: FontWeight.w700, fontSize: 18),),
                     InkWell(
                       onTap: () => Navigator.pop(context),
                       child: Container(
@@ -2055,138 +2145,138 @@ class _Visitor_PageState extends State<Visitor_Page> {
                 // color: Colors.redAccent,
                 child: Column(
                   children: [
-                    Divider(color: Colors.grey, height: 40,),
+                    const Divider(color: Colors.grey, height: 40,),
                     Row(
                       children: [
                         Container(
                             width: 150,
-                            child: Text('Visitor Name', style: GoogleFonts.openSans(fontWeight: FontWeight.w600),)),
+                            child: KText(text:'Visitor Name', style: GoogleFonts.openSans(fontWeight: FontWeight.w600),)),
                         Container(
                             width: 70,
-                            child: Center(child: Text(':', style: GoogleFonts.openSans(fontWeight: FontWeight.w600),))),
+                            child: Center(child: KText(text:':', style: GoogleFonts.openSans(fontWeight: FontWeight.w600),))),
                         Container(
 
                             width: 150,
-                            child: Text('${visitorData['name']}',style: GoogleFonts.openSans(fontWeight: FontWeight.w600, color: Color(0xff262626).withOpacity(0.8)),)),
+                            child: KText(text:'${visitorData['name']}',style: GoogleFonts.openSans(fontWeight: FontWeight.w600, color: const Color(0xff262626).withOpacity(0.8)),)),
                       ],
                     ),
-                    SizedBox(height: 4,),
+                    const SizedBox(height: 4,),
                     Row(
                       children: [
                         Container(
                             width: 150,
-                            child: Text('Visitor ID', style: GoogleFonts.openSans(fontWeight: FontWeight.w600),)),
+                            child: KText(text:'Visitor ID', style: GoogleFonts.openSans(fontWeight: FontWeight.w600),)),
                         Container(
                             width: 70,
-                            child: Center(child: Text(':', style: GoogleFonts.openSans(fontWeight: FontWeight.w600),))),
+                            child: Center(child: KText(text:':', style: GoogleFonts.openSans(fontWeight: FontWeight.w600),))),
                         Container(
                             width: 150,
-                            child: Text('${visitorData['residentid']}',style: GoogleFonts.openSans(fontWeight: FontWeight.w600, color: Color(0xff262626).withOpacity(0.8)),)),
+                            child: KText(text:'${visitorData['residentid']}',style: GoogleFonts.openSans(fontWeight: FontWeight.w600, color: const Color(0xff262626).withOpacity(0.8)),)),
                       ],
                     ),
-                    SizedBox(height: 4,),
+                    const SizedBox(height: 4,),
                     Row(
                       children: [
                         Container(
                             width: 150,
-                            child: Text('Date', style: GoogleFonts.openSans(fontWeight: FontWeight.w600),)),
+                            child: KText(text:'Date', style: GoogleFonts.openSans(fontWeight: FontWeight.w600),)),
                         Container(
                             width: 70,
-                            child: Center(child: Text(':', style: GoogleFonts.openSans(fontWeight: FontWeight.w600),))),
+                            child: Center(child: KText(text:':', style: GoogleFonts.openSans(fontWeight: FontWeight.w600),))),
                         Container(
                             width: 150,
-                            child: Text('${visitorData['checkinDate']}',style: GoogleFonts.openSans(fontWeight: FontWeight.w600, color: Color(0xff262626).withOpacity(0.8)),)),
+                            child: KText(text:'${visitorData['checkinDate']}',style: GoogleFonts.openSans(fontWeight: FontWeight.w600, color: const Color(0xff262626).withOpacity(0.8)),)),
                       ],
                     ),
-                    SizedBox(height: 4,),
+                    const SizedBox(height: 4,),
                     Row(
                       children: [
                         Container(
                             width: 150,
-                            child: Text('Phone No', style: GoogleFonts.openSans(fontWeight: FontWeight.w600),)),
+                            child: KText(text:'Phone No', style: GoogleFonts.openSans(fontWeight: FontWeight.w600),)),
                         Container(
                             width: 70,
-                            child: Center(child: Text(':', style: GoogleFonts.openSans(fontWeight: FontWeight.w600),))),
+                            child: Center(child: KText(text:':', style: GoogleFonts.openSans(fontWeight: FontWeight.w600),))),
                         Container(
 
                             width: 150,
-                            child: Text('${visitorData['number']}',style: GoogleFonts.openSans(fontWeight: FontWeight.w600, color: Color(0xff262626).withOpacity(0.8)),)),
+                            child: KText(text:'${visitorData['number']}',style: GoogleFonts.openSans(fontWeight: FontWeight.w600, color: const Color(0xff262626).withOpacity(0.8)),)),
                       ],
                     ),
-                    SizedBox(height: 4,),
+                    const SizedBox(height: 4,),
                     Row(
                       children: [
                         Container(
                             width: 150,
-                            child: Text('Purpose', style: GoogleFonts.openSans(fontWeight: FontWeight.w600),)),
+                            child: KText(text:'Purpose', style: GoogleFonts.openSans(fontWeight: FontWeight.w600),)),
                         Container(
                             width: 70,
-                            child: Center(child: Text(':', style: GoogleFonts.openSans(fontWeight: FontWeight.w600),))),
+                            child: Center(child: KText(text:':', style: GoogleFonts.openSans(fontWeight: FontWeight.w600),))),
                         Container(
 
                             width: 150,
-                            child: Text('${visitorData['reason']}',style: GoogleFonts.openSans(fontWeight: FontWeight.w600, color: Color(0xff262626).withOpacity(0.8)),)),
+                            child: KText(text:'${visitorData['reason']}',style: GoogleFonts.openSans(fontWeight: FontWeight.w600, color: const Color(0xff262626).withOpacity(0.8)),)),
                       ],
                     ),
-                    SizedBox(height: 4,),
+                    const SizedBox(height: 4,),
                     Row(
                       children: [
                         Container(
                             width: 150,
-                            child: Text('Receiver User ID', style: GoogleFonts.openSans(fontWeight: FontWeight.w600),)),
+                            child: KText(text:'Receiver User ID', style: GoogleFonts.openSans(fontWeight: FontWeight.w600),)),
                         Container(
                             width: 70,
-                            child: Center(child: Text(':', style: GoogleFonts.openSans(fontWeight: FontWeight.w600),))),
+                            child: Center(child: KText(text:':', style: GoogleFonts.openSans(fontWeight: FontWeight.w600),))),
                         Container(
 
                             width: 150,
-                            child: Text('${visitorData['residentid']}',style: GoogleFonts.openSans(fontWeight: FontWeight.w600, color: Color(0xff262626).withOpacity(0.8)),)),
+                            child: KText(text:'${visitorData['residentid']}',style: GoogleFonts.openSans(fontWeight: FontWeight.w600, color: const Color(0xff262626).withOpacity(0.8)),)),
                       ],
                     ),
-                    SizedBox(height: 4,),
+                    const SizedBox(height: 4,),
                     Row(
                       children: [
                         Container(
                             width: 150,
-                            child: Text('Check In Time', style: GoogleFonts.openSans(fontWeight: FontWeight.w600),)),
+                            child: KText(text:'Check In Time', style: GoogleFonts.openSans(fontWeight: FontWeight.w600),)),
                         Container(
                             width: 70,
-                            child: Center(child: Text(':', style: GoogleFonts.openSans(fontWeight: FontWeight.w600),))),
+                            child: Center(child: KText(text:':', style: GoogleFonts.openSans(fontWeight: FontWeight.w600),))),
                         Container(
 
                             width: 150,
-                            child: Text('${visitorData['checkinTime']}',style: GoogleFonts.openSans(fontWeight: FontWeight.w600, color: Color(0xff262626).withOpacity(0.8)),)),
+                            child: KText(text:'${visitorData['checkinTime']}',style: GoogleFonts.openSans(fontWeight: FontWeight.w600, color: const Color(0xff262626).withOpacity(0.8)),)),
                       ],
                     ),
-                    SizedBox(height: 4,),
+                    const SizedBox(height: 4,),
                     Row(
                       children: [
                         Container(
                             width: 150,
-                            child: Text('Check Out Time', style: GoogleFonts.openSans(fontWeight: FontWeight.w600),)),
+                            child: KText(text:'Check Out Time', style: GoogleFonts.openSans(fontWeight: FontWeight.w600),)),
                         Container(
                             width: 70,
-                            child: Center(child: Text(':', style: GoogleFonts.openSans(fontWeight: FontWeight.w600),))),
+                            child: Center(child: KText(text:':', style: GoogleFonts.openSans(fontWeight: FontWeight.w600),))),
                         Container(
                             width: 150,
-                            child: Text('${visitorData['checkoutTime']}',style: GoogleFonts.openSans(fontWeight: FontWeight.w600, color: Color(0xff262626).withOpacity(0.8)),)),
+                            child: KText(text:'${visitorData['checkoutTime']}',style: GoogleFonts.openSans(fontWeight: FontWeight.w600, color: const Color(0xff262626).withOpacity(0.8)),)),
                       ],
                     ),
-                    SizedBox(height: 4,),
+                    const SizedBox(height: 4,),
                     Row(
                       children: [
                         Container(
                             width: 150,
-                            child: Text('Status', style: GoogleFonts.openSans(fontWeight: FontWeight.w600),)),
+                            child: KText(text:'Status', style: GoogleFonts.openSans(fontWeight: FontWeight.w600),)),
                         Container(
                             width: 70,
-                            child: Center(child: Text(':', style: GoogleFonts.openSans(fontWeight: FontWeight.w600),))),
+                            child: Center(child: KText(text:':', style: GoogleFonts.openSans(fontWeight: FontWeight.w600),))),
                         Container(
                             width: 150,
-                            child: Text('${visitorData['status']}',style: GoogleFonts.openSans(fontWeight: FontWeight.w600, color: Color(0xff262626).withOpacity(0.8)),)),
+                            child: KText(text:'${visitorData['status']}',style: GoogleFonts.openSans(fontWeight: FontWeight.w600, color: const Color(0xff262626).withOpacity(0.8)),)),
                       ],
                     ),
-                    SizedBox(height: 4,),
+                    const SizedBox(height: 4,),
                   ],
                 ),
                   ),
@@ -2209,19 +2299,187 @@ class _Visitor_PageState extends State<Visitor_Page> {
         items: [
           PopupMenuItem<String>(
             value: 'print',
-            child:  const Text('Print'),
+            child:KText(text:'Print',style: GoogleFonts.openSans(),),
             onTap: () {
+              _generatePdf();
             },
           ),
           PopupMenuItem<String>(
             value: 'excel',
-            child:  const Text('Excel'),
+            child:KText(text:'Excel',style: GoogleFonts.openSans(),),
             onTap: () {
+              _generateCSVAndView(context);
             },
           ),
         ],
         elevation: 8.0,
         useRootNavigator: true);
+  }
+
+
+
+
+  Future<void> _generateCSVAndView(BuildContext context) async {
+    final List<List<dynamic>> data = [[
+      'Visitor Name',
+      'Number of Visitors',
+      'Date',
+      'Phone Number',
+      'Purpose',
+      'Receiver UserID',
+      'Check In Time',
+      'Check Out Time',
+      'Status',
+    ]
+    ];
+
+    // Fetch data from Firebase Firestore
+    QuerySnapshot querySnapshot =
+    await FirebaseFirestore.instance.collection('Visitors').get();
+
+    // Populate data from Firestore
+    querySnapshot.docs.forEach((doc) {
+      data.add([
+        doc['name'],
+        doc['totalvisitors'],
+        doc['checkinDate'],
+        doc['number'],
+        doc['reason'],
+        doc['residentid'],
+        doc['checkinTime'],
+        doc['checkoutTime'],
+        doc['status'],
+      ]);
+    });
+    // Convert data to CSV format
+    String csvData = ListToCsvConverter().convert(data);
+    // Convert to Blob (for web)
+    final blob = html.Blob([csvData], 'text/csv');
+    // Create object URL
+    final url = html.Url.createObjectUrlFromBlob(blob);
+    // Create anchor element
+    final anchor = html.AnchorElement(href: url)
+      ..setAttribute("download", "users.csv")
+      ..click();
+    // Revoke object URL
+    html.Url.revokeObjectUrl(url);
+  }
+  _generatePdf() async {
+    final pdf = pw.Document();
+    final font = await PdfGoogleFonts.nunitoExtraLight();
+
+    // Fetch user data from Firebase
+    List<Map<String, dynamic>> userData = await fetchUserDataFromFirebase();
+
+    pdf.addPage(
+      pw.Page(
+        pageFormat: PdfPageFormat.a4,
+        build: (context) {
+          return pw.Column(
+            children: [
+              pw.Row(
+                children: [
+                  pw.Container(
+                    decoration: pw.BoxDecoration(border: pw.Border.all(color: PdfColors.black)),
+                    width: 80,
+                    height: 20,
+                    child: pw.Text('S.No'),
+                  ),
+                  pw.Container(
+                    decoration: pw.BoxDecoration(border: pw.Border.all(color: PdfColors.black)),
+                    width: 80,
+                    height: 20,
+                    child: pw.Text('Name'),
+                  ),
+                  pw.Container(
+                    decoration: pw.BoxDecoration(border: pw.Border.all(color: PdfColors.black)),
+                    width: 80,
+                    height: 20,
+                    child: pw.Text('Number'),
+                  ),
+                  pw.Container(
+                    decoration: pw.BoxDecoration(border: pw.Border.all(color: PdfColors.black)),
+                    width: 110,
+                    height: 20,
+                    child: pw.Text('Reason'),
+                  ),
+                  pw.Container(
+                    decoration: pw.BoxDecoration(border: pw.Border.all(color: PdfColors.black)),
+                    width: 80,
+                    height: 20,
+                    child: pw.Text('Check In'),
+                  ),
+
+                  pw.Container(
+                    decoration: pw.BoxDecoration(border: pw.Border.all(color: PdfColors.black)),
+                    width: 80,
+                    height: 20,
+                    child: pw.Text('Check Out '),
+                  ),
+                ],
+              ),
+              for (var i = 0; i < userData.length; i++)
+                pw.Row(
+                  children: [
+                    pw.Container(
+                      decoration: pw.BoxDecoration(border: pw.Border.all(color: PdfColors.black)),
+                      width: 80,
+                      height: 20,
+                      child: pw.Text((i + 1).toString()),
+                    ),
+                    pw.Container(
+                      decoration: pw.BoxDecoration(border: pw.Border.all(color: PdfColors.black)),
+                      width: 80,
+                      height: 20,
+                      child: pw.Text( userData[i]['name'] ?? ''),
+                    ),
+                    pw.Container(
+                      decoration: pw.BoxDecoration(border: pw.Border.all(color: PdfColors.black)),
+                      width: 80,
+                      height: 20,
+                      child: pw.Text( userData[i]['number'] ?? ''),
+                    ),
+                    pw.Container(
+                      decoration: pw.BoxDecoration(border: pw.Border.all(color: PdfColors.black)),
+                      width: 110,
+                      height: 20,
+                      child: pw.Text( userData[i]['reason'] ?? ''),
+                    ),
+                    pw.Container(
+                      decoration: pw.BoxDecoration(border: pw.Border.all(color: PdfColors.black)),
+                      width: 80,
+                      height: 20,
+                      child: pw.Text( userData[i]['checkinDate'] ?? ''),
+                    ),
+                    pw.Container(
+                      decoration: pw.BoxDecoration(border: pw.Border.all(color: PdfColors.black)),
+                      width: 80,
+                      height: 20,
+                      child: pw.Text( userData[i]['checkoutDate'] ?? ''),
+                    ),
+
+                  ],
+                ),
+            ],
+          );
+        },
+      ),
+    );
+
+    Printing.layoutPdf(
+      onLayout: (PdfPageFormat format) async => pdf.save(),
+    );
+    return pdf.save();
+  }
+  Future<List<Map<String, dynamic>>> fetchUserDataFromFirebase() async {
+    List<Map<String, dynamic>> userData = [];
+    QuerySnapshot querySnapshot = await FirebaseFirestore.instance.collection(
+        'Visitors').get();
+    querySnapshot.docs.forEach((doc) {
+      Map<String, dynamic> userDataMap = doc.data() as Map<String, dynamic>;
+      userData.add(userDataMap);
+    });
+    return userData;
   }
 
 

@@ -19,7 +19,7 @@ class _NotificationsPageState extends State<NotificationsPage> {
           style: GoogleFonts.openSans(
             fontSize: 20,
             fontWeight: FontWeight.w700,
-            color: Color(0xff262626),
+            color: const Color(0xff262626),
           ),
         ),
       ),
@@ -27,12 +27,12 @@ class _NotificationsPageState extends State<NotificationsPage> {
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            Icon(
+            const Icon(
               Icons.notifications_off_outlined,
               size: 64,
               color: Colors.grey,
             ),
-            SizedBox(height: 20),
+            const SizedBox(height: 20),
             Text(
               'No Notifications',
               style: GoogleFonts.openSans(

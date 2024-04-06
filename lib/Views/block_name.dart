@@ -446,7 +446,7 @@ class _BlockNameState extends State<BlockName> {
                     ),
                     Padding(
                       padding: const EdgeInsets.only(left: 40, right: 20),
-                      child: KText(text:'Are you sure you want to delete this asset record?', style: GoogleFonts.openSans(fontWeight: FontWeight.w600, fontSize: 17),),
+                      child: KText(text:'Are you sure you want to delete this block?', style: GoogleFonts.openSans(fontWeight: FontWeight.w600, fontSize: 17),),
                     ),
                     KText(text: 'Once deleted, it cannot be recovered.', style: GoogleFonts.openSans(fontWeight: FontWeight.w600, fontSize: 17),),
                     const SizedBox(height: 25,),
@@ -630,7 +630,7 @@ class _BlockNameState extends State<BlockName> {
                                           child: Row(
                                             children: [
                                               KText(
-                                                text:'Add Room',
+                                                text:'Add Block',
                                                 style: GoogleFonts.openSans(
                                                   fontSize: 13,
                                                   fontWeight: FontWeight.w600,

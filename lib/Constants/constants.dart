@@ -17,7 +17,7 @@ class Constants {
   static String networkChurchLogo = 'https://firebasestorage.googleapis.com/v0/b/church-management-cbf7d.appspot.com/o/dailyupdates%2Flogo.png?alt=media&token=6c944fcd-500c-4c8d-af7b-a7086e6b956a&_gl=1*1pse0u7*_ga*MTQxNDQ0NTk0Mi4xNjkyMjUyODI4*_ga_CW55HF8NVT*MTY5ODkxMDQ0MS4zMTQuMS4xNjk4OTEzMDA2LjIyLjAuMA..';
   static String MembershipAmount = '1000';
 
-  static String apiKeyForNotification = 'AAAAuzKqCXA:APA91bHpckZw1E2JuVr8MTPvoic6pDOOtxmTddTsSBno2ZYd3fMDo7kFmbsHHRfmuZurh0ut8n_46FgPAI5YdtfpwmJk85o9qeTMca9QgVhy7CiDUOdSer_ifyqaAQcGtF_oyBaX8UMQ';
+  static String apiKeyForNotification = 'AAAAOWokDMU:APA91bFQCZA3QKCHPmSiw8IuXK9CT6ZUcslpZ_Mvaj3zwYS-kSaPrlww7t_pq5LzWbfC5ebqi3PmB35T8O14bvlx6Rnv9c2N7OCUohenCAC7nYKCdazXTGLy3lNAtIB3QVJ0ywHDboIh';
 
 
   datePicker(context) async {

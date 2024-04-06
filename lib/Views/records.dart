@@ -1,5 +1,6 @@
 import 'package:animate_do/animate_do.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:hms_ikia/widgets/ReusableHeader.dart';
@@ -84,14 +85,14 @@ class _RecordsState extends State<Records> {
                       });
                     },
                     ),
-SizedBox(width: 10,),
+const SizedBox(width: 10,),
                     Container(
                       width: 260,
                       height: 46,
                       decoration: BoxDecoration(
-                        color: Color(0xffF5F5F5),
+                        color: const Color(0xffF5F5F5),
                         borderRadius: BorderRadius.circular(30),
-                        border: Border.all(color: Color(0x7f262626)),
+                        border: Border.all(color: const Color(0x7f262626)),
                       ),
                       child: Padding(
                         padding: const EdgeInsets.only(left: 0.0, right: 0),
@@ -107,14 +108,14 @@ SizedBox(width: 10,),
                               onPressed: () {
 
                               },
-                              icon: Icon(Icons.calendar_month, size: 20,),
+                              icon: const Icon(Icons.calendar_month, size: 20,),
                             ),
                             border: InputBorder.none,
                             hintText: "Select the Date",
                             hintStyle: GoogleFonts.openSans(
                               fontSize: 12,
                               fontWeight: FontWeight.w600,
-                              color: Color(0x7f262626),
+                              color: const Color(0x7f262626),
                             ),
                           ),
                           style: GoogleFonts.openSans(
@@ -132,7 +133,7 @@ SizedBox(width: 10,),
               Padding(
                 padding: const EdgeInsets.all(10.0),
                 child: ElevatedButton(
-                    style: ButtonStyle(backgroundColor: MaterialStatePropertyAll(Color(0xff37d1d3))),
+                    style: const ButtonStyle(backgroundColor: MaterialStatePropertyAll(Color(0xff37d1d3))),
                     onPressed: (){
                       _EditshowMyDialog(context);
                       // _showMyDialog(context);
@@ -141,7 +142,7 @@ SizedBox(width: 10,),
               Padding(
                 padding: const EdgeInsets.all(10.0),
                 child: ElevatedButton(
-                    style: ButtonStyle(backgroundColor: MaterialStatePropertyAll(Color(0xff37d1d3))),
+                    style: const ButtonStyle(backgroundColor: MaterialStatePropertyAll(Color(0xff37d1d3))),
                     onPressed: (){
                       // _EditshowMyDialog
                       _showMyDialog(context);
@@ -164,19 +165,19 @@ SizedBox(width: 10,),
                       children: [
                         Container(
                             width: 200,
-                            child: Text('S.No', style: GoogleFonts.openSans(fontWeight: FontWeight.w700, fontSize: 18),)),
+                            child: KText(text:'S.No', style: GoogleFonts.openSans(fontWeight: FontWeight.w700, fontSize: 18),)),
                         Container(
                             width: 200,
-                            child: Text('User ID', style: GoogleFonts.openSans(fontWeight: FontWeight.w700, fontSize: 18),)),
+                            child: KText(text:'User ID', style: GoogleFonts.openSans(fontWeight: FontWeight.w700, fontSize: 18),)),
                         Container(
                              width: 200,
-                            child: Text('Name', style: GoogleFonts.openSans(fontWeight: FontWeight.w700, fontSize: 18),)),
+                            child: KText(text:'Name', style: GoogleFonts.openSans(fontWeight: FontWeight.w700, fontSize: 18),)),
                         Container(
                             width: 200,
-                            child: Text('Phone No', style: GoogleFonts.openSans(fontWeight: FontWeight.w700, fontSize: 18),)),
+                            child: KText(text:'Phone No', style: GoogleFonts.openSans(fontWeight: FontWeight.w700, fontSize: 18),)),
                         Container(
                             width: 200,
-                            child: Center(child: Text('Status', style: GoogleFonts.openSans(fontWeight: FontWeight.w700, fontSize: 18),))),
+                            child: Center(child: KText(text:'Status', style: GoogleFonts.openSans(fontWeight: FontWeight.w700, fontSize: 18),))),
                       ],),
                   ),
                 ),
@@ -185,10 +186,12 @@ SizedBox(width: 10,),
               doc(getSelectedDate()
               ).collection('Residents').snapshots(), builder: (context, snapshot) {
                 print(snapshot);
-                if (!snapshot.hasData) {
-                  return CircularProgressIndicator();
-                }if(isDataAvailable){
+                if (snapshot.connectionState == ConnectionState.waiting) {
+                  return const CircularProgressIndicator();
+                }
 
+                // if(isDataAvailable){
+                if(snapshot.hasData && snapshot.data!.docs.isNotEmpty){
                   // this is matched one with the search
                   List<DocumentSnapshot> matchedData = [];
                   // this is remaining one
@@ -204,7 +207,6 @@ SizedBox(width: 10,),
                         remainingData.add(doc);
                       }
                     });
-
                     // Sort the matched data
                     matchedData.sort((a, b) {
                       final nameA = a["name"].toString().toLowerCase();
@@ -219,8 +221,6 @@ SizedBox(width: 10,),
                   }
                   // Concatenate matched data and remaining data
                   List<DocumentSnapshot> combinedData = [...matchedData, ...remainingData];
-
-
                   var documents = snapshot.data!.docs;
                   return ListView.builder(
                     shrinkWrap: true,
@@ -230,14 +230,14 @@ SizedBox(width: 10,),
                         final document = combinedData[index];
                         int serialNumber = index + 1;
                         String status = 'Absent';
-                        Color Tcolor = Color(0xffF12D2D);
-                        Color Bcolor = Color(0xffFFD3D3);
+                        Color Tcolor = const Color(0xffF12D2D);
+                        Color Bcolor = const Color(0xffFFD3D3);
                         document['attendanceStatus'] == true ?
                         status = 'Present' : status = 'Absent';
                         document['attendanceStatus'] == true ?
-                        Tcolor = Color(0xff1DA644) : Tcolor = Color(0xffF12D2D);
+                        Tcolor = const Color(0xff1DA644) : Tcolor = const Color(0xffF12D2D);
                         document['attendanceStatus'] == true ?
-                        Bcolor = Color(0xffDDFFE7): Bcolor = Color(0xffFFD3D3);
+                        Bcolor = const Color(0xffDDFFE7): Bcolor = const Color(0xffFFD3D3);
 
                         return Padding(
                           padding: const EdgeInsets.only(left: 30, right: 30),
@@ -252,12 +252,12 @@ SizedBox(width: 10,),
                                   width: 200,
                                   child: Padding(
                                     padding: const EdgeInsets.only(left: 0),
-                                    child: Text(document['userid'],
+                                    child: KText(text:document['userid'],
                                       style: GoogleFonts.openSans(fontSize: 18),),
                                   )),
                               Container(
                                   width: 200,
-                                  child: Text(document['name'],
+                                  child: KText(text:document['name'],
                                     style: GoogleFonts.openSans(fontSize: 18),)
                               ),
                               Container(
@@ -273,7 +273,7 @@ SizedBox(width: 10,),
                                     width: 200,
                                     child: Center(child: ElevatedButton(
                                       style: ButtonStyle(backgroundColor: MaterialStatePropertyAll(Bcolor)),
-                                      onPressed: () {}, child: Text(status, style: GoogleFonts.openSans(color: Tcolor, fontSize: 15),),)
+                                      onPressed: () {}, child: KText(text:status, style: GoogleFonts.openSans(color: Tcolor, fontSize: 15),),)
                                     )
                                 ),
                               ),
@@ -286,15 +286,14 @@ SizedBox(width: 10,),
                 }
                 else {
                  return Center(
-                   child: Container(
-                     width: 200,
-                     height: 230,
-                     // child: Center(
-                     //   child: Lottie.network(
-                     //        'https://raw.githubusercontent.com/xvrh/lottie-flutter/master/example/assets/Mobilo/A.json'),
-                     // ),
-                     child: Center(
-                       child: Lottie.asset('assets/ui-design-/noData.json'),
+                   child: Padding(
+                     padding: const EdgeInsets.only(top: 40),
+                     child: Container(
+                       width: 200,
+                       height: 230,
+                       child: Center(
+                         child: Lottie.asset('assets/ui-design-/noData.json'),
+                       ),
                      ),
                    ),
                  );
@@ -330,8 +329,8 @@ SizedBox(width: 10,),
 
 if(existingDocument.exists){
   ScaffoldMessenger.of(context).showSnackBar(
-    const SnackBar(
-      content: Text("Today's Attendance done "),
+     SnackBar(
+      content: KText(text:"Already Today's Attendance Taken Successfully ", style: GoogleFonts.openSans(),),
       duration: Duration(seconds: 2),
     ),
   );
@@ -347,12 +346,12 @@ if(existingDocument.exists){
           child: Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              const Text('Mark Todays Attendance'),
+               KText(text:'Mark Todays Attendance', style: GoogleFonts.openSans(),),
               ElevatedButton(
-                  style: ButtonStyle(backgroundColor: MaterialStatePropertyAll(Color(0xff37d1d3))),
+                  style: const ButtonStyle(backgroundColor: MaterialStatePropertyAll(Color(0xff37d1d3))),
                   onPressed: (){
                     Navigator.of(context).pop();
-                  }, child: Text('Cancel', style: GoogleFonts.openSans(fontWeight: FontWeight.w600, color: Colors.white),))
+                  }, child: KText(text:'Cancel', style: GoogleFonts.openSans(fontWeight: FontWeight.w600, color: Colors.white),))
             ],
           ),
         ),
@@ -362,17 +361,17 @@ if(existingDocument.exists){
             children: <Widget>[
               Container(
                 child: Row(children: [
-                  SizedBox(width: 100, child: Text('No.',style: GoogleFonts.openSans(fontSize: 18, fontWeight: FontWeight.w600),),),
-                  SizedBox(width: 400, child: Text('Name',style: GoogleFonts.openSans(fontSize: 18, fontWeight: FontWeight.w600),),),
-                  SizedBox(width: 400, child: Text('Actions',style: GoogleFonts.openSans(fontSize: 18, fontWeight: FontWeight.w600),),),
-                  Divider(color: Colors.grey, thickness: 0.1,)
+                  SizedBox(width: 100, child: KText(text:'No.',style: GoogleFonts.openSans(fontSize: 18, fontWeight: FontWeight.w600),),),
+                  SizedBox(width: 400, child: KText(text:'Name',style: GoogleFonts.openSans(fontSize: 18, fontWeight: FontWeight.w600),),),
+                  SizedBox(width: 400, child: KText(text:'Actions',style: GoogleFonts.openSans(fontSize: 18, fontWeight: FontWeight.w600),),),
+                  const Divider(color: Colors.grey, thickness: 0.1,)
                 ],),
               ),
-              Divider(color: Colors.grey, thickness: 0.2,),
+              const Divider(color: Colors.grey, thickness: 0.2,),
               Container(
                   width: 900,
                   height: 500,
-                  child: StreamBuilder(stream: FirebaseFirestore.instance.collection('Users').snapshots(), builder: (context, snapshot){
+                  child: StreamBuilder(stream: FirebaseFirestore.instance.collection('Users').orderBy('timestamp', descending: true).snapshots(), builder: (context, snapshot){
                     if(snapshot.hasData){
                       List<bool> attendanceStatus2 = List.generate(snapshot.data!.docs.length, (index) => false);
                       return ListView.builder(itemBuilder: (context, index) {
@@ -384,7 +383,7 @@ if(existingDocument.exists){
                           child: Container(
                             child: Row(children: [
                               SizedBox(width: 100, child: Text( '${serialNumber}',style: GoogleFonts.openSans(fontSize: 18, fontWeight: FontWeight.w600),),),
-                              SizedBox(width: 400, child: Text(data['firstName'],style: GoogleFonts.openSans(fontSize: 18, fontWeight: FontWeight.w600),),),
+                              SizedBox(width: 400, child: KText(text:data['firstName'],style: GoogleFonts.openSans(fontSize: 18, fontWeight: FontWeight.w600),),),
                               SizedBox(
                                 child: SmartSwitch(
                                   size: SwitchSize.medium,
@@ -404,7 +403,7 @@ if(existingDocument.exists){
                                   },
                                 ),
                               ),
-                              Divider(color: Colors.grey, thickness: 0.1,)
+                              const Divider(color: Colors.grey, thickness: 0.1,)
                             ],),
                           ),
                         );
@@ -417,7 +416,7 @@ if(existingDocument.exists){
                     // }
 
                     else{
-                      return Text('Document ');
+                      return const Text('Document ');
                     }
                   },)
               ),
@@ -426,10 +425,11 @@ if(existingDocument.exists){
         ),
         actions: <Widget>[
           ElevatedButton(
-              style: ButtonStyle(backgroundColor: MaterialStatePropertyAll(Color(0xff37d1d3))),
+              style: const ButtonStyle(backgroundColor: MaterialStatePropertyAll(Color(0xff37d1d3))),
               onPressed: (){
                 AttendanceColl(attendanceStatus, formattedDate);
-              }, child: Text('Submit', style: GoogleFonts.openSans(fontWeight: FontWeight.w600, color: Colors.white),))
+                seperateAttendance(attendanceStatus, formattedDate);
+              }, child: KText(text:'Submit', style: GoogleFonts.openSans(fontWeight: FontWeight.w600, color: Colors.white),))
         ],
       );
     },
@@ -465,12 +465,12 @@ if(existingDocument.exists){
               child: Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
-                  const Text('Update Todays Attendance'),
+                   KText(text:"Update Today's Attendance", style: GoogleFonts.openSans(),),
                   ElevatedButton(
-                      style: ButtonStyle(backgroundColor: MaterialStatePropertyAll(Color(0xff37d1d3))),
+                      style: const ButtonStyle(backgroundColor: MaterialStatePropertyAll(Color(0xff37d1d3))),
                       onPressed: (){
                         Navigator.of(context).pop();
-                      }, child: Text('Cancel', style: GoogleFonts.openSans(fontWeight: FontWeight.w600, color: Colors.white),))
+                      }, child: KText(text: 'Cancel', style: GoogleFonts.openSans(fontWeight: FontWeight.w600, color: Colors.white),))
                 ],
               ),
             ),
@@ -479,13 +479,13 @@ if(existingDocument.exists){
                 children: <Widget>[
                   Container(
                     child: Row(children: [
-                      SizedBox(width: 100, child: Text('No.',style: GoogleFonts.openSans(fontSize: 18, fontWeight: FontWeight.w600),),),
-                      SizedBox(width: 400, child: Text('Name',style: GoogleFonts.openSans(fontSize: 18, fontWeight: FontWeight.w600),),),
-                      SizedBox(width: 400, child: Text('Actions',style: GoogleFonts.openSans(fontSize: 18, fontWeight: FontWeight.w600),),),
-                      Divider(color: Colors.grey, thickness: 0.1,)
+                      SizedBox(width: 100, child: KText(text: 'No.',style: GoogleFonts.openSans(fontSize: 18, fontWeight: FontWeight.w600),),),
+                      SizedBox(width: 400, child: KText(text:'Name',style: GoogleFonts.openSans(fontSize: 18, fontWeight: FontWeight.w600),),),
+                      SizedBox(width: 400, child: KText(text:'Actions',style: GoogleFonts.openSans(fontSize: 18, fontWeight: FontWeight.w600),),),
+                      const Divider(color: Colors.grey, thickness: 0.1,)
                     ],),
                   ),
-                  Divider(color: Colors.grey, thickness: 0.2,),
+                  const Divider(color: Colors.grey, thickness: 0.2,),
                   Container(
                       width: 900,
                       height: 500,
@@ -501,8 +501,8 @@ if(existingDocument.exists){
                               padding: const EdgeInsets.all(8.0),
                               child: Container(
                                 child: Row(children: [
-                                  SizedBox(width: 100, child: Text( '${serialNumber}',style: GoogleFonts.openSans(fontSize: 18, fontWeight: FontWeight.w600),),),
-                                  SizedBox(width: 400, child: Text(data['name'],style: GoogleFonts.openSans(fontSize: 18, fontWeight: FontWeight.w600),),),
+                                  SizedBox(width: 100, child: KText( text:'${serialNumber}',style: GoogleFonts.openSans(fontSize: 18, fontWeight: FontWeight.w600),),),
+                                  SizedBox(width: 400, child: KText(text:data['name'],style: GoogleFonts.openSans(fontSize: 18, fontWeight: FontWeight.w600),),),
                                   SizedBox(
                                     child: SmartSwitch(
                                       size: SwitchSize.medium,
@@ -525,7 +525,7 @@ if(existingDocument.exists){
                                       },
                                     ),
                                   ),
-                                  Divider(color: Colors.grey, thickness: 0.1,)
+                                  const Divider(color: Colors.grey, thickness: 0.1,)
                                 ],),
                               ),
                             );
@@ -536,7 +536,7 @@ if(existingDocument.exists){
                         // }
 
                         else{
-                          return Text('Document ');
+                          return KText(text:'Document ', style: GoogleFonts.openSans(),);
                         }
                       },)
                   ),
@@ -545,12 +545,12 @@ if(existingDocument.exists){
             ),
             actions: <Widget>[
               ElevatedButton(
-                  style: ButtonStyle(backgroundColor: MaterialStatePropertyAll(Color(0xff37d1d3))),
+                  style: const ButtonStyle(backgroundColor: MaterialStatePropertyAll(Color(0xff37d1d3))),
                   onPressed: (){
                     // AttendanceColl(attendanceStatus, formattedDate);
                     showTopSnackBar(
                       Overlay.of(context),
-                      CustomSnackBar.success(
+                      const CustomSnackBar.success(
                         backgroundColor: Color(0xff3ac6cf),
                         message:
                         "Attendance Updated Sucessfully",
@@ -558,36 +558,29 @@ if(existingDocument.exists){
                     );
                     Navigator.pop(context);
 
-                  }, child: Text('Submit', style: GoogleFonts.openSans(fontWeight: FontWeight.w600, color: Colors.white),))
+                  }, child: KText(text:'Submit', style: GoogleFonts.openSans(fontWeight: FontWeight.w600, color: Colors.white),))
             ],
           );
         },
       );
     }
 else{
-      // ScaffoldMessenger.of(context).showSnackBar(
-      //   const SnackBar(
-      //     content: Text("You Didnt even took the Attendance Yet!!"),
-      //     duration: Duration(seconds: 2),
-      //   ),
-      // );
-
       showTopSnackBar(
         Overlay.of(context),
-        CustomSnackBar.error(
+        const CustomSnackBar.error(
           backgroundColor: Color(0xffF12D2D),
           message:
-          "You Didnt even took the Attendance Yet!!",
+          "Please ensure attendance is taken before editing.",
         ),
       );
-
- // if today didnt took attendance
     }
   }
 
   Future<void> AttendanceColl(List<bool> attendanceStatus, String formattedDate) async {
+
     DateTime now = DateTime.now();
     formattedDate = DateFormat('yyyy-MM-dd').format(now);
+
     FirebaseFirestore.instance
         .collection('Attendance')
         .doc(formattedDate)
@@ -598,8 +591,9 @@ else{
 
     // Get all users and update their attendance status
    var docu = await FirebaseFirestore.instance
-        .collection('Users')
+        .collection('Users').orderBy('timestamp', descending: true)
         .get();
+    print('Attendance marked successfully 1');
    for(int i=0;i<docu.docs.length;i++){
      FirebaseFirestore.instance
          .collection('Attendance')
@@ -617,10 +611,50 @@ else{
     Navigator.of(context).pop();
   }
 
+  ///Under the user main collection
+  Future<void> seperateAttendance(List<bool> attendanceStatus, String formattedDate) async {
+    DateTime now = DateTime.now();
+    formattedDate = DateFormat('yyyy-MM-dd').format(now);
+
+    String _getFormattedTime() {
+      final now = DateTime.now();
+      final formattedTime = DateFormat.jm().format(now);
+      return formattedTime;
+    }
+    // Update attendance for all users
+    var usersQuerySnapshot = await FirebaseFirestore.instance.collection('Users').orderBy('timestamp', descending: true).get();
+    for (int i = 0; i < usersQuerySnapshot.docs.length; i++) {
+      var userDoc = usersQuerySnapshot.docs[i];
+      var userId = userDoc.id;
+
+      print('Attendance marked successfully 3');
+
+      print(_getFormattedTime);
+      print(formattedDate);
+      print(attendanceStatus);
+
+      await FirebaseFirestore.instance
+          .collection('Users')
+          .doc(userId)
+          .collection('myAttendance')
+          .doc(formattedDate)
+          .set({
+        'time': DateFormat.jm().format(DateTime.now()),
+        'date': formattedDate,
+        'attendanceStatus': attendanceStatus[i],
+        'timestamp': DateTime.now().millisecondsSinceEpoch
+      });
+    }
+
+    print('Attendance marked successfully');
+
+  }
+
+
   Future<void> AttendaceDatePicker(BuildContext context) async {
     final DateTime? picked = await showDatePicker(
       context: context,
-      firstDate: DateTime.now().subtract(Duration(days: 365)),
+      firstDate: DateTime.now().subtract(const Duration(days: 365)),
       lastDate: DateTime.now(),
       initialDate: selectedAttDate ?? DateTime.now(),
     );
@@ -638,22 +672,7 @@ else{
       fetchAttendanceData(DateFormat('yyyy-MM-dd').format(DateTime.now()));
     }
   }
-  // Future fetchAttendanceData(String selectedDate) async {
-  //   DocumentSnapshot attendanceDoc = await FirebaseFirestore.instance
-  //       .collection('Attendance')
-  //       .doc(selectedDate)
-  //       .get();
-  //
-  //   if (attendanceDoc.exists) {
-  //     QuerySnapshot attendanceRecords = await FirebaseFirestore.instance
-  //         .collection('Attendance')
-  //         .doc(selectedDate)
-  //         .collection('Residents')
-  //         .get();
-  //
-  //   } else {
-  //   return Lottie.asset('assets/ui-design-/noData.json');
-  //   }}
+
   Future fetchAttendanceData(String selectedDate) async {
     DocumentSnapshot attendanceDoc = await FirebaseFirestore.instance
         .collection('Attendance')

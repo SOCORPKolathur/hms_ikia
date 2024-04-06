@@ -29,7 +29,7 @@ class _ResidentAddFormState extends State<ResidentAddForm> {
   final GlobalKey<FormState> _formKey = GlobalKey<FormState>();
   final GlobalKey<FormFieldState<String>> _firstNameKey = GlobalKey<FormFieldState<String>>();
   final GlobalKey<FormFieldState<String>> _gender = GlobalKey<FormFieldState<String>>();
-  final GlobalKey<FormFieldState<String>> _bloodgroop = GlobalKey<FormFieldState<String>>();
+  final GlobalKey<FormFieldState<String>> _bloodgroup = GlobalKey<FormFieldState<String>>();
   final GlobalKey<FormFieldState<String>>  _dob = GlobalKey<FormFieldState<String>>();
   final GlobalKey<FormFieldState<String>> _phonenumber = GlobalKey<FormFieldState<String>>();
   final GlobalKey<FormFieldState<String>> _aadharnum = GlobalKey<FormFieldState<String>>();
@@ -84,6 +84,7 @@ class _ResidentAddFormState extends State<ResidentAddForm> {
   TextEditingController blockname = new TextEditingController();
   // used this in Update page too
   List<String> prefix=["Select Prefix","Mr.","Ms.","Mrs"];
+  String selectedprefix="Select Prefix";
 
   List<String> BlockNames = [];
   String selectedBlockName = "Select Block Name";
@@ -137,7 +138,6 @@ class _ResidentAddFormState extends State<ResidentAddForm> {
   // Room name
   List<String> gender=["Select Gender","Male","Female","Transgender"];
   // used this in Update page too
-  String selectedprefix="Select Prefix";
   // block
   // String selectedBlockName = "Select Block Name";
   // String selectedRoomName = "Select Room Name";
@@ -500,21 +500,37 @@ class _ResidentAddFormState extends State<ResidentAddForm> {
                                         //   });
                                         // },
 
-                                        (String? value){
+                                            (String? value){
                                           setState(() {
                                             selectedprefix = value!;
-                                            if(selectedprefix == 'Mr.'){
+                                            if(selectedprefix == 'Mr.') {
                                               gender.remove('Female');
+
+
                                               if(selectedgender == 'Female'){
-                                                selectedgender = '';
-                      }else{
-                                                if(!gender.contains('Female')){
-                                                  gender.add('Female');
-                      }
-                      }
-                      }
+                                                selectedgender = 'Male';
+                                              }
+                                            } else {
+                                              if(!gender.contains('Female')) {
+                                                gender.add('Female');
+                                              }
+                                            }
+
+                                            if(selectedprefix == 'Ms.' || selectedprefix == 'Mrs') {
+                                              gender.remove('Male');
+
+                                              if(selectedgender == 'Male'){
+                                                selectedgender = 'Female';
+                                              }
+                                            } else {
+                                              if(!gender.contains('Male')) {
+                                                gender.add('Male');
+                                              }
+                                            }
+
                                           });
-                      },
+                                        },
+
 
 
                                         buttonStyleData:
@@ -748,7 +764,7 @@ class _ResidentAddFormState extends State<ResidentAddForm> {
                             ],
                           ),
                           const SizedBox(width: 18,),
-                          CustomTextField(key: _bloodgroop,header: "*Blood Group",hint: "Enter bloob group",controller: bloodgroup,
+                          CustomTextField(key: _bloodgroup,header: "*Blood Group",hint: "Enter blood group",controller: bloodgroup,
                             onChanged: (value) {
                               setState(() {
                                 // Update _firstNameError only if the value becomes empty
@@ -817,7 +833,7 @@ showError: _phonenumError,
                           const SizedBox(width: 18,),
                           CustomTextField(
                             key: _aadharnum,
-                            header: "*Aadhaar Number",hint: "Enter aadhaar name",controller: aadhaar,
+                            header: "*Aadhaar Number",hint: "Enter aadhaar number",controller: aadhaar,
 
                             onChanged: (value) {
 setState(() {
@@ -1424,6 +1440,12 @@ showError: _useridError,
       setState(() {
         usercount = docu.docs[0]["usercount"] + 1;
         userid.text="IKIA${usercount.toString().padLeft(4,"0")}";
+
+      });
+    }else{
+      setState(() {
+        usercount = 1;
+        userid.text="IKIA${(usercount).toString().padLeft(4,"0")}";
       });
     }
 
@@ -1453,8 +1475,8 @@ showError: _useridError,
     "parentmobile" : parentmobile.text,
     "parentOccupation" : parentOccupation.text,
     "userid" : userid.text,
-    // "blockname" : blockname.text,
       "imageUrl":imgUrl,
+      "fcmToken": "",
       "timestamp":DateTime.now().millisecondsSinceEpoch,
       "status" : false,
       "uid" : '',

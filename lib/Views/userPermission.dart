@@ -35,6 +35,8 @@ class _userPermissionState extends State<userPermission> {
     'Sms',
     'Notifications',
     'User Permissions',
+    'Mess Time Table',
+    'Complaints'
   ];
 
   Map<String, bool> moduleStates = {};
@@ -56,13 +58,6 @@ class _userPermissionState extends State<userPermission> {
       });
     });
     fetchRoleModules(selectedRole);
-  }
-
-
-
-
-  getroleModules(){
-    
   }
 
   @override
@@ -87,13 +82,16 @@ class _userPermissionState extends State<userPermission> {
                     child: Row(
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
-                      Text('Manage Role Permission', style: GoogleFonts.openSans(fontWeight: FontWeight.w700, color: Colors.black, fontSize: 17),),
+                      KText(text:'Manage Role Permission', style: GoogleFonts.openSans(fontWeight: FontWeight.w700, color: Colors.black, fontSize: 17),),
                       Row(children: [
                         ElevatedButton(
                           style: const ButtonStyle(
                             backgroundColor: MaterialStatePropertyAll(Color(0xff37d1d3))
                           ),
-                          onPressed: (){}, child: const Text('Manage Role', style: TextStyle(color: Colors.white, fontWeight: FontWeight.w500),),
+                          onPressed: (){
+                            ManageRolePopUp();
+
+                          }, child: const KText(text:'Manage Role', style: TextStyle(color: Colors.white, fontWeight: FontWeight.w500),),
                         ),
                         const SizedBox(width: 8,),
                         ElevatedButton(
@@ -101,7 +99,7 @@ class _userPermissionState extends State<userPermission> {
                                 backgroundColor: MaterialStatePropertyAll(Color(0xff37d1d3))),
                             onPressed: (){
                               AddRolePopUp();
-                            }, child: const Text('Add Role', style: TextStyle(color: Colors.white, fontWeight: FontWeight.w500),)
+                            }, child: const KText(text:'Add Role', style: TextStyle(color: Colors.white, fontWeight: FontWeight.w500),)
                         )
                       ],)
                     ],),
@@ -123,7 +121,7 @@ crossAxisAlignment: CrossAxisAlignment.start,
                               // crossAxisAlignment: CrossAxisAlignment.center,
                               children: [
                               // Select role Dropdown
-                              Text('Select Role', style: GoogleFonts.openSans(color: const Color(0xff262626).withOpacity(0.6), fontSize: 16, fontWeight: FontWeight.w600),),
+                              KText(text:'Select Role', style: GoogleFonts.openSans(color: const Color(0xff262626).withOpacity(0.6), fontSize: 16, fontWeight: FontWeight.w600),),
                               Padding(
                                 padding: const EdgeInsets.only(bottom: 10, top: 10),
                                 child: Container(
@@ -143,7 +141,7 @@ crossAxisAlignment: CrossAxisAlignment.start,
                                         elevation: 1,
                                         focusColor: Colors.white,
                                         isExpanded: true,
-                                        hint: const Text(
+                                        hint: const KText(text:
                                           'Select Role',
                                           style: TextStyle(
                                             fontSize: 12,
@@ -154,7 +152,7 @@ crossAxisAlignment: CrossAxisAlignment.start,
                                         items: Roles.map((String item) {
                                           return DropdownMenuItem<String>(
                                             value: item,
-                                            child: Text(
+                                            child: KText(text:
                                               item,
                                               style: const TextStyle(
                                                 color: Color(0x7f262626),
@@ -183,7 +181,7 @@ crossAxisAlignment: CrossAxisAlignment.start,
                           ],
                         ),
                       //   Modules
-                        Text('Modules', style: GoogleFonts.openSans(fontWeight: FontWeight.w700, fontSize: 19),),
+                        KText(text:'Modules', style: GoogleFonts.openSans(fontWeight: FontWeight.w700, fontSize: 19),),
                         const Divider(),
 
                         Container(
@@ -197,21 +195,14 @@ crossAxisAlignment: CrossAxisAlignment.start,
                                   children: [
                                     Checkbox(
                                       checkColor: Colors.white,
-                                      activeColor: Color(0xff37D1D3),
-
-
-
+                                      activeColor: const Color(0xff37D1D3),
                                       value: true,
                                       onChanged: (v){
-
                                       },
-
-
-
                                     ),
-                                    SizedBox(width: 3),
+                                    const SizedBox(width: 3),
                                     SizedBox(
-                                      child: Text(availableModules[index]),
+                                      child: KText(text:availableModules[index],style: GoogleFonts.openSans(),),
                                     ),
                                   ],
                                 );
@@ -224,16 +215,10 @@ crossAxisAlignment: CrossAxisAlignment.start,
                                     children: [
                                       Checkbox(
                                         checkColor: Colors.white,
-                                        activeColor: Color(0xff37D1D3),
-
-
-
+                                        activeColor: const Color(0xff37D1D3),
                                         value: modulespermissions.contains(availableModules[index].toString()),
-
                                         onChanged: (newValue) {
                                           setState(() {
-
-
                                           if(newValue==true) {
                                             modulespermissions.add(availableModules[index].toString());
                                           }
@@ -241,12 +226,11 @@ crossAxisAlignment: CrossAxisAlignment.start,
                                             modulespermissions.remove(availableModules[index]);
                                           }
                                           });
-
                                         },
                                       ),
-                                      SizedBox(width: 3),
+                                      const SizedBox(width: 3),
                                       SizedBox(
-                                        child: Text(availableModules[index]),
+                                        child: KText(text:availableModules[index], style: GoogleFonts.openSans(),),
                                       ),
                                     ],
                                   ),
@@ -256,7 +240,7 @@ crossAxisAlignment: CrossAxisAlignment.start,
                             },
 
 
-                            gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(crossAxisCount: 5,childAspectRatio: 9/2,),
+                            gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(crossAxisCount: 5,childAspectRatio: 9/2,),
 
                           ),
                         ),
@@ -290,7 +274,7 @@ crossAxisAlignment: CrossAxisAlignment.start,
                                 ),
                               );
 
-                            }, child: const Text('Update', style: TextStyle(color: Colors.white, fontWeight: FontWeight.w500),),
+                            }, child: const KText(text:'Update', style: TextStyle(color: Colors.white, fontWeight: FontWeight.w500),),
                           ),
                         ],)
                       ],
@@ -453,14 +437,14 @@ crossAxisAlignment: CrossAxisAlignment.start,
                              ScaffoldMessenger.of(context).showSnackBar(
                                SnackBar(
                                  content: KText(text:'Account Created Successfully', style: GoogleFonts.openSans(),),
-                                 duration: Duration(seconds: 2),
+                                 duration: const Duration(seconds: 2),
                                ),
                              );
                           }else{
                             ScaffoldMessenger.of(context).showSnackBar(
                               SnackBar(
                                 content: KText(text:'Please Enter the Username & Password', style: GoogleFonts.openSans(),),
-                                duration: Duration(seconds: 2),
+                                duration: const Duration(seconds: 2),
                               ),
                             );
                           }
@@ -500,6 +484,7 @@ crossAxisAlignment: CrossAxisAlignment.start,
       },
     );
   }
+
 // create firebase auth
   Future<void> createFirebaseAccount(String email, String password) async {
     try {
@@ -547,38 +532,17 @@ crossAxisAlignment: CrossAxisAlignment.start,
     }
   }
 
-
-
-
-  // Future<void> fetchRoleModules(String role) async {
-  //   try {
-  //     DocumentSnapshot snapshot =
-  //     await FirebaseFirestore.instance.collection('Roles').doc(role).get();
-  //     if (snapshot.exists) {
-  //       List<String> modules = List<String>.from(snapshot.get('modules'));
-  //       moduleStates = Map.fromIterable(availableModules,
-  //           key: (module) => module, value: (module) => modules.contains(module));
-  //       setState(() {});
-  //     }
-  //   } catch (e) {
-  //     print("Error fetching role modules: $e");
-  //   }
-  // }
-
-
   List modulespermissions=[];
   fetchRoleModules(String role) async {
     print("hello");
     setState(() {
       modulespermissions.clear();
     });
-    
       var snapshot = await FirebaseFirestore.instance.collection('Roles').where("username",isEqualTo: role).get();
       if (snapshot.docs.isNotEmpty) {
         setState(() {
           modulespermissions = snapshot.docs[0]["modules"];
         });
-
       }
       print(modulespermissions);
       for(int i=0;i<availableModules.length;i++) {
@@ -586,8 +550,187 @@ crossAxisAlignment: CrossAxisAlignment.start,
           print(availableModules[i]);
         }
       }
-   
   }
 
+//   manage role
+  Future<void> ManageRolePopUp() async {
+    return showDialog<void>(
+      context: context,
+      barrierDismissible: false,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          elevation: 0,
+          backgroundColor: const Color(0xffFFFFFF),
+          title: Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              KText(text:'Manage Role', style: GoogleFonts.openSans(fontWeight: FontWeight.w700, fontSize: 18),),
+              InkWell(
+                onTap: () => Navigator.pop(context),
+                child: Container(
+                  height: 30, width: 30,
+                  // here the Cross Icon
+                  child:  Stack(
+                    alignment: Alignment.center,
+                    children: [
+                      Container(
+                        height: 38,
+                        width: 38,
+                        decoration: const BoxDecoration(
+                          color: Colors.white,
+                          borderRadius: BorderRadius.all(Radius.circular(50)),
+                          boxShadow:[
+                            BoxShadow(
+                                color: Color(0xfff5f6f7),
+                                blurRadius: 5,
+                                spreadRadius: 1,
+                                offset: Offset(4,4)
+                            )
+                          ],
+                        ),
+                      ),
+                      ClipRRect(
+                        borderRadius: const BorderRadius.all(Radius.circular(50)),
+                        child: Container(
+                          height: 20,
+                          width: 20,
+                          child: Image.asset('assets/ui-design-/images/Multiply.png', fit: BoxFit.contain,scale: 0.5,),
+                        ),
+                      )
+                    ],
+                  ),
+                ),
+              ),
+            ],
+          ),
+          content: Container(
+            width: 500,
+            height: 400,
+            child: Column(
+              children: [
+                const SizedBox(height: 10,),
+                Divider(color: const Color(0xff262626).withOpacity(0.1), thickness: 1, height: 0.5),
+                Padding(
+                  padding: const EdgeInsets.only(top: 30.0),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.center,
+                    children: [
+                      // KText(text:'Room Number', style: GoogleFonts.openSans(color: const Color(0xff262626).withOpacity(0.6), fontSize: 16, fontWeight: FontWeight.w600),),
+                      Padding(
+                        padding: const EdgeInsets.only(bottom: 10, top: 10),
+                        child: CustomTextField(
+                          hint: 'Enter Email',
+                          readOrwrite: true,
+                          controller: TextEditingController(text: selectedRole),
+                          fillColor: Colors.white,
+                          validator: null,
+                          header: 'Email',
+                          width: 250,
+                          height: 45,
+                        ),
+                      ),
+                      // KText(text:'Room Number', style: GoogleFonts.openSans(color: const Color(0xff262626).withOpacity(0.6), fontSize: 16, fontWeight: FontWeight.w600),),
+                      Padding(
+                        padding: const EdgeInsets.only(bottom: 10, top: 10),
+                        child: CustomTextField(
+                          hint: 'Password',
+                          controller: passwordCont,
+                          fillColor: Colors.white,
+                          validator: null,
+                          header: 'Password',
+                          width: 250,
+                          height: 45,
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+                const SizedBox(height: 40),
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.end,
+                  children: [
+                    SizedBox(
+                      width: 110,
+                      height: 40,
+                      child: ElevatedButton(
+                        style: const ButtonStyle(
+                            elevation: MaterialStatePropertyAll(0),
+                            backgroundColor: MaterialStatePropertyAll(Color(0xfff5f6f7))),
+                        onPressed: (){
+                          Navigator.pop(context);
+                        }, child:
+                      KText(
+                        text:'Cancel',
+                        style: GoogleFonts.openSans(
+                          fontSize: 13,
+                          fontWeight: FontWeight.w600,
+                          color: const Color(0xff37D1D3),
+                        ),
+                      ),
+                      ),
+                    ),
+
+                    const SizedBox(width: 10,),
+                    SizedBox(
+                      height: 40,
+                      child: ElevatedButton(
+                        style: const ButtonStyle(
+                            elevation: MaterialStatePropertyAll(3),
+                            backgroundColor: MaterialStatePropertyAll(Color(0xff37D1D3))
+                        ),
+                        onPressed: () {
+                          if(usernameCont.text.isNotEmpty && passwordCont.text.isNotEmpty){
+                            createFirebaseAccount(usernameCont.text, passwordCont.text);
+                            Navigator.pop(context);
+                            ScaffoldMessenger.of(context).showSnackBar(
+                              SnackBar(
+                                content: KText(text:'Account Created Successfully', style: GoogleFonts.openSans(),),
+                                duration: const Duration(seconds: 2),
+                              ),
+                            );
+                          }else{
+                            ScaffoldMessenger.of(context).showSnackBar(
+                              SnackBar(
+                                content: KText(text:'Please Enter the Username & Password', style: GoogleFonts.openSans(),),
+                                duration: const Duration(seconds: 2),
+                              ),
+                            );
+                          }
+                        },
+                        child: Row(
+                          children: [
+                            KText(
+                              text:'Create',
+                              style: GoogleFonts.openSans(
+                                fontSize: 13,
+                                fontWeight: FontWeight.w600,
+                                color: Colors.white,
+                              ),
+                            ),
+                            const SizedBox(width: 8),
+                            const CircleAvatar(
+                              radius: 8,
+                              backgroundColor: Colors.white,
+                              child: Center(
+                                child: Icon(
+                                  Icons.add,
+                                  color: Color(0xff37D1D3),
+                                  size: 13,
+                                ),
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+              ],
+            ),
+          ),
+        );
+      },
+    );
+  }
 
 }

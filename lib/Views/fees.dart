@@ -1,4 +1,5 @@
 import 'dart:html';
+import 'dart:math';
 
 import 'package:animate_do/animate_do.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
@@ -12,6 +13,7 @@ import 'package:top_snackbar_flutter/custom_snack_bar.dart';
 import 'package:top_snackbar_flutter/top_snack_bar.dart';
 import '../widgets/ReusableHeader.dart';
 import '../widgets/customtextfield.dart';
+import '../widgets/kText.dart';
 import '../widgets/userMiniDetails.dart';
 
 class FeesPage extends StatefulWidget {
@@ -37,6 +39,7 @@ class _FeesPageState extends State<FeesPage> {
     'Card',
     'Others'
   ];
+  bool viewAllHistory = false;
 
   static const IconData filter_alt_outlined = IconData(0xf068, fontFamily: 'MaterialIcons');
   double height = 220;
@@ -84,7 +87,7 @@ class _FeesPageState extends State<FeesPage> {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              const ReusableHeader(Headertext: 'Fees Register ', SubHeadingtext: '"Manage Easily Residents Records"'),
+              const ReusableHeader(Headertext: 'Fees Register ', SubHeadingtext: '"Manage Easily Fees Records"'),
           const SizedBox(height: 10,),
           Container(
             height: 100,
@@ -107,9 +110,7 @@ class _FeesPageState extends State<FeesPage> {
                           print('values Emp');
                         }
                         else{
-                          // searchSuggestions = searchSuggestions.where((user) => user['name'].toLowerCase().contains(value.toLowerCase())).toList();
                           searchSuggestions = searchSuggestions.where((user) => user['name'].toLowerCase().startsWith(value.toLowerCase())).toList();
-
                           print('getting data');
                           print(value);}
                         print(searchSuggestions);
@@ -138,7 +139,7 @@ class _FeesPageState extends State<FeesPage> {
                             onPressed: (){}, child:
                         Row(
                           children: [
-                            const Text('Search', style: TextStyle(color: Colors.white),),
+                            const KText(text:'Search', style: TextStyle(color: Colors.white),),
                             SizedBox.fromSize(size: const Size(8,0),),
                             const Icon(Icons.search, color: Colors.white,)
                               ],)
@@ -173,7 +174,7 @@ class _FeesPageState extends State<FeesPage> {
                             },
                             child: Row(
                               children: [
-                                const Text('Reset', style: TextStyle(color: Color(0xff37D1D3))),
+                                const KText(text:'Reset', style: TextStyle(color: Color(0xff37D1D3))),
                                 SizedBox.fromSize(size: const Size(8, 0)),
                                 SizedBox(
                                   width: 20,
@@ -211,8 +212,8 @@ class _FeesPageState extends State<FeesPage> {
                               leading: CircleAvatar(
                                 backgroundImage: NetworkImage(searchSuggestions[index]['profilePicture']),
                               ),
-                              title: Text(
-                                searchSuggestions[index]['name'],
+                              title: KText(
+                               text: searchSuggestions[index]['name'],
                                 style: GoogleFonts.openSans(
                                   fontWeight: FontWeight.w700,
                                   fontSize: 15,
@@ -310,316 +311,330 @@ class _FeesPageState extends State<FeesPage> {
                      child:
                      Padding(
                        padding: const EdgeInsets.all(20),
-                       child: Column(children: [
-                         // Export Button
-                         Row(
-                           mainAxisAlignment: MainAxisAlignment.end,
-                           children: [
-                             // SizedBox(
-                             //   height: 40,
-                             //   child: ElevatedButton(
-                             //     style:  const ButtonStyle(
-                             //         elevation: MaterialStatePropertyAll(3),
-                             //         backgroundColor: MaterialStatePropertyAll(Color(0xff37D1D3))),
-                             //     onPressed: () {
-                             //     },
-                             //     child: Row(children: [
-                             //       Text('Export Data', style: GoogleFonts.openSans(color: Colors.white),),
-                             //        const Icon(Icons.downloading, color: Colors.white,)
-                             //     ],),
-                             //   ),
-                             // )
-                           ],),
-                        SizedBox(height: 20,),
-                          Row(children: [
-                            Text('Selected Fees                    :     ', style: GoogleFonts.openSans(fontWeight: FontWeight.w600 ),),
-                       const SizedBox(height: 30),
-                            Padding(
-                              padding: const EdgeInsets.only(top: 8.0),
-                              child: Container(
-                                width: 430,
-                                height: 50,
-                                decoration: BoxDecoration (
-                                  border: Border.all(color: const Color(0x7f262626)),
-                                  borderRadius: BorderRadius.circular(30),
-                                ),
-                                child: Padding(
-                                  padding: const EdgeInsets.only(left: 12.0,right: 6),
-                                  child:  DropdownButtonHideUnderline(
-                                    child:
-                                    DropdownButtonFormField2<
-                                        String>(
-                                      isExpanded: true,
-                                      hint: Text(
-                                        'Select Fee', style:
-                                      GoogleFonts.openSans (
-                                        fontSize: 12,
-                                        fontWeight: FontWeight.w600,
-                                        color: const Color(0x7f262626),
-                                      ),
-                                      ),
-                                      items: selectFee
-                                          .map((String
-                                      item) =>
-                                          DropdownMenuItem<
-                                              String>(
-                                            value: item,
-                                            child: Text(
-                                              item,
-                                              style:
-                                              GoogleFonts.openSans (
-                                                fontSize: 12,
-                                                fontWeight: FontWeight.w600,
+                       child: SingleChildScrollView(
+                         child: Column(children: [
+                          SizedBox(height: 20,),
+                            Row(children: [
+                              KText(text:'Selected Fees                    :     ', style: GoogleFonts.openSans(fontWeight: FontWeight.w600 ),),
+                         const SizedBox(height: 30),
+                              Padding(
+                                padding: const EdgeInsets.only(top: 8.0),
+                                child: Container(
+                                  width: 430,
+                                  height: 50,
+                                  decoration: BoxDecoration (
+                                    border: Border.all(color: const Color(0x7f262626)),
+                                    borderRadius: BorderRadius.circular(30),
+                                  ),
+                                  child: Padding(
+                                    padding: const EdgeInsets.only(left: 12.0,right: 6),
+                                    child:  DropdownButtonHideUnderline(
+                                      child:
+                                      DropdownButtonFormField2<
+                                          String>(
+                                        isExpanded: true,
+                                        hint: KText(
+                                          text:'Select Fee', style:
+                                        GoogleFonts.openSans (
+                                          fontSize: 12,
+                                          fontWeight: FontWeight.w600,
+                                          color: const Color(0x7f262626),
+                                        ),
+                                        ),
+                                        items: selectFee
+                                            .map((String
+                                        item) =>
+                                            DropdownMenuItem<
+                                                String>(
+                                              value: item,
+                                              child: KText(text:
+                                                item,
+                                                style:
+                                                GoogleFonts.openSans (
+                                                  fontSize: 12,
+                                                  fontWeight: FontWeight.w600,
+                                                ),
                                               ),
-                                            ),
-                                          )).toList(),
-                                      value:
-                                      selectedPaymentFor,
-                                      onChanged:
-                                          (String? value) {
-                                        setState(() {
-                                          selectedPaymentFor =
-                                          value!;
-                                        });
-                                      },
-                                      buttonStyleData:
-                                      const ButtonStyleData(
+                                            )).toList(),
+                                        value:
+                                        selectedPaymentFor,
+                                        onChanged:
+                                            (String? value) {
+                                          setState(() {
+                                            selectedPaymentFor =
+                                            value!;
+                                          });
+                                        },
+                                        buttonStyleData:
+                                        const ButtonStyleData(
+                                        ),
+                                        menuItemStyleData:
+                                        const MenuItemStyleData(
+                                        ),
+                                        decoration:
+                                        const InputDecoration(
+                                            border:
+                                            InputBorder
+                                                .none),
                                       ),
-                                      menuItemStyleData:
-                                      const MenuItemStyleData(
-                                      ),
-                                      decoration:
-                                      const InputDecoration(
-                                          border:
-                                          InputBorder
-                                              .none),
                                     ),
                                   ),
                                 ),
                               ),
-                            ),
-                          ]
-                         ,),
-                         const SizedBox(height: 25,),
-                         Row(children: [
-                            Text('Payment Method              :     ',style: GoogleFonts.openSans(fontWeight: FontWeight.w600 )),
-                           const SizedBox(height: 30),
-                           Padding(
-                             padding: const EdgeInsets.only(top: 8.0),
-                             child: Container(
-                               width: 430,
-                               height: 50,
-                               decoration: BoxDecoration (
-                                 border: Border.all(color: const Color(0x7f262626)),
-                                 borderRadius: BorderRadius.circular(30),
-                               ),
-                               child: Padding(
-                                 padding: const EdgeInsets.only(left: 12.0,right: 6),
-                                 child:  DropdownButtonHideUnderline(
-                                   child:
-                                   DropdownButtonFormField2<
-                                       String>(
-                                     isExpanded: true,
-                                     hint: Text(
-                                       'Select Payment Method', style:
-                                     GoogleFonts.openSans (
-                                       fontSize: 12,
-                                       fontWeight: FontWeight.w600,
-                                       color: const Color(0x7f262626),
-                                     ),
-                                     ),
-                                     items: paymentMethod
-                                         .map((String
-                                     item) =>
-                                         DropdownMenuItem<
-                                             String>(
-                                           value: item,
-                                           child: Text(
-                                             item,
-                                             style:
-                                             GoogleFonts.openSans (
-                                               fontSize: 12,
-                                               fontWeight: FontWeight.w600,
+                            ]
+                           ,),
+                           const SizedBox(height: 25,),
+                           Row(children: [
+                             KText(text:'Payment Method              :     ',style: GoogleFonts.openSans(fontWeight: FontWeight.w600 )),
+                             const SizedBox(height: 30),
+                             Padding(
+                               padding: const EdgeInsets.only(top: 8.0),
+                               child: Container(
+                                 width: 430,
+                                 height: 50,
+                                 decoration: BoxDecoration (
+                                   border: Border.all(color: const Color(0x7f262626)),
+                                   borderRadius: BorderRadius.circular(30),
+                                 ),
+                                 child: Padding(
+                                   padding: const EdgeInsets.only(left: 12.0,right: 6),
+                                   child:  DropdownButtonHideUnderline(
+                                     child:
+                                     DropdownButtonFormField2<
+                                         String>(
+                                       isExpanded: true,
+                                       hint: KText(
+                                         text:
+                                         'Select Payment Method', style:
+                                       GoogleFonts.openSans (
+                                         fontSize: 12,
+                                         fontWeight: FontWeight.w600,
+                                         color: const Color(0x7f262626),
+                                       ),
+                                       ),
+                                       items: paymentMethod
+                                           .map((String
+                                       item) =>
+                                           DropdownMenuItem<
+                                               String>(
+                                             value: item,
+                                             child: KText(
+                                               text:
+                                               item,
+                                               style:
+                                               GoogleFonts.openSans (
+                                                 fontSize: 12,
+                                                 fontWeight: FontWeight.w600,
+                                               ),
                                              ),
-                                           ),
-                                         )).toList(),
-                                     value:
-                                     selectedMethod,
-                                     onChanged:
-                                         (String? value) {
-                                       setState(() {
-                                         selectedMethod =
-                                         value!;
-                                       });
-                                     },
-                                     buttonStyleData:
-                                     const ButtonStyleData(
+                                           )).toList(),
+                                       value:
+                                       selectedMethod,
+                                       onChanged:
+                                           (String? value) {
+                                         setState(() {
+                                           selectedMethod =
+                                           value!;
+                                         });
+                                       },
+                                       buttonStyleData:
+                                       const ButtonStyleData(
+                                       ),
+                                       menuItemStyleData:
+                                       const MenuItemStyleData(
+                                       ),
+                                       decoration:
+                                       const InputDecoration(
+                                           border:
+                                           InputBorder
+                                               .none),
                                      ),
-                                     menuItemStyleData:
-                                     const MenuItemStyleData(
-                                     ),
-                                     decoration:
-                                     const InputDecoration(
-                                         border:
-                                         InputBorder
-                                             .none),
                                    ),
                                  ),
                                ),
                              ),
-                           ),
-                         ],),
-                         const SizedBox(height: 30,),
-                         Row(children: [
-                            Text('Payment Amount             :     ',style: GoogleFonts.openSans(fontWeight: FontWeight.w600,  )),
-                           const SizedBox(height: 30),
-                           CustomTextField(hint: 'Enter the Amount', controller: paymentAmount, validator: null, header: '', width: 430,)
-                         ],),
-                         const SizedBox(height: 30,),
-
-                         Padding(
-                           padding: const EdgeInsets.only(right: 1),
-                           child: Row(
+                           ],),
+                           const SizedBox(height: 30,),
+                           Row(children: [
+                              KText(text:'Payment Amount             :     ',style: GoogleFonts.openSans(fontWeight: FontWeight.w600,  )),
+                             const SizedBox(height: 30),
+                             CustomTextField(hint: 'Enter the Amount', controller: paymentAmount, validator: null, header: '', width: 430,)
+                           ],),
+                           const SizedBox(height: 30,),
+                         
+                           Row(
                              mainAxisAlignment: MainAxisAlignment.end,
                              children: [
-                               Container(
-                                 height: 44,
-                                 width: 128,
-                                 // width: 130,
-                                 child:
-                                 ElevatedButton(
-                                   style: ButtonStyle(
-                                     backgroundColor: MaterialStatePropertyAll(Color(0xff37D1D3)),
-                                     shape: MaterialStateProperty.all<RoundedRectangleBorder>(
-                                         RoundedRectangleBorder(
-                                             borderRadius: BorderRadius.circular(50),
-                                             side:
-                                             const BorderSide(color: Color(0xff37D1D3)
-                                             )
-                                         )
+                               Padding(
+                                 padding: const EdgeInsets.only(right: 1),
+                                 child: Row(
+                                   mainAxisAlignment: MainAxisAlignment.end,
+                                   children: [
+                                     Container(
+                                       height: 44,
+                                       width: 128,
+                                       // width: 130,
+                                       child:
+                                       ElevatedButton(
+                                         style: ButtonStyle(
+                                           backgroundColor: MaterialStatePropertyAll(Color(0xff37D1D3)),
+                                           shape: MaterialStateProperty.all<RoundedRectangleBorder>(
+                                               RoundedRectangleBorder(
+                                                   borderRadius: BorderRadius.circular(50),
+                                                   side:
+                                                   const BorderSide(color: Color(0xff37D1D3)
+                                                   )
+                                               )
+                                           ),
+                                           // elevation: MaterialStatePropertyAll(2),
+                                         ),
+                                         onPressed: () {
+                                           if (
+                                           paymentAmount.text.isNotEmpty &&
+                                               selectedPaymentFor != null &&
+                                               selectedMethod != null
+                                           ) {
+                                             String defaultPaymentMethod = selectedMethod!;
+                                             String defaultPaymentFor = selectedPaymentFor!;
+                                             double defaultFees = double.parse(paymentAmount.text);
+                                             // Call the method to process Resident with the provided values
+                                             Resident(defaultPaymentMethod, defaultPaymentFor, defaultFees);
+                                             // Clear the fields
+                                             paymentAmount.clear();
+                                             setState(() {
+                                               selectedPaymentFor = null;
+                                               selectedMethod = null;
+                                             });
+                                             showTopSnackBar(
+                                               Overlay.of(context),
+                                               CustomSnackBar.success(
+                                                 message: "Fees Added Successfully",
+                                               ),
+                                             );
+                                           } else {
+                                             print('Write');
+                                             showTopSnackBar(
+                                               Overlay.of(context),
+                                               CustomSnackBar.error(
+                                                 message: "Please Enter all the fields",
+                                               ),
+                                             );
+                                           }
+                                         },
+                                         child: Row(
+                                           children: [
+                                             KText(text:'Submit', style: GoogleFonts.openSans(color: Colors.white)),
+                                             SizedBox.fromSize(size: const Size(8, 0)),
+                                             const Icon(Icons.save, size: 18, color: Colors.white),
+                                           ],
+                                         ),
+                                       ),
                                      ),
-                                     // elevation: MaterialStatePropertyAll(2),
-                                   ),
-                                   onPressed: () {
-                                     if (
-                                     paymentAmount.text.isNotEmpty &&
-                                         selectedPaymentFor != null &&
-                                         selectedMethod != null
-                                     ) {
-                                       String defaultPaymentMethod = selectedMethod!;
-                                       String defaultPaymentFor = selectedPaymentFor!;
-                                       double defaultFees = double.parse(paymentAmount.text);
-
-                                       // Call the method to process Resident with the provided values
-                                       Resident(defaultPaymentMethod, defaultPaymentFor, defaultFees);
-
-                                       // Clear the fields
-                                       paymentAmount.clear();
-                                       setState(() {
-                                         selectedPaymentFor = null;
-                                         selectedMethod = null;
-                                       });
-
-                                       showTopSnackBar(
-                                         Overlay.of(context),
-                                         CustomSnackBar.success(
-                                           message: "Fees Added Successfully",
-                                         ),
-                                       );
-                                     } else {
-                                       print('Write');
-                                       showTopSnackBar(
-                                         Overlay.of(context),
-                                         CustomSnackBar.error(
-                                           message: "Please Enter all the fields",
-                                         ),
-                                       );
-                                     }
-                                   },
-
-                                   child: Row(
-                                     children: [
-                                        Text('Submit', style: GoogleFonts.openSans(color: Colors.white)),
-                                       SizedBox.fromSize(size: const Size(8, 0)),
-                                       const Icon(Icons.save, size: 18, color: Colors.white),
-                                     ],
-                                   ),
+                                   ],
                                  ),
                                ),
+                             SizedBox(width: 10,),
+                             //   view all button
+                               SizedBox(
+                                 width: 120,
+                                 height: 40,
+                                 child: ElevatedButton(
+                                     style: ElevatedButton.styleFrom(
+                                         backgroundColor: Color(0xff37D1D3),
+                                         textStyle: GoogleFonts.openSans(
+                                             fontWeight: FontWeight.w600, color: Colors.white, fontSize: 15
+                                         )
+                                     ),
+                                     onPressed: (){
+                                       setState(() {
+                                         viewAllHistory = !viewAllHistory;
+                                       });
+                                     }, child:  KText( text:
+                                     viewAllHistory ? 'View Less' : 'View All', style: GoogleFonts.openSans(),)),
+                               ),
+
                              ],
                            ),
-                         ),
-                         const SizedBox(height: 30,),
-                         SizedBox(
-                           child: Row(children: [
-                              Text('Previous Payments          :     ',style: GoogleFonts.openSans(fontWeight: FontWeight.w600 )),
-                            Container(
-                              width: 510,
-                              child: Row(
-                                mainAxisAlignment: MainAxisAlignment.spaceAround,
-                               children: [
-                               SizedBox(
-                                   width: 80,
-                                   child: Text('Date', style: GoogleFonts.openSans(fontWeight: FontWeight.w600,),)),
-                               SizedBox(child: Text('Fees Type', style: GoogleFonts.openSans(fontWeight: FontWeight.w600,))),
-                               SizedBox(child: Text('Amount', style: GoogleFonts.openSans(fontWeight: FontWeight.w600,))),
-                               SizedBox(child: Text('Method', style: GoogleFonts.openSans(fontWeight: FontWeight.w600,))),
-                               ],),
-                            )
-                           ],),
-                         ),
 
-                         const SizedBox(height: 15,),
-                        StreamBuilder(stream: FirebaseFirestore.instance.collection('Users').doc(selectedUser?['docId']).collection('fees').orderBy("timestamp", descending: true).snapshots(), builder: (context, snapshot) {
-                           if(snapshot.hasData){
-                             return ListView.builder(
-                               shrinkWrap: true,
-                               itemBuilder: (context, index) {
-                               var data = snapshot.data!.docs[index];
-                               return  Padding(
-                                 padding: const EdgeInsets.only(left: 145),
-                                 child: SingleChildScrollView(
-                                   child: Padding(
-                                     padding: const EdgeInsets.all(2.0),
-                                     child: Container(
-                                       width: 510,
-                                       // color: Colors.blue,
-                                       child: Row(
-                                         mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                                         children: [
-                                           Padding(
-                                             padding: const EdgeInsets.only(left: 40, right: 10),
-                                             child: Container(
-                                                 width: 110,
-                                                 child: Text(data['date'], style: GoogleFonts.openSans(fontWeight: FontWeight.w600,color: Color(0xff262626).withOpacity(0.8)),)),
-                                           ),
-                                           Container(
-                                               width: 100,
-                                               child: Text(data['feesType'], style: GoogleFonts.openSans(fontWeight: FontWeight.w600,color: Color(0xff262626).withOpacity(0.8)))),
-                                           Padding(
-                                             padding: const EdgeInsets.only(left: 10, right: 0),
-                                             child: Container(
-                                                 width: 60,
-                                                 child: Text('₹${data['fees'].toString()}', style: GoogleFonts.openSans(fontWeight: FontWeight.w600,color: Color(0xff262626).withOpacity(0.8)))),
-                                           ),
-                                           Padding(
-                                             padding: const EdgeInsets.only(left: 25),
-                                             child: Container(
-                                                 width: 60,
-                                                 child: Text(data['paymentMethod'].toString(), style: GoogleFonts.openSans(fontWeight: FontWeight.w600,color: Color(0xff262626).withOpacity(0.8)))),
-                                           ),
-                                         ],),
+
+
+                           const SizedBox(height: 30,),
+                           SizedBox(
+                             child: Row(children: [
+                               KText(text:'Previous Payments          :     ',style: GoogleFonts.openSans(fontWeight: FontWeight.w600 )),
+                              Container(
+                                width: 510,
+                                child: Row(
+                                  mainAxisAlignment: MainAxisAlignment.spaceAround,
+                                 children: [
+                                 SizedBox(
+                                     width: 80,
+                                     child: KText(text:'Date', style: GoogleFonts.openSans(fontWeight: FontWeight.w600,),)),
+                                 SizedBox(child: KText(text:'Fees Type', style: GoogleFonts.openSans(fontWeight: FontWeight.w600,))),
+                                 SizedBox(child: KText(text:'Amount', style: GoogleFonts.openSans(fontWeight: FontWeight.w600,))),
+                                 SizedBox(child: KText(text:'Method', style: GoogleFonts.openSans(fontWeight: FontWeight.w600,))),
+                                 ],),
+                              )
+                             ],),
+                           ),
+                         
+                           const SizedBox(height: 15,),
+                          StreamBuilder(stream: FirebaseFirestore.instance.collection('Users').doc(selectedUser?['docId']).collection('fees').orderBy("timestamp", descending: true).snapshots(), builder: (context, snapshot) {
+                             if(snapshot.hasData){
+                               List<DocumentSnapshot> documents = snapshot.data!.docs;
+                               int itemCount = viewAllHistory ? documents.length : min(documents.length, 5);
+                               return ListView.builder(
+                                 shrinkWrap: true,
+                                 itemBuilder: (context, index) {
+                                 var data = snapshot.data!.docs[index];
+                                 return  Padding(
+                                   padding: const EdgeInsets.only(left: 145),
+                                   child: SingleChildScrollView(
+                                     child: Padding(
+                                       padding: const EdgeInsets.all(2.0),
+                                       child: Container(
+                                         width: 510,
+                                         // color: Colors.blue,
+                                         child: Row(
+                                           mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                                           children: [
+                                             Padding(
+                                               padding: const EdgeInsets.only(left: 40, right: 10),
+                                               child: Container(
+                                                   width: 110,
+                                                   child: Text(data['date'], style: GoogleFonts.openSans(fontWeight: FontWeight.w600,color: Color(0xff262626).withOpacity(0.8)),)),
+                                             ),
+                                             Container(
+                                                 width: 100,
+                                                 child: KText(text:data['feesType'], style: GoogleFonts.openSans(fontWeight: FontWeight.w600,color: Color(0xff262626).withOpacity(0.8)))),
+                                             Padding(
+                                               padding: const EdgeInsets.only(left: 10, right: 0),
+                                               child: Container(
+                                                   width: 60,
+                                                   child: KText(text:'₹${data['fees'].toString()}', style: GoogleFonts.openSans(fontWeight: FontWeight.w600,color: Color(0xff262626).withOpacity(0.8)))),
+                                             ),
+                                             Padding(
+                                               padding: const EdgeInsets.only(left: 25),
+                                               child: Container(
+                                                   width: 60,
+                                                   child: KText(text: data['paymentMethod'].toString(), style: GoogleFonts.openSans(fontWeight: FontWeight.w600,color: Color(0xff262626).withOpacity(0.8)))),
+                                             ),
+                                           ],),
+                                       ),
                                      ),
                                    ),
-                                 ),
+                                 );
+                               },
+                                 // itemCount:  snapshot.data!.docs.length,
+                               itemCount: itemCount,
                                );
-                             },itemCount:  snapshot.data!.docs.length,);
-                         }else{
-                             return CircularProgressIndicator();
-                           }
-                         },),
-                         SizedBox(height: 10,),
-                       ],),
+                           }else{
+                               return CircularProgressIndicator();
+                             }
+                           },),
+                           SizedBox(height: 10,),
+                         ],),
+                       ),
                      ),
                    )
                  ],)
@@ -663,4 +678,8 @@ class _FeesPageState extends State<FeesPage> {
     });
     print('Subcollection created successfully');
   }
+
+
+
+
 }

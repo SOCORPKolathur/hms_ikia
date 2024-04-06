@@ -328,88 +328,6 @@ class _RoomsState extends State<Rooms> {
                       // Add print statement to check combinedData
                       print("Combined Data: $combinedData");
 
-                      //real one
-                      // return GridView.builder(
-                      //   gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-                      //     crossAxisCount: 7,
-                      //     crossAxisSpacing: 10.0,
-                      //     childAspectRatio: 1.0,
-                      //   ),
-                      //   itemCount: combinedData.length,
-                      //   itemBuilder: (BuildContext context, index) {
-                      //     final documents = combinedData[index];
-                      //     var data = documents.data() as Map<String, dynamic>?;
-                      //     if (data != null) {
-                      //       int bedCount = data['bedcount'] ?? 0;
-                      //       int vacantCount = data['vacant'] ?? bedCount;
-                      //       double occupancyPercentage = bedCount != 0 ? ((bedCount - vacantCount) / bedCount) * 100 : 0;
-                      //       String occupancyStatus;
-                      //       Color homeColor = const Color(0xff37d1d3);
-                      //       if (occupancyPercentage == 100) {
-                      //         occupancyStatus = 'Occupied';
-                      //         homeColor = const Color(0xfff12d2d);
-                      //       } else if (occupancyPercentage >= 50) {
-                      //         occupancyStatus = 'Reserved';
-                      //         homeColor = const Color(0xfffd7e50);
-                      //       } else if (occupancyPercentage > 0) {
-                      //         occupancyStatus = 'Empty';
-                      //         homeColor = const Color(0xff37d1d3);
-                      //       } else {
-                      //         occupancyStatus = 'Empty';
-                      //         homeColor = const Color(0xff37d1d3);
-                      //       }
-                      //       // Change the occupancyStatus to "Full" if vacantCount is 0
-                      //       if (vacantCount == 0) {
-                      //         occupancyStatus = 'Occupied';
-                      //         homeColor = const Color(0xfff12d2d);
-                      //       }
-                      //       return Padding(
-                      //         padding: const EdgeInsets.all(10),
-                      //         child: Container(
-                      //           height: 40,
-                      //           width: 40,
-                      //           decoration: BoxDecoration(
-                      //             border: Border.all(color: homeColor), // Change border color dynamically
-                      //             borderRadius: BorderRadius.circular(20),
-                      //           ),
-                      //           child: Column(
-                      //             mainAxisAlignment: MainAxisAlignment.center,
-                      //             children: [
-                      //               Text(
-                      //                 'Room No: ${data['roomnumber']}',
-                      //                 style: TextStyle(
-                      //                   color: const Color(0xff595959),
-                      //                   fontWeight: FontWeight.w600,
-                      //                 ),
-                      //               ),
-                      //               Icon(
-                      //                 Icons.home_work,
-                      //                 size: 40,
-                      //                 color: homeColor, // Change color dynamically
-                      //               ),
-                      //               Text(
-                      //                 occupancyStatus,
-                      //                 style: TextStyle(
-                      //                   fontWeight: FontWeight.w700,
-                      //                   fontSize: 16,
-                      //                   color: homeColor,
-                      //                 ),
-                      //               ),
-                      //             ],
-                      //           ),
-                      //         ),
-                      //       );
-                      //     } else {
-                      //       // Handle the case when data is null
-                      //       return Container();
-                      //     }
-                      //   },
-                      // );
-
-
-
-
-                    //  try
 
                       return GridView.builder(
                         gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
@@ -1013,13 +931,6 @@ class _RoomsState extends State<Rooms> {
           residentNumbers.add(residentNumber);
         }
       });
-      // for number
-      // residentSnapshot.docs.forEach((resDoc) {
-      //   String residentNumber = resDoc['phone'];
-      //   if (residentNumber != null && residentNumber.isNotEmpty) {
-      //     residentNumber.add(residentNumber);
-      //   }
-      // });
 
       // Show dialog with resident details
       showDialog<void>(
