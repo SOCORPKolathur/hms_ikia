@@ -1,3 +1,5 @@
+import 'dart:convert';
+import 'package:http/http.dart' as http;
 import 'package:animate_do/animate_do.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
@@ -33,28 +35,11 @@ class _RecordsState extends State<Records> {
   bool AttendanceStatus = false;
   DateTime ? selectedAttDate;
   bool isDataAvailable = true;
-
-
-  // setDateTime() async {
-  //   setState(() {
-  //     searchDateController.text = formatter.format(selectedDate);
-  //   });
-  // }
-
   DateTime? dateRangeStart;
   DateTime? dateRangeEnd;
   bool isFiltered= false;
   bool attendanceMarked = false;
   bool editAttendance = false;
-
-  // @override
-  // void initState() {
-  //   setDateTime();
-  //   super.initState();
-  // }
-
-
-
 
   @override
   Widget build(BuildContext context) {
@@ -86,6 +71,7 @@ class _RecordsState extends State<Records> {
                     },
                     ),
 const SizedBox(width: 10,),
+
                     Container(
                       width: 260,
                       height: 46,
@@ -189,7 +175,6 @@ const SizedBox(width: 10,),
                 if (snapshot.connectionState == ConnectionState.waiting) {
                   return const CircularProgressIndicator();
                 }
-
                 // if(isDataAvailable){
                 if(snapshot.hasData && snapshot.data!.docs.isNotEmpty){
                   // this is matched one with the search
@@ -300,7 +285,6 @@ const SizedBox(width: 10,),
                 }
               },
               )
-
            ]
           ),
         ),
@@ -386,6 +370,8 @@ if(existingDocument.exists){
                               SizedBox(width: 400, child: KText(text:data['firstName'],style: GoogleFonts.openSans(fontSize: 18, fontWeight: FontWeight.w600),),),
                               SizedBox(
                                 child: SmartSwitch(
+                                  activeName: 'Present',
+                                  inactiveName: 'Absent',
                                   size: SwitchSize.medium,
                                   disabled: false,
                                   activeColor: Constants()
@@ -429,6 +415,7 @@ if(existingDocument.exists){
               onPressed: (){
                 AttendanceColl(attendanceStatus, formattedDate);
                 seperateAttendance(attendanceStatus, formattedDate);
+                sendNotifications();
               }, child: KText(text:'Submit', style: GoogleFonts.openSans(fontWeight: FontWeight.w600, color: Colors.white),))
         ],
       );
@@ -522,7 +509,7 @@ if(existingDocument.exists){
                                            .doc(formattedDate).collection('Residents').doc(data.id).update({
                                          'attendanceStatus' : ChangeValue
                                        });
-                                      },
+                                      }, inactiveName: 'Absent', activeName: 'Present',
                                     ),
                                   ),
                                   const Divider(color: Colors.grey, thickness: 0.1,)
@@ -577,10 +564,8 @@ else{
   }
 
   Future<void> AttendanceColl(List<bool> attendanceStatus, String formattedDate) async {
-
     DateTime now = DateTime.now();
     formattedDate = DateFormat('yyyy-MM-dd').format(now);
-
     FirebaseFirestore.instance
         .collection('Attendance')
         .doc(formattedDate)
@@ -610,7 +595,6 @@ else{
     print('Attendance marked successfully');
     Navigator.of(context).pop();
   }
-
   ///Under the user main collection
   Future<void> seperateAttendance(List<bool> attendanceStatus, String formattedDate) async {
     DateTime now = DateTime.now();
@@ -686,4 +670,57 @@ else{
       isDataAvailable = false;
     }
   }
-}
+
+
+  void sendPushMessage({required String token, required String body, required String title}) async {
+    try {
+      print('FCM Token: $token');
+      var response = await http.post(
+        Uri.parse('https://fcm.googleapis.com/fcm/send'),
+        headers: <String, String>{
+          'Content-Type': 'application/json',
+          'Authorization': 'key=${Constants.apiKeyForNotification}',
+        },
+        body: jsonEncode(
+          <String, dynamic>{
+            'notification': <String, dynamic>{'body': body, 'title': title},
+            'priority': 'high',
+            'data': <String, dynamic>{
+              'click_action': 'FLUTTER_NOTIFICATION_CLICK',
+              'id': '1',
+              'status': 'done'
+            },
+            "to": token,
+          },
+        ),
+      );
+
+      print('FCM Response: ${response.statusCode}');
+      print('FCM Response Body: ${response.body}');
+    } catch (e) {
+      print('Error sending push notification: $e');
+    }
+  }
+
+  void sendNotifications() async {
+    try {
+
+      QuerySnapshot usersSnapshot = await FirebaseFirestore.instance.collection('Users').get();
+
+      for (var user in usersSnapshot.docs) {
+        String token = user['fcmToken'];
+        String name = user['firstName'];
+        sendPushMessage(
+            token: token,
+            title: 'Attendance Submitted',
+            body: "Took Today's Attendance"
+        );
+      }
+
+
+    } catch (e) {
+      print('Error sending notifications: $e');
+    }
+
+
+}}

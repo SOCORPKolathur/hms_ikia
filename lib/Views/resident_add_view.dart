@@ -4,6 +4,7 @@ import 'dart:math';
 import 'dart:typed_data';
 import 'package:awesome_dialog/awesome_dialog.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:country_state_city_picker/model/select_status_model.dart' as Statusmodel;
 import 'package:dropdown_button2/dropdown_button2.dart';
 import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/material.dart';
@@ -14,6 +15,7 @@ import 'package:hms_ikia/widgets/customtextfield.dart';
 import 'package:hms_ikia/widgets/kText.dart';
 import 'package:intl/intl.dart';
 import 'package:toastification/toastification.dart';
+import 'package:dropdown_search/dropdown_search.dart';
 
 class ResidentAddForm extends StatefulWidget {
   final Function(bool) updateDisplay;
@@ -78,13 +80,249 @@ class _ResidentAddFormState extends State<ResidentAddForm> {
   TextEditingController parentmobile = new TextEditingController();
   TextEditingController parentOccupation = new TextEditingController();
   TextEditingController userid = new TextEditingController();
+  TextEditingController countrycon = TextEditingController();
+  TextEditingController citycon = TextEditingController();
   // roomno
   TextEditingController roomnumber = new TextEditingController();
   // blockname
   TextEditingController blockname = new TextEditingController();
   // used this in Update page too
+
+   List<String> StateList = <String>[
+    "Select State",
+    "Andhra Pradesh",
+    "Arunachal Pradesh",
+    "Assam",
+    "Bihar",
+    "Chhattisgarh",
+    "Goa",
+    'Gujarat',
+    "Haryana",
+    "Himachal Pradesh",
+    "Jharkhand",
+    "Karnataka",
+    "Kerala",
+    "Madhya Pradesh",
+    "Maharashtra",
+    "Manipur",
+    "Meghalaya",
+    "Mizoram",
+    "Nagaland",
+    "Odisha",
+    "Punjab",
+    "Rajasthan",
+    "Sikkim",
+    "Tamil Nadu",
+    "Telangana",
+    "Tripura",
+    "Uttarakhand",
+    " Uttar Pradesh",
+    "West Bengal",
+  ];
+   List<String> coutryList = <String>[
+    'Select Country',
+    "Afghanistan",
+    "Albania",
+    "Algeria",
+    "Andorra",
+    "Angola",
+    "Antigua and Barbuda",
+    "Argentina",
+    "Armenia",
+    "Australia",
+    "Austria",
+    "Azerbaijan",
+    "Bahamas",
+    "Bahrain",
+    "Bangladesh",
+    "Barbados",
+    "Belarus",
+    "Belgium",
+    'Belize',
+    "Bhutan",
+    'Bolivia',
+    'Bosnia and Herzegovina',
+    'Botswana',
+    'Brazil',
+    'Brunei',
+    'Bulgaria',
+    'Burkina Faso',
+    'Burundi',
+    "Côte d'Ivoire",
+    'Cabo Verde	',
+    'Cambodia',
+    'Cameroon	',
+    'Canada',
+    'Central African Republic',
+    'Chad',
+    'Chile',
+    'China',
+    'Colombia',
+    'Comoros',
+    'Congo (Congo-Brazzaville)	',
+    'Costa Rica	',
+    'Croatia	',
+    'Cuba	',
+    'Cyprus	',
+    'Czechia (Czech Republic)',
+    'Democratic Republic of the Congo',
+    'Denmark',
+    'Djibouti',
+    'Dominica',
+    'Dominican Republic',
+    'Ecuador',
+    'Egypt',
+    'El Salvador',
+    'Equatorial Guinea',
+    'Eritrea	',
+    'Estonia	',
+    'Eswatini (Swaziland)	',
+    'Ethiopia	',
+    'Fiji	',
+    'Finland	',
+    'France	',
+    'Gabon	',
+    'Gambia	',
+    'Georgia',
+    'Germany',
+    'Ghana',
+    'Greece',
+    'Grenada',
+    'Guatemala',
+    'Guinea',
+    'Guinea-Bissau',
+    'Guyana',
+    'Haiti',
+    'Holy See	',
+    'Honduras',
+    'Hungary',
+    'Iceland',
+    'India',
+    'Indonesia',
+    'Iran',
+    'Iraq',
+    'Ireland',
+    'Israel',
+    'Italy',
+    'Jamaica',
+    'Japan',
+    'Jordan',
+    'Kazakhstan',
+    'Kenya',
+    'Kiribati',
+    'Kuwait',
+    'Kyrgyzstan',
+    'Laos',
+    'Latvia',
+    'Lebanon',
+    'Lesotho',
+    'Liberia',
+    'Libya',
+    'Liechtenstein',
+    'Lithuania',
+    'Luxembourg',
+    'Madagascar',
+    'Malawi',
+    'Malaysia',
+    'Maldives',
+    'Mali',
+    'Malta',
+    'Marshall Islands	',
+    'Mauritania',
+    'Mauritius',
+    'Mexico',
+    'Micronesia',
+    'Moldova',
+    'Monaco',
+    'Mongolia',
+    'Montenegro',
+    'Morocco',
+    'Mozambique',
+    'Myanmar (formerly Burma)',
+    'Namibia',
+    'Nauru',
+    'Nepal',
+    'Netherlands',
+    'New Zealand',
+    'Nicaragua',
+    'Niger',
+    'Nigeria',
+    'North Korea',
+    'North Macedonia',
+    'Norway',
+    'Oman',
+    'Pakistan',
+    'Palau',
+    'Palestine State',
+    'Panama',
+    'Papua New Guinea',
+    'Paraguay',
+    'Peru',
+    'Philippines',
+    'Poland',
+    'Portugal',
+    'Qatar',
+    'Romania',
+    'Russia',
+    'Rwanda',
+    'Saint Kitts and Nevis	',
+    'Saint Lucia	',
+    'Saint Vincent and the Grenadines	',
+    'Samoa',
+    'San Marino	',
+    'Sao Tome and Principe	',
+    'Saudi Arabia	',
+    'Senegal',
+    'Serbia',
+    'Seychelles	',
+    'Sierra Leone	',
+    'Singapore',
+    'Slovakia',
+    'Slovenia',
+    'Solomon Islands	',
+    'Somalia',
+    'South Africa',
+    'South Korea',
+    'South Sudan',
+    'Spain',
+    'Sri Lanka',
+    'Sudan',
+    'Suriname',
+    'Sweden',
+    'Switzerland',
+    'Syria',
+    'Tajikistan',
+    'Tanzania',
+    'Thailand',
+    'Timor-Leste',
+    'Togo',
+    'Tonga',
+    'Trinidad and Tobago',
+    'Tunisia',
+    'Turkey',
+    'Turkmenistan',
+    'Tuvalu',
+    'Uganda',
+    'Ukraine',
+    'United Arab Emirates',
+    'United Kingdom	',
+    'United States of America	',
+    'Uruguay	',
+    'Uzbekistan	',
+    'Vanuatu	',
+    'Venezuela	',
+    'Vietnam	',
+    'Yemen',
+    'Zambia',
+    'Zimbabwe',
+  ];
+List <String> _cities = [];
+
   List<String> prefix=["Select Prefix","Mr.","Ms.","Mrs"];
   String selectedprefix="Select Prefix";
+
+  List<String> bloodgroups =['Select Blood Group', 'A+', 'B+', 'A-', 'B-', 'AB+', 'AB-'];
+  String selectedBloodgroup = 'Select Blood Group';
 
   List<String> BlockNames = [];
   String selectedBlockName = "Select Block Name";
@@ -179,9 +417,9 @@ class _ResidentAddFormState extends State<ResidentAddForm> {
   @override
   void initState() {
     setState(() {
-      country.text="India";
+      countrycon.text="India";
       state.text="Tamil Nadu";
-      city.text="Chennai";
+      citycon.text="Chennai";
       // getBlockNames();
       getRoomNames(selectedBlockName);
       getBlockNames().then((names) {
@@ -191,6 +429,7 @@ class _ResidentAddFormState extends State<ResidentAddForm> {
       }
       );
     });
+    getCity(state.text);
     getuserid();
     // TODO: implement initState
     super.initState();
@@ -200,6 +439,16 @@ class _ResidentAddFormState extends State<ResidentAddForm> {
     double baseWidth = 1512;
     double fem = MediaQuery.of(context).size.width / baseWidth;
     double ffem = fem * 0.97;
+
+    double width = MediaQuery
+        .of(context)
+        .size
+        .width;
+    double height = MediaQuery
+        .of(context)
+        .size
+        .height;
+
     return Padding(
       padding: const EdgeInsets.all(15.0),
       child: SingleChildScrollView(
@@ -764,20 +1013,105 @@ class _ResidentAddFormState extends State<ResidentAddForm> {
                             ],
                           ),
                           const SizedBox(width: 18,),
-                          CustomTextField(key: _bloodgroup,header: "*Blood Group",hint: "Enter blood group",controller: bloodgroup,
-                            onChanged: (value) {
-                              setState(() {
-                                // Update _firstNameError only if the value becomes empty
-                                _bloodgroupError = value.trim().isEmpty;
-                              });
-                            },
-                            validator: (String? value) {
-                              if (value == null || value.isEmpty) {
-                                return null;
-                              }
-                              return null;
-                            },
-                            showError: _bloodgroupError,
+                          // CustomTextField(key: _bloodgroup,header: "*Blood Group",hint: "Enter blood group",controller: bloodgroup,
+                          //   onChanged: (value) {
+                          //     setState(() {
+                          //       // Update _firstNameError only if the value becomes empty
+                          //       _bloodgroupError = value.trim().isEmpty;
+                          //     });
+                          //   },
+                          //   validator: (String? value) {
+                          //     if (value == null || value.isEmpty) {
+                          //       return null;
+                          //     }
+                          //     return null;
+                          //   },
+                          //   showError: _bloodgroupError,
+                          // ),
+
+
+                          Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+
+                              Container(
+                                // firstnameSVK (87:1540)
+                                child: Text(
+                                  "Blood Group",
+                                  style: GoogleFonts.openSans (
+                                    fontSize: 14,
+                                    fontWeight: FontWeight.w600,
+                                    color: const Color(0xff262626),
+                                  ),
+                                ),
+                              ),
+
+                              Padding(
+                                padding: const EdgeInsets.only(top: 8.0),
+                                child: Container(
+                                  width: 220,
+                                  height: 50,
+                                  decoration: BoxDecoration (
+                                    border: Border.all(color: const Color(0x7f262626)),
+                                    borderRadius: BorderRadius.circular(30),
+                                  ),
+                                  child: Padding(
+                                    padding: const EdgeInsets.only(left: 12.0,right: 6),
+                                    child:  DropdownButtonHideUnderline(
+                                      child:
+                                      DropdownButtonFormField2<
+                                          String>(
+                                        isExpanded: true,
+                                        hint: Text(
+                                          'Select Blood Group', style:
+                                        GoogleFonts.openSans (
+                                          fontSize: 12,
+                                          fontWeight: FontWeight.w600,
+                                          color: const Color(0x7f262626),
+                                        ),
+                                        ),
+                                        items: bloodgroups
+                                            .map((String
+                                        item) =>
+                                            DropdownMenuItem<
+                                                String>(
+                                              value: item,
+                                              child: Text(
+                                                item,
+                                                style:
+                                                GoogleFonts.openSans (
+                                                  fontSize: 12,
+                                                  fontWeight: FontWeight.w600,
+                                                ),
+                                              ),
+                                            )).toList(),
+                                        value:
+                                        selectedBloodgroup,
+                                        onChanged:
+                                            (String? value) {
+                                          setState(() {
+                                            selectedBloodgroup =
+                                            value!;
+                                          });
+                                        },
+                                        buttonStyleData:
+                                        const ButtonStyleData(
+                                        ),
+                                        menuItemStyleData:
+                                        const MenuItemStyleData(
+
+                                        ),
+                                        decoration:
+                                        const InputDecoration(
+                                            border:
+                                            InputBorder
+                                                .none),
+                                      ),
+                                    ),
+                                  ),
+                                ),
+                              ),
+                            ],
                           ),
                           const SizedBox(width: 18,),
                         ],
@@ -824,7 +1158,7 @@ showError: _phonenumError,
                             ],
                           ),
                           const SizedBox(width: 18,),
-                          CustomTextField(header: "Mobile Number",hint: "Enter mobile number",controller: mobile,validator: null,
+                          CustomTextField(header: "Alternative Phone Number",hint: "Enter mobile number",controller: mobile,validator: null,
                             inputFormatters: [
                               LengthLimitingTextInputFormatter(10),
                               FilteringTextInputFormatter.allow(RegExp(r'[0-9]')),
@@ -919,7 +1253,66 @@ showError: _addressError,
                           width: 696,
                           ),
                           const SizedBox(width: 18,),
-                          CustomTextField(header: "Country",hint: "Select country",controller: country,validator: null,),
+                          // CustomTextField(header: "Country",hint: "Select country",controller: country,validator: null,),
+
+                          Column(
+                            crossAxisAlignment:
+                            CrossAxisAlignment
+                                .start,
+                            children: [
+                              Container(
+                                // firstnameSVK (87:1540)
+                                child: Text(
+                                  "Country",
+                                  style: GoogleFonts.openSans (
+                                    fontSize: 14,
+                                    fontWeight: FontWeight.w600,
+                                    color: const Color(0xff262626),
+                                  ),
+                                ),
+                              ),
+
+                              SizedBox(
+                                  height: height / 123.1666),
+
+                              Container(
+                                width: 220,
+                                height: 50,
+                                decoration: BoxDecoration(
+                                  color: Colors.white,
+                                  borderRadius: BorderRadius.circular(30),
+                                  border: Border.all(color: const Color(0x7f262626)),
+                                ),
+                                padding:  EdgeInsets.only(
+                                    left: width/273.2),
+                                child:
+                                DropdownSearch <String>(
+                                  autoValidateMode: AutovalidateMode.onUserInteraction,
+                                  selectedItem: countrycon.text,
+                                  popupProps: const PopupProps.menu(
+                                    showSearchBox: true,
+                                  ),
+                                  dropdownDecoratorProps: const DropDownDecoratorProps(
+                                    textAlignVertical: TextAlignVertical.center,
+                                    dropdownSearchDecoration: InputDecoration(
+                                      contentPadding: EdgeInsets.only(bottom: 8, left: 6),
+                                        border: InputBorder.none),
+                                  ),
+                                  items: coutryList,
+                                  onChanged: (String?
+                                  value) {
+                                    if (value ==
+                                        'Select Country') {
+                                    }
+                                    else {
+                              setState(() {
+                                countrycon.text = value!;
+                              });
+                                    }
+                                  },
+                                ), ),
+                            ],
+                          ),
                              ],
                       ),
 
@@ -927,27 +1320,131 @@ showError: _addressError,
                       Row(
                         mainAxisAlignment: MainAxisAlignment.start,
                         children: [
-                          CustomTextField(header: "State",hint: "Select state",controller: state,validator: null,),
+                          // CustomTextField(header: "State",hint: "Select state",controller: state,validator: null,),
+                          Column(
+                            crossAxisAlignment:
+                            CrossAxisAlignment
+                                .start,
+                            children: [
+                              Container(
+                                // firstnameSVK (87:1540)
+                                child: Text(
+                                  "State",
+                                  style: GoogleFonts.openSans (
+                                    fontSize: 14,
+                                    fontWeight: FontWeight.w600,
+                                    color: const Color(0xff262626),
+                                  ),
+                                ),
+                              ),
+                              SizedBox(
+                                  height: height / 123.1666),
+                              Container(
+                                width: 220,
+                                height: 50,
+                                decoration: BoxDecoration(
+                                  color: Colors.white,
+                                  borderRadius: BorderRadius.circular(30),
+                                  border: Border.all(color: const Color(0x7f262626)),
+                                ),
+                                padding:  EdgeInsets.only(
+                                    left: width/273.2),
+                                child:
+                                DropdownSearch <String>(
+                                  autoValidateMode: AutovalidateMode.onUserInteraction,
+                                  selectedItem: state.text,
+                                  popupProps: const PopupProps.menu(
+                                    showSearchBox: true,
+                                  ),
+                                  dropdownDecoratorProps: const DropDownDecoratorProps(
+                                    // baseStyle:SafeGoogleFont( 'Nunito', fontSize:  20 * ffem,),
+                                    textAlignVertical: TextAlignVertical.center,
+                                    dropdownSearchDecoration: InputDecoration(
+                                        contentPadding: EdgeInsets.only(bottom: 8, left: 6),
+                                        border: InputBorder.none),
+                                  ),
+                                  items: StateList,
+                                  onChanged: (String? value) {
+                                    getCity(value.toString());
+                                      setState(() {
+                                        state.text =
+                                        value!;
+                                      });
+                                  },
+                                ),  ),
+                            ],
+                          ),
                           const SizedBox(width: 18,),
-                          CustomTextField(
-                            key: _city,
-                            header: "*City",hint: "Select City",controller: city,
-
-                            onChanged: (value) {
-setState(() {
-// Update _firstNameError only if the value becomes empty
-_cityError = value.trim().isEmpty;
-});
-},
-validator: (String? value) {
-if (value == null || value.isEmpty) {
-return null;
-}
-return null;
-},
-showError: _cityError,
-
-
+                          Column(
+                            crossAxisAlignment:
+                            CrossAxisAlignment
+                                .start,
+                            children: [
+                              Container(
+                                // firstnameSVK (87:1540)
+                                child: Text(
+                                  "City",
+                                  style: GoogleFonts.openSans (
+                                    fontSize: 14,
+                                    fontWeight: FontWeight.w600,
+                                    color: const Color(0xff262626),
+                                  ),
+                                ),
+                              ),
+                              SizedBox(
+                                  height: height / 123.1666),
+                              Container(
+                                height: 50,
+                                width:220,
+                                decoration: BoxDecoration(
+                                  color: Colors.white,
+                                  borderRadius: BorderRadius.circular(30),
+                                  border: Border.all(color: const Color(0x7f262626)),
+                                ),
+                                padding:  EdgeInsets.only(
+                                    left: width/273.2),
+                                child:
+                                DropdownSearch <String>(
+                                  autoValidateMode: AutovalidateMode.onUserInteraction,
+                                  selectedItem: citycon.text,
+                                  popupProps: const PopupProps.menu(
+                                    showSearchBox: true,
+                                  ),
+                                  dropdownDecoratorProps: const DropDownDecoratorProps(
+                                    textAlignVertical: TextAlignVertical.center,
+                                    dropdownSearchDecoration: InputDecoration(
+                                        contentPadding: EdgeInsets.only(bottom: 8, left: 6),
+                                        border: InputBorder.none),
+                                  ),
+                                  items: _cities,
+                                  validator: (value) {
+                                    if (value ==
+                                        'Select City') {
+                                      setState(() {
+                                        citycon.text = value!;
+                                      });
+                                    }
+                                    return null;
+                                  },
+                                  onChanged: (String?
+                                  value) {
+                                    if (value ==
+                                        'Select City') {
+                                      setState(() {
+                          
+                                      });
+                                    }
+                                    else {
+                                      setState(() {
+                                        citycon.text =
+                                        value!;
+                                      });
+                                    }
+                                  },
+                                ),
+                          
+                              ),
+                            ],
                           ),
                           const SizedBox(width: 18,),
                           CustomTextField(
@@ -1180,7 +1677,7 @@ showError: _useridError,
                               Text('Block Name',   style: GoogleFonts.openSans(
                                 fontSize: 14,
                                 fontWeight: FontWeight.w600,
-                                color: Color(0xff262626),
+                                color: const Color(0xff262626),
                               ),),
                               Padding(
                                 padding: const EdgeInsets.only(top: 8.0),
@@ -1239,7 +1736,7 @@ showError: _useridError,
                               Text('Room No',   style: GoogleFonts.openSans(
                                 fontSize: 14,
                                 fontWeight: FontWeight.w600,
-                                color: Color(0xff262626),
+                                color: const Color(0xff262626),
                               ),),
 
                               Padding(
@@ -1353,7 +1850,7 @@ showError: _useridError,
                                 } else {
                                   print("Please provide both block name and room number.");
                                   toastification.show(
-                                    backgroundColor: Color(0xffFF7E75FF),
+                                    backgroundColor: const Color(0xffFF7E75FF),
                                     context: context,
                                     title: 'Please Fill all the requirements',
                                     autoCloseDuration: const Duration(seconds: 5),
@@ -1460,15 +1957,15 @@ showError: _useridError,
     "lastName" : lastName.text,
     "dob" :dob.text,
       "gender":selectedgender,
-    "bloodgroup" : bloodgroup.text,
+    "bloodgroup" : selectedBloodgroup,
     "phone" : phone.text,
     "mobile" : mobile.text,
     "aadhaar" : aadhaar.text,
     "email" : email.text,
     "address" : address.text,
-    "country" : country.text,
+    "country" : countrycon.text,
     "state" : state.text,
-    "city" : city.text,
+    "city" : citycon.text,
     "pincode" : pincode.text,
       "parentprefix":selectedprefix2,
     "parentname" : parentname.text,
@@ -1479,11 +1976,16 @@ showError: _useridError,
       "fcmToken": "",
       "timestamp":DateTime.now().millisecondsSinceEpoch,
       "status" : false,
+      "status2" : true,
       "uid" : '',
       "usercount" : usercount,
     });
     Successdialog();
   }
+
+
+
+
   Successdialog(){
     double width = MediaQuery.of(context).size.width;
     return AwesomeDialog(
@@ -1546,7 +2048,7 @@ showError: _useridError,
         print('Vacant count updated to $newVacantCount');
       } else {
         toastification.show(
-          backgroundColor: Color(0xffFF7E75FF),
+          backgroundColor: const Color(0xffFF7E75FF),
           context: context,
           title: 'Room is full. Cannot add more residents.',
           autoCloseDuration: const Duration(seconds: 5),
@@ -1555,13 +2057,53 @@ showError: _useridError,
     } else {
       print('Room not found for user: blockname:- $userBlockName *** roomnumber:- $userRoomNumber');
       toastification.show(
-        backgroundColor: Color(0xffFF7E75FF),
+        backgroundColor: const Color(0xffFF7E75FF),
         context: context,
         title: 'No Room is Available',
         autoCloseDuration: const Duration(seconds: 5),
       );
     }
   }
+  ///
+  Future getCity(state) async {
+    setState(() {
+      _cities.clear();
+    });
+    setState(() {
+      _cities.add("Select City");
+    });
+    var response = await getResponse();
+    var takestate = response
+        .map((map) => Statusmodel.StatusModel.fromJson(map))
+        .where((item) => item.emoji + "    " + item.name == "🇮🇳    India")
+        .map((item) => item.state)
+        .toList();
+    var states = takestate as List;
+    states.forEach((f) {
+      var name = f.where((item) => item.name == state);
+      var cityname = name.map((item) => item.city).toList();
+      cityname.forEach((ci) {
+        if (!mounted) return;
+        setState(() {
+          var citiesname = ci.map((item) => item.name).toList();
+          for (var citynames in citiesname) {
+            _cities.add(citynames.toString());
+          }
+        });
+      });
+    });
+    print("Get cityssss");
+    print(_cities);
+    return _cities;
+  }
+
+  Future getResponse() async {
+    var res = await rootBundle.loadString(
+        'packages/country_state_city_picker/lib/assets/country.json');
+    return jsonDecode(res);
+  }
+
+
 
 
 }

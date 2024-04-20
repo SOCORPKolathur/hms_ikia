@@ -141,204 +141,230 @@ class _BlockNameState extends State<BlockName> {
                             child: KText(text:'Action',style: GoogleFonts.openSans(fontWeight: FontWeight.w700, fontSize: 18,color: Colors.black),),
                           ))),
                     ],),
-             SizedBox(height: 8,),
-             Divider(color: Colors.black, thickness: 0.1,),
+             const SizedBox(height: 8,),
+             const Divider(color: Colors.black, thickness: 0.1,),
              const SizedBox(height: 15,),
-                    StreamBuilder(
-                      stream: FirebaseFirestore.instance.collection('Block').snapshots(),
-                      builder: (context, snapshot) {
-                        if (snapshot.hasData) {
-                          // this is matched one with the search
-                          List<DocumentSnapshot> matchedData = [];
-                          // this is remaining one
-                          List<DocumentSnapshot> remainingData = [];
-                          if(searchBlock.text.isNotEmpty){
-                            // Separate the snapshot data based on the search text
-                            snapshot.data!.docs.forEach((doc) {
-                              final blockName = doc["blockname"].toString().toLowerCase();
-                              final searchText = searchBlock.text.toLowerCase();
-                              if (blockName.contains(searchText)) {
-                                matchedData.add(doc);
-                              } else {
-                                remainingData.add(doc);
-                              }
-                            });
-
-                            // Sort the matched data
-                            matchedData.sort((a, b) {
-                              final nameA = a["blockname"].toString().toLowerCase();
-                              final nameB = b["blockname"].toString().toLowerCase();
-                              final searchText = searchBlock.text.toLowerCase();
-                              return nameA.compareTo(nameB);
-                            });
-
-                          }else{
-                            // If search query is empty, display original data
-                            remainingData = snapshot.data!.docs;
-                          }
-                          // Concatenate matched data and remaining data
-                          List<DocumentSnapshot> combinedData = [...matchedData, ...remainingData];
-                          return ListView.builder(
-                            itemCount: snapshot.data!.docs.length,
-                            shrinkWrap: true,
-                            itemBuilder: (context, index) {
-                              if(snapshot.hasData){
-                                final document = combinedData[index];
-                                int serialNumber = index + 1;
-                                return Padding(
-                                  padding: const EdgeInsets.only(top: 10, bottom: 10),
-                                  child: InkWell(
-                                    onTap: () {
-                                      print(snapshot.data!.docs[index]['blockname']);
-                                    },
-                                    child: Row(
-                                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                                      children: [
-                                        Container(
-                                          width: 300,
-                                          child: Center(
-                                            child: KText(
-                                              text:'${serialNumber}',
-                                              style: GoogleFonts.openSans(fontWeight: FontWeight.w600, fontSize: 16),
-                                            ),
-                                          ),
-                                        ),
-                                        Container(
-                                          width: 300,
-                                          child: Center(
-                                            child: KText(
-                                              text:document['blockname'],
-                                              style: GoogleFonts.openSans(fontWeight: FontWeight.w600, fontSize: 16),
-                                            ),
-                                          ),
-                                        ),
-                                        Container(
-                                          width: 300,
-                                          child: Center(
-                                            child: SizedBox(
-                                              width: 120,
-                                              child: ElevatedButton(
-                                                style: ButtonStyle(backgroundColor: MaterialStatePropertyAll(Color(0xffF12D2D))),
-                                                child: Row(children: [
-                                                  Icon(Icons.delete, color: Colors.white,size: 20,),
-                                                  SizedBox(width: 5,),
-                                                  KText(text:'Delete', style: GoogleFonts.openSans(color: Colors.white, fontWeight: FontWeight.w500),)
-                                                ],),onPressed: (){
-                                                ForDeleteDialog(context, document.id);
-                                              },),
-                                            ),
-                                          ),
-                                        ),
-                                        // Container(
-                                        //   width: 300,
-                                        //   child: Center(
-                                        //     child: InkWell(
-                                        //       onTap: () {
-                                        //         ForDeleteDialog(context, blockId); // Pass document ID to delete function
-                                        //         print('Doc ID:- $blockId');
-                                        //         print('UserName:- ${data['blockname']}');
-                                        //       },
-                                        //       // child: Icon(Icons.delete, color: Colors.red),
-                                        //       child: ElevatedButton(
-                                        //         style: ButtonStyle(backgroundColor: MaterialStatePropertyAll(Color(0xffF12D2D))),
-                                        //
-                                        //         child: Row(children: [
-                                        //         Icon(Icons.delete),
-                                        //         Text('Delete')
-                                        //       ],),onPressed: (){
-                                        //
-                                        //       },)
-                                        //     ),
-                                        //   ),
-                                        // ),
-                                      ],
-                                    ),
-                                  ),
-                                );
-                              }
-                            },
-                            // itemCount: documents.length,
-                          );
-                        } else {
-                          return const CircularProgressIndicator();
-                        }
-                      },
-                    ),
                     // StreamBuilder(
                     //   stream: FirebaseFirestore.instance.collection('Block').snapshots(),
                     //   builder: (context, snapshot) {
                     //     if (snapshot.hasData) {
-                    //       var documents = snapshot.data!.docs;
-                    //       documents.sort((a, b) => (a['blockname'] as String).compareTo(b['blockname'] as String));
-                    //       if (blockController.text.isNotEmpty) {
-                    //         setState(() {
-                    //           documents = documents.where((doc) => doc['blockname'].toString().toLowerCase().contains(blockController.text.toLowerCase())).toList();
+                    //       // this is matched one with the search
+                    //       List<DocumentSnapshot> matchedData = [];
+                    //       // this is remaining one
+                    //       List<DocumentSnapshot> remainingData = [];
+                    //       if(searchBlock.text.isNotEmpty){
+                    //         // Separate the snapshot data based on the search text
+                    //         snapshot.data!.docs.forEach((doc) {
+                    //           final blockName = doc["blockname"].toString().toLowerCase();
+                    //           final searchText = searchBlock.text.toLowerCase();
+                    //           if (blockName.contains(searchText)) {
+                    //             matchedData.add(doc);
+                    //           } else {
+                    //             remainingData.add(doc);
+                    //           }
                     //         });
+                    //
+                    //         // Sort the matched data
+                    //         matchedData.sort((a, b) {
+                    //           final nameA = a["blockname"].toString().toLowerCase();
+                    //           final nameB = b["blockname"].toString().toLowerCase();
+                    //           final searchText = searchBlock.text.toLowerCase();
+                    //           return nameA.compareTo(nameB);
+                    //         });
+                    //
+                    //       }else{
+                    //         // If search query is empty, display original data
+                    //         remainingData = snapshot.data!.docs;
                     //       }
+                    //       // Concatenate matched data and remaining data
+                    //       List<DocumentSnapshot> combinedData = [...matchedData, ...remainingData];
                     //       return ListView.builder(
+                    //         itemCount: snapshot.data!.docs.length,
                     //         shrinkWrap: true,
                     //         itemBuilder: (context, index) {
-                    //           var data = documents[index].data();
-                    //           String blockId = documents[index].id;
-                    //           int serialNumber = index + 1;
-                    //           return Padding(
-                    //             padding: const EdgeInsets.only(top: 10, bottom: 10),
-                    //             child: InkWell(
-                    //               onTap: () {
-                    //                 print(snapshot.data!.docs[index]['blockname']);
-                    //               },
-                    //               child: Row(
-                    //                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    //                 children: [
-                    //                   Container(
-                    //                     width: 300,
-                    //                     child: Center(
-                    //                       child: Text(
-                    //                         '${serialNumber}',
-                    //                         style: GoogleFonts.openSans(fontWeight: FontWeight.w600, fontSize: 16),
-                    //                       ),
-                    //                     ),
-                    //                   ),
-                    //                   Container(
-                    //                     width: 300,
-                    //                     child: Center(
-                    //                       child: Text(
-                    //                         data['blockname'],
-                    //                         style: GoogleFonts.openSans(fontWeight: FontWeight.w600, fontSize: 16),
-                    //                       ),
-                    //                     ),
-                    //                   ),
-                    //                   Container(
-                    //                     width: 300,
-                    //                     child: Center(
-                    //                       child: SizedBox(
-                    //                         width: 120,
-                    //                         child: ElevatedButton(
-                    //                           style: ButtonStyle(backgroundColor: MaterialStatePropertyAll(Color(0xffF12D2D))),
-                    //                           child: Row(children: [
-                    //                             Icon(Icons.delete, color: Colors.white,size: 20,),
-                    //                             SizedBox(width: 5,),
-                    //                             Text('Delete', style: GoogleFonts.openSans(color: Colors.white, fontWeight: FontWeight.w500),)
-                    //                           ],),
-                    //                           onPressed: () {
-                    //                             ForDeleteDialog(context, blockId);
-                    //                           },
+                    //           if(snapshot.hasData){
+                    //             final document = combinedData[index];
+                    //             int serialNumber = index + 1;
+                    //             return Padding(
+                    //               padding: const EdgeInsets.only(top: 10, bottom: 10),
+                    //               child: InkWell(
+                    //                 onTap: () {
+                    //                   print(snapshot.data!.docs[index]['blockname']);
+                    //                 },
+                    //                 child: Row(
+                    //                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    //                   children: [
+                    //                     Container(
+                    //                       width: 300,
+                    //                       child: Center(
+                    //                         child: KText(
+                    //                           text:'${serialNumber}',
+                    //                           style: GoogleFonts.openSans(fontWeight: FontWeight.w600, fontSize: 16),
                     //                         ),
                     //                       ),
                     //                     ),
-                    //                   ),
-                    //                 ],
+                    //                     Container(
+                    //                       width: 300,
+                    //                       child: Center(
+                    //                         child: KText(
+                    //                           text:document['blockname'],
+                    //                           style: GoogleFonts.openSans(fontWeight: FontWeight.w600, fontSize: 16),
+                    //                         ),
+                    //                       ),
+                    //                     ),
+                    //                     Container(
+                    //                       width: 300,
+                    //                       child: Center(
+                    //                         child: SizedBox(
+                    //                           width: 120,
+                    //                           child: ElevatedButton(
+                    //                             style: ButtonStyle(backgroundColor: MaterialStatePropertyAll(Color(0xffF12D2D))),
+                    //                             child: Row(children: [
+                    //                               Icon(Icons.delete, color: Colors.white,size: 20,),
+                    //                               SizedBox(width: 5,),
+                    //                               KText(text:'Delete', style: GoogleFonts.openSans(color: Colors.white, fontWeight: FontWeight.w500),)
+                    //                             ],),onPressed: (){
+                    //                             ForDeleteDialog(context, document.id);
+                    //                           },),
+                    //                         ),
+                    //                       ),
+                    //                     ),
+                    //                     // Container(
+                    //                     //   width: 300,
+                    //                     //   child: Center(
+                    //                     //     child: InkWell(
+                    //                     //       onTap: () {
+                    //                     //         ForDeleteDialog(context, blockId); // Pass document ID to delete function
+                    //                     //         print('Doc ID:- $blockId');
+                    //                     //         print('UserName:- ${data['blockname']}');
+                    //                     //       },
+                    //                     //       // child: Icon(Icons.delete, color: Colors.red),
+                    //                     //       child: ElevatedButton(
+                    //                     //         style: ButtonStyle(backgroundColor: MaterialStatePropertyAll(Color(0xffF12D2D))),
+                    //                     //
+                    //                     //         child: Row(children: [
+                    //                     //         Icon(Icons.delete),
+                    //                     //         Text('Delete')
+                    //                     //       ],),onPressed: (){
+                    //                     //
+                    //                     //       },)
+                    //                     //     ),
+                    //                     //   ),
+                    //                     // ),
+                    //                   ],
+                    //                 ),
                     //               ),
-                    //             ),
-                    //           );
+                    //             );
+                    //           }
                     //         },
-                    //         itemCount: documents.length,
+                    //         // itemCount: documents.length,
                     //       );
                     //     } else {
                     //       return const CircularProgressIndicator();
                     //     }
                     //   },
                     // ),
+
+
+                    StreamBuilder(
+                      stream: FirebaseFirestore.instance.collection('Block').snapshots(),
+                      builder: (context, snapshot) {
+                        if (snapshot.hasData) {
+                          // Filtered and sorted data
+                          List<DocumentSnapshot> sortedData = [];
+
+                          // If search text is not empty, filter and sort
+                          if (searchBlock.text.isNotEmpty) {
+                            // Filter the snapshot data based on the search text
+                            List<DocumentSnapshot> filteredData = snapshot.data!.docs.where((doc) {
+                              final blockName = doc["blockname"].toString().toLowerCase();
+                              final searchText = searchBlock.text.toLowerCase();
+                              return blockName.contains(searchText);
+                            }).toList();
+
+                            // Sort the filtered data alphabetically
+                            filteredData.sort((a, b) {
+                              final nameA = a["blockname"].toString().toLowerCase();
+                              final nameB = b["blockname"].toString().toLowerCase();
+                              return nameA.compareTo(nameB);
+                            });
+
+                            sortedData = filteredData;
+                          } else {
+                            // If search query is empty, display original data sorted alphabetically
+                            sortedData = snapshot.data!.docs.toList()..sort((a, b) {
+                              final nameA = a["blockname"].toString().toLowerCase();
+                              final nameB = b["blockname"].toString().toLowerCase();
+                              return nameA.compareTo(nameB);
+                            });
+                          }
+
+                          return ListView.builder(
+                            itemCount: sortedData.length,
+                            shrinkWrap: true,
+                            itemBuilder: (context, index) {
+                              final document = sortedData[index];
+                              int serialNumber = index + 1;
+                              return Padding(
+                                padding: const EdgeInsets.only(top: 10, bottom: 10),
+                                child: InkWell(
+                                  onTap: () {
+                                    print(document['blockname']);
+                                  },
+                                  child: Row(
+                                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                    children: [
+                                      Container(
+                                        width: 300,
+                                        child: Center(
+                                          child: KText(
+                                            text:'$serialNumber',
+                                            style: GoogleFonts.openSans(fontWeight: FontWeight.w600, fontSize: 16),
+                                          ),
+                                        ),
+                                      ),
+                                      Container(
+                                        width: 300,
+                                        child: Center(
+                                          child: KText(
+                                            text: document['blockname'],
+                                            style: GoogleFonts.openSans(fontWeight: FontWeight.w600, fontSize: 16),
+                                          ),
+                                        ),
+                                      ),
+                                      Container(
+                                        width: 300,
+                                        child: Center(
+                                          child: SizedBox(
+                                            width: 120,
+                                            child: ElevatedButton(
+                                              style: const ButtonStyle(backgroundColor: MaterialStatePropertyAll(Color(0xffF12D2D))),
+                                              child: Row(children: [
+                                                const Icon(Icons.delete, color: Colors.white, size: 20,),
+                                                const SizedBox(width: 5,),
+                                                KText(text:'Delete', style: GoogleFonts.openSans(color: Colors.white, fontWeight: FontWeight.w500),)
+                                              ],),
+                                              onPressed: () {
+                                                ForDeleteDialog(context, document.id);
+                                              },
+                                            ),
+                                          ),
+                                        ),
+                                      ),
+                                    ],
+                                  ),
+                                ),
+                              );
+                            },
+                          );
+                        } else {
+                          return const CircularProgressIndicator();
+                        }
+                      },
+                    ),
+
+
+
                   ],)
               )
             ],
@@ -357,7 +383,7 @@ class _BlockNameState extends State<BlockName> {
       if (querySnapshot.docs.isNotEmpty) {
         showTopSnackBar(
           Overlay.of(context),
-          CustomSnackBar.error(
+          const CustomSnackBar.error(
             message:
             "Block with this name already exists!",
           ),
@@ -388,6 +414,7 @@ class _BlockNameState extends State<BlockName> {
       );
     }
   }
+
   Future<void> ForDeleteDialog(BuildContext con, String documentId) async {
     return showDialog<void>(
       context: context,
@@ -415,7 +442,7 @@ class _BlockNameState extends State<BlockName> {
                           onTap: (){
                             Navigator.pop(context);
                           },
-                          child: CircleAvatar(
+                          child: const CircleAvatar(
                             backgroundColor: Color(0xffF5F6F7), radius: 20, child: Padding(
                             padding: EdgeInsets.all(4),
                             child: Icon(Icons.close, color: Colors.grey, size: 18,),
@@ -475,7 +502,7 @@ class _BlockNameState extends State<BlockName> {
                                 await FirebaseFirestore.instance.collection('Block').doc(documentId).delete();
                                 showTopSnackBar(
                                   Overlay.of(context),
-                                  CustomSnackBar.success(
+                                  const CustomSnackBar.success(
                                     backgroundColor: Color(0xff3ac6cf),
                                     message:
                                     "Block Deleted successfully!",
@@ -604,7 +631,7 @@ class _BlockNameState extends State<BlockName> {
                                           height: 45,
                                         ),
                                       ),
-                                      SizedBox(width: 10,),
+                                      const SizedBox(width: 10,),
                                       SizedBox(
                                         height: 40,
                                         child: ElevatedButton(

@@ -1,3 +1,5 @@
+import 'dart:convert';
+import 'package:http/http.dart'as http;
 import 'package:animate_do/animate_do.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:dropdown_button2/dropdown_button2.dart';
@@ -5,6 +7,7 @@ import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:hms_ikia/widgets/ReusableHeader.dart';
 
+import '../Constants/constants.dart';
 import '../widgets/ReusableRoomContainer.dart';
 import '../widgets/customtextfield.dart';
 import '../widgets/kText.dart';
@@ -47,70 +50,6 @@ class _ComplaintsState extends State<Complaints> {
             children: [
               const ReusableHeader(Headertext: 'Complains', SubHeadingtext: 'Complains...'),
                const SizedBox(height: 25,),
-              //  const Row(
-              //   mainAxisAlignment: MainAxisAlignment.spaceAround,
-              //   children: [
-              //     ReusableRoomContainer(
-              //       firstColor: Color(0xff034d7f),
-              //       secondColor: Color(0xff058be5),
-              //       title: 'Today Complaints',
-              //       totalRooms: '05',
-              //       waveImg: 'assets/ui-design-/images/Vector 38 (1).png', roomImg: 'assets/ui-design-/images/Group 70.png',
-              //     ),
-              //     ReusableRoomContainer(
-              //       firstColor: Color(0xff0e4d1f),
-              //       secondColor: Color(0xff1b9a3f),
-              //       totalRooms: '20',
-              //       title: 'Completed',
-              //       waveImg: 'assets/ui-design-/images/Vector 37 (3).png', roomImg: 'assets/ui-design-/images/Group 71.png',
-              //     ),
-              //     ReusableRoomContainer(
-              //       firstColor: Color(0xff971c1c),
-              //       secondColor: Color(0xffe22a2a),
-              //       totalRooms: '20',
-              //       title: 'In Completed',
-              //       waveImg: 'assets/ui-design-/images/Vector 36 (3).png', roomImg: 'assets/ui-design-/images/Group 72.png',
-              //     ),
-              //   ],
-              // ),
-            
-            
-            // StreamBuilder(stream: FirebaseFirestore.instance.collection('Complaints').where('date',isEqualTo: _getFormattedDate()).snapshots(), builder: (context, snapshot) {
-            //   if(snapshot.hasData){
-            //     var todayComplaint = snapshot.data!.docs.length;
-            //     return
-            //        Row(
-            //         mainAxisAlignment: MainAxisAlignment.spaceAround,
-            //         children: [
-            //           ReusableRoomContainer(
-            //             firstColor: Color(0xff034d7f),
-            //             secondColor: Color(0xff058be5),
-            //             title: 'Today Complaints',
-            //             totalRooms: todayComplaint.toString(),
-            //             waveImg: 'assets/ui-design-/images/Vector 38 (1).png', roomImg: 'assets/ui-design-/images/Group 70.png',
-            //           ),
-            //           ReusableRoomContainer(
-            //             firstColor: Color(0xff0e4d1f),
-            //             secondColor: Color(0xff1b9a3f),
-            //             totalRooms: '20',
-            //             title: 'Completed',
-            //             waveImg: 'assets/ui-design-/images/Vector 37 (3).png', roomImg: 'assets/ui-design-/images/Group 71.png',
-            //           ),
-            //           ReusableRoomContainer(
-            //             firstColor: Color(0xff971c1c),
-            //             secondColor: Color(0xffe22a2a),
-            //             totalRooms: '20',
-            //             title: 'In Completed',
-            //             waveImg: 'assets/ui-design-/images/Vector 36 (3).png', roomImg: 'assets/ui-design-/images/Group 72.png',
-            //           ),
-            //         ],
-            //       );
-            //   }else{
-            //     return CircularProgressIndicator();
-            //   }
-            // },),
-
-
               StreamBuilder(
                 stream: FirebaseFirestore.instance.collection('Complaints').snapshots(),
                 builder: (context, snapshot) {
@@ -382,6 +321,262 @@ class _ComplaintsState extends State<Complaints> {
   }
 //   Complaints Details
 
+ //  Future<void> complaintDetail(BuildContext con, DocumentSnapshot userData) async {
+ //    String selectedStatus = userData['status'];
+ //
+ //    return showDialog<void>(
+ //        context: context,
+ //        barrierDismissible: false,
+ //        builder: (BuildContext context) {
+ //          return AlertDialog(
+ //            elevation: 0,
+ //            backgroundColor: const Color(0xffFFFFFF),
+ //            title: Row(
+ //              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+ //              children: [
+ //                KText(text:'Complaint Details', style: GoogleFonts.openSans(fontWeight: FontWeight.w700, fontSize: 18),),
+ //                InkWell(
+ //                  onTap: () => Navigator.pop(context),
+ //                  child: SizedBox(
+ //                    height: 30, width: 30,
+ //                    child:  Stack(
+ //                      alignment: Alignment.center,
+ //                      children: [
+ //                        Container(
+ //                          height: 38,
+ //                          width: 38,
+ //                          decoration: const BoxDecoration(
+ //                            color: Colors.white,
+ //                            borderRadius: BorderRadius.all(Radius.circular(50)),
+ //                            boxShadow:[
+ //                              BoxShadow(
+ //                                  color: Color(0xfff5f6f7),
+ //                                  blurRadius: 5,
+ //                                  spreadRadius: 1,
+ //                                  offset: Offset(4,4)
+ //                              )
+ //                            ],
+ //                          ),
+ //                        ),
+ //                        ClipRRect(
+ //                          borderRadius: const BorderRadius.all(Radius.circular(50)),
+ //                          child: SizedBox(
+ //                            height: 20,
+ //                            width: 20,
+ //                            child: Image.asset('assets/ui-design-/images/Multiply.png', fit: BoxFit.contain,scale: 0.5,),
+ //                          ),
+ //                        )
+ //                      ],
+ //                    ),
+ //                  ),
+ //                ),
+ //              ],
+ //            ),
+ //
+ //            content: SingleChildScrollView(
+ //              child: SizedBox(
+ //                width: 380,
+ //                height: 330,
+ //                child: Column(
+ //                  crossAxisAlignment: CrossAxisAlignment.start,
+ //                  children: [
+ //                    const Divider(color: Colors.grey, height: 10,),
+ //                    Row(
+ //                      children: [
+ //                        SizedBox(
+ //                            width: 150,
+ //                            child: KText(text:'User Name', style: GoogleFonts.openSans(fontWeight: FontWeight.w600),)),
+ //                        SizedBox(
+ //                            width: 70,
+ //                            child: Center(child: Text(':', style: GoogleFonts.openSans(fontWeight: FontWeight.w600),))),
+ //                        SizedBox(
+ //
+ //                            width: 150,
+ //                            child: KText(text: userData['username'],style: GoogleFonts.openSans(fontWeight: FontWeight.w600, color: const Color(0xff262626).withOpacity(0.8)),)),
+ //                      ],
+ //                    ),
+ //                    const SizedBox(height: 4,),
+ //                    Row(
+ //                      children: [
+ //                        SizedBox(
+ //                            width: 150,
+ //                            child: KText(text:'User Id', style: GoogleFonts.openSans(fontWeight: FontWeight.w600),)),
+ //                        SizedBox(
+ //                            width: 70,
+ //                            child: Center(child: KText(text:':', style: GoogleFonts.openSans(fontWeight: FontWeight.w600),))),
+ //                        SizedBox(
+ //                            width: 150,
+ //                            child: KText(text:userData['userId'],style: GoogleFonts.openSans(fontWeight: FontWeight.w600, color: const Color(0xff262626).withOpacity(0.8)),)),
+ //                      ],
+ //                    ),
+ //                    const SizedBox(height: 4,),
+ //                    Row(
+ //                      children: [
+ //                        SizedBox(
+ //                            width: 150,
+ //                            child: KText(text:'Reason', style: GoogleFonts.openSans(fontWeight: FontWeight.w600),)),
+ //                        SizedBox(
+ //                            width: 70,
+ //                            child: Center(child: KText(text:':', style: GoogleFonts.openSans(fontWeight: FontWeight.w600),))),
+ //                        SizedBox(
+ //                            width: 150,
+ //                            child: KText(text:userData['reason'],style: GoogleFonts.openSans(fontWeight: FontWeight.w600, color: const Color(0xff262626).withOpacity(0.8)),)),
+ //                      ],
+ //                    ),
+ //                    const SizedBox(height: 4,),
+ //                    Row(
+ //                      children: [
+ //                        SizedBox(
+ //                            width: 150,
+ //                            child: KText(text:'Priority', style: GoogleFonts.openSans(fontWeight: FontWeight.w600),)),
+ //                        SizedBox(
+ //                            width: 70,
+ //                            child: Center(child: KText(text:':', style: GoogleFonts.openSans(fontWeight: FontWeight.w600),))),
+ //                        SizedBox(
+ //                            width: 150,
+ //                            child: KText(text:userData['priority'],style: GoogleFonts.openSans(fontWeight: FontWeight.w600, color: const Color(0xff262626).withOpacity(0.8)),)),
+ //                      ],
+ //                    ),
+ //                    const SizedBox(height: 4,),
+ //                    Row(
+ //                      children: [
+ //                        SizedBox(
+ //                            width: 150,
+ //                            child: KText(text:'Date', style: GoogleFonts.openSans(fontWeight: FontWeight.w600),)),
+ //                        SizedBox(
+ //                            width: 70,
+ //                            child: Center(child: KText(text:':', style: GoogleFonts.openSans(fontWeight: FontWeight.w600),))),
+ //                        SizedBox(
+ //                            width: 150,
+ //                            child: KText(text:userData['date'],style: GoogleFonts.openSans(fontWeight: FontWeight.w600, color: const Color(0xff262626).withOpacity(0.8)),)),
+ //                      ],
+ //                    ),
+ //                    const SizedBox(height: 4,),
+ //                    Row(
+ //                      children: [
+ //                        SizedBox(
+ //                            width: 150,
+ //                            child: KText(text:'Time', style: GoogleFonts.openSans(fontWeight: FontWeight.w600),)),
+ //                        SizedBox(
+ //                            width: 70,
+ //                            child: Center(child: KText(text:':', style: GoogleFonts.openSans(fontWeight: FontWeight.w600),))),
+ //                        SizedBox(
+ //                            width: 150,
+ //                            child: KText(text:userData['time'],style: GoogleFonts.openSans(fontWeight: FontWeight.w600, color: const Color(0xff262626).withOpacity(0.8)),)),
+ //                      ],
+ //                    ),
+ //                    const SizedBox(height: 4,),
+ //                    Row(
+ //                      children: [
+ //                        SizedBox(
+ //                            width: 150,
+ //                            child: KText(text:'Status', style: GoogleFonts.openSans(fontWeight: FontWeight.w600),)),
+ //                        SizedBox(
+ //                            width: 70,
+ //                            child: Center(child: KText(text:':', style: GoogleFonts.openSans(fontWeight: FontWeight.w600),))),
+ //                        SizedBox(
+ //                            width: 150,
+ //                            child: KText(text:userData['status'],style: GoogleFonts.openSans(fontWeight: FontWeight.w600, color: const Color(0xff262626).withOpacity(0.8)),)),
+ //                      ],
+ //                    ),
+ //                    const SizedBox(height: 14,),
+ //                    const Text('Change Status', style: TextStyle(fontWeight: FontWeight.w700, fontSize: 18)),
+ //                    const Divider(color: Colors.grey, height: 10,),
+ //
+ //                    Padding(
+ //                      padding: const EdgeInsets.only(top: 8.0),
+ //                      child: Container(
+ //                        width: 180,
+ //                        height: 50,
+ //                        decoration: BoxDecoration (
+ //                          border: Border.all(color: const Color(0x7f262626)),
+ //                          borderRadius: BorderRadius.circular(30),
+ //                        ),
+ //                        child: Padding(
+ //                          padding: const EdgeInsets.only(left: 12.0,right: 6),
+ //                          child:  DropdownButtonHideUnderline(
+ //                            child:
+ //                            DropdownButtonFormField2<
+ //                                String>(
+ //                              isExpanded: true,
+ //                              hint: Text(
+ //                                'Select Status', style:
+ //                              GoogleFonts.openSans (
+ //                                fontSize: 12,
+ //                                fontWeight: FontWeight.w600,
+ //                                color: const Color(0x7f262626),
+ //                              ),
+ //                              ),
+ //                              items: status
+ //                                  .map((String
+ //                              item) =>
+ //                                  DropdownMenuItem<
+ //                                      String>(
+ //                                    value: item,
+ //                                    child: Text(
+ //                                      item,
+ //                                      style:
+ //                                      GoogleFonts.openSans (
+ //                                        fontSize: 12,
+ //                                        fontWeight: FontWeight.w600,
+ //                                      ),
+ //                                    ),
+ //                                  )).toList(),
+ //                              value:
+ //                              selectedStatus,
+ //                              onChanged:
+ //                                  (String? value) {
+ //                                setState(() {
+ //                                  selectedStatus = '';
+ //                                  selectedStatus =
+ //                                  value!;
+ //                                });
+ //
+ //                              },
+ //                              buttonStyleData:
+ //                              const ButtonStyleData(
+ //                              ),
+ //                              menuItemStyleData:
+ //                              const MenuItemStyleData(
+ //
+ //                              ),
+ //                              decoration:
+ //                              const InputDecoration(
+ //                                  border:
+ //                                  InputBorder
+ //                                      .none),
+ //                            ),
+ //                          ),
+ //                        ),
+ //                      ),
+ //                    ),
+ //
+ // const SizedBox(height: 10,),
+ //                    Row(
+ //                      mainAxisAlignment: MainAxisAlignment.end,
+ //                      children: [
+ //                        ElevatedButton(
+ //                            style: const ButtonStyle(backgroundColor: MaterialStatePropertyAll(Color(0xff39cad0))),
+ //                            onPressed: () async {
+ //                              await FirebaseFirestore.instance.collection('Complaints').doc(userData.id).update({'status': selectedStatus});
+ //                              // Close the dialog
+ //                              Navigator.pop(context);
+ //
+ //                            }, child: KText(text:'Update', style: GoogleFonts.openSans(color: Colors.white),))
+ //                      ],
+ //                    )
+ //                  ],
+ //                ),
+ //              ),
+ //            ),
+ //          );
+ //        },
+ //      );
+ //    }
+
+
+
+
   Future<void> complaintDetail(BuildContext con, DocumentSnapshot userData) async {
     String selectedStatus = userData['status'];
     return showDialog<void>(
@@ -394,7 +589,7 @@ class _ComplaintsState extends State<Complaints> {
             title: Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
-                KText(text:'Complaint Details', style: GoogleFonts.openSans(fontWeight: FontWeight.w700, fontSize: 18),),
+                KText(text: 'Complaint Details', style: GoogleFonts.openSans(fontWeight: FontWeight.w700, fontSize: 18)),
                 InkWell(
                   onTap: () => Navigator.pop(context),
                   child: SizedBox(
@@ -423,7 +618,7 @@ class _ComplaintsState extends State<Complaints> {
                           child: SizedBox(
                             height: 20,
                             width: 20,
-                            child: Image.asset('assets/ui-design-/images/Multiply.png', fit: BoxFit.contain,scale: 0.5,),
+                            child: Image.asset('assets/ui-design-/images/Multiply.png', fit: BoxFit.contain, scale: 0.5,),
                           ),
                         )
                       ],
@@ -445,14 +640,16 @@ class _ComplaintsState extends State<Complaints> {
                       children: [
                         SizedBox(
                             width: 150,
-                            child: KText(text:'User Name', style: GoogleFonts.openSans(fontWeight: FontWeight.w600),)),
+                            child: KText(text:'User Name', style: GoogleFonts.openSans(fontWeight: FontWeight.w600),)
+                        ),
                         SizedBox(
                             width: 70,
-                            child: Center(child: Text(':', style: GoogleFonts.openSans(fontWeight: FontWeight.w600),))),
+                            child: Center(child: Text(':', style: GoogleFonts.openSans(fontWeight: FontWeight.w600),))
+                        ),
                         SizedBox(
-
                             width: 150,
-                            child: KText(text: userData['username'],style: GoogleFonts.openSans(fontWeight: FontWeight.w600, color: const Color(0xff262626).withOpacity(0.8)),)),
+                            child: KText(text: userData['username'],style: GoogleFonts.openSans(fontWeight: FontWeight.w600, color: const Color(0xff262626).withOpacity(0.8)),)
+                        ),
                       ],
                     ),
                     const SizedBox(height: 4,),
@@ -460,13 +657,16 @@ class _ComplaintsState extends State<Complaints> {
                       children: [
                         SizedBox(
                             width: 150,
-                            child: KText(text:'User Id', style: GoogleFonts.openSans(fontWeight: FontWeight.w600),)),
+                            child: KText(text:'User Id', style: GoogleFonts.openSans(fontWeight: FontWeight.w600),)
+                        ),
                         SizedBox(
                             width: 70,
-                            child: Center(child: KText(text:':', style: GoogleFonts.openSans(fontWeight: FontWeight.w600),))),
+                            child: Center(child: KText(text:':', style: GoogleFonts.openSans(fontWeight: FontWeight.w600),))
+                        ),
                         SizedBox(
                             width: 150,
-                            child: KText(text:userData['userId'],style: GoogleFonts.openSans(fontWeight: FontWeight.w600, color: const Color(0xff262626).withOpacity(0.8)),)),
+                            child: KText(text:userData['userId'],style: GoogleFonts.openSans(fontWeight: FontWeight.w600, color: const Color(0xff262626).withOpacity(0.8)),)
+                        ),
                       ],
                     ),
                     const SizedBox(height: 4,),
@@ -474,13 +674,16 @@ class _ComplaintsState extends State<Complaints> {
                       children: [
                         SizedBox(
                             width: 150,
-                            child: KText(text:'Reason', style: GoogleFonts.openSans(fontWeight: FontWeight.w600),)),
+                            child: KText(text:'Reason', style: GoogleFonts.openSans(fontWeight: FontWeight.w600),)
+                        ),
                         SizedBox(
                             width: 70,
-                            child: Center(child: KText(text:':', style: GoogleFonts.openSans(fontWeight: FontWeight.w600),))),
+                            child: Center(child: KText(text:':', style: GoogleFonts.openSans(fontWeight: FontWeight.w600),))
+                        ),
                         SizedBox(
                             width: 150,
-                            child: KText(text:userData['reason'],style: GoogleFonts.openSans(fontWeight: FontWeight.w600, color: const Color(0xff262626).withOpacity(0.8)),)),
+                            child: KText(text:userData['reason'],style: GoogleFonts.openSans(fontWeight: FontWeight.w600, color: const Color(0xff262626).withOpacity(0.8)),)
+                        ),
                       ],
                     ),
                     const SizedBox(height: 4,),
@@ -488,13 +691,16 @@ class _ComplaintsState extends State<Complaints> {
                       children: [
                         SizedBox(
                             width: 150,
-                            child: KText(text:'Priority', style: GoogleFonts.openSans(fontWeight: FontWeight.w600),)),
+                            child: KText(text:'Priority', style: GoogleFonts.openSans(fontWeight: FontWeight.w600),)
+                        ),
                         SizedBox(
                             width: 70,
-                            child: Center(child: KText(text:':', style: GoogleFonts.openSans(fontWeight: FontWeight.w600),))),
+                            child: Center(child: KText(text:':', style: GoogleFonts.openSans(fontWeight: FontWeight.w600),))
+                        ),
                         SizedBox(
                             width: 150,
-                            child: KText(text:userData['priority'],style: GoogleFonts.openSans(fontWeight: FontWeight.w600, color: const Color(0xff262626).withOpacity(0.8)),)),
+                            child: KText(text:userData['priority'],style: GoogleFonts.openSans(fontWeight: FontWeight.w600, color: const Color(0xff262626).withOpacity(0.8)),)
+                        ),
                       ],
                     ),
                     const SizedBox(height: 4,),
@@ -502,13 +708,16 @@ class _ComplaintsState extends State<Complaints> {
                       children: [
                         SizedBox(
                             width: 150,
-                            child: KText(text:'Date', style: GoogleFonts.openSans(fontWeight: FontWeight.w600),)),
+                            child: KText(text:'Date', style: GoogleFonts.openSans(fontWeight: FontWeight.w600),)
+                        ),
                         SizedBox(
                             width: 70,
-                            child: Center(child: KText(text:':', style: GoogleFonts.openSans(fontWeight: FontWeight.w600),))),
+                            child: Center(child: KText(text:':', style: GoogleFonts.openSans(fontWeight: FontWeight.w600),))
+                        ),
                         SizedBox(
                             width: 150,
-                            child: KText(text:userData['date'],style: GoogleFonts.openSans(fontWeight: FontWeight.w600, color: const Color(0xff262626).withOpacity(0.8)),)),
+                            child: KText(text:userData['date'],style: GoogleFonts.openSans(fontWeight: FontWeight.w600, color: const Color(0xff262626).withOpacity(0.8)),)
+                        ),
                       ],
                     ),
                     const SizedBox(height: 4,),
@@ -516,13 +725,16 @@ class _ComplaintsState extends State<Complaints> {
                       children: [
                         SizedBox(
                             width: 150,
-                            child: KText(text:'Time', style: GoogleFonts.openSans(fontWeight: FontWeight.w600),)),
+                            child: KText(text:'Time', style: GoogleFonts.openSans(fontWeight: FontWeight.w600),)
+                        ),
                         SizedBox(
                             width: 70,
-                            child: Center(child: KText(text:':', style: GoogleFonts.openSans(fontWeight: FontWeight.w600),))),
+                            child: Center(child: KText(text:':', style: GoogleFonts.openSans(fontWeight: FontWeight.w600),))
+                        ),
                         SizedBox(
                             width: 150,
-                            child: KText(text:userData['time'],style: GoogleFonts.openSans(fontWeight: FontWeight.w600, color: const Color(0xff262626).withOpacity(0.8)),)),
+                            child: KText(text:userData['time'],style: GoogleFonts.openSans(fontWeight: FontWeight.w600, color: const Color(0xff262626).withOpacity(0.8)),)
+                        ),
                       ],
                     ),
                     const SizedBox(height: 4,),
@@ -530,13 +742,16 @@ class _ComplaintsState extends State<Complaints> {
                       children: [
                         SizedBox(
                             width: 150,
-                            child: KText(text:'Status', style: GoogleFonts.openSans(fontWeight: FontWeight.w600),)),
+                            child: KText(text:'Status', style: GoogleFonts.openSans(fontWeight: FontWeight.w600),)
+                        ),
                         SizedBox(
                             width: 70,
-                            child: Center(child: KText(text:':', style: GoogleFonts.openSans(fontWeight: FontWeight.w600),))),
+                            child: Center(child: KText(text:':', style: GoogleFonts.openSans(fontWeight: FontWeight.w600),))
+                        ),
                         SizedBox(
                             width: 150,
-                            child: KText(text:userData['status'],style: GoogleFonts.openSans(fontWeight: FontWeight.w600, color: const Color(0xff262626).withOpacity(0.8)),)),
+                            child: KText(text:userData['status'],style: GoogleFonts.openSans(fontWeight: FontWeight.w600, color: const Color(0xff262626).withOpacity(0.8)),)
+                        ),
                       ],
                     ),
                     const SizedBox(height: 14,),
@@ -554,93 +769,136 @@ class _ComplaintsState extends State<Complaints> {
                         ),
                         child: Padding(
                           padding: const EdgeInsets.only(left: 12.0,right: 6),
-                          child:  DropdownButtonHideUnderline(
-                            child:
-                            DropdownButtonFormField2<
-                                String>(
+                          child: DropdownButtonHideUnderline(
+                            child: DropdownButtonFormField2<String>(
                               isExpanded: true,
                               hint: Text(
-                                'Select Status', style:
-                              GoogleFonts.openSans (
+                                'Select Status', style: GoogleFonts.openSans (
                                 fontSize: 12,
                                 fontWeight: FontWeight.w600,
                                 color: const Color(0x7f262626),
                               ),
                               ),
-                              items: status
-                                  .map((String
-                              item) =>
-                                  DropdownMenuItem<
-                                      String>(
+                              items: status.map((String item) =>
+                                  DropdownMenuItem<String>(
                                     value: item,
                                     child: Text(
                                       item,
-                                      style:
-                                      GoogleFonts.openSans (
+                                      style: GoogleFonts.openSans (
                                         fontSize: 12,
                                         fontWeight: FontWeight.w600,
                                       ),
                                     ),
                                   )).toList(),
-                              value:
-                              selectedStatus,
-                              onChanged:
-                                  (String? value) {
+                              value: selectedStatus,
+                              onChanged: (String? value) {
                                 setState(() {
                                   selectedStatus = '';
-                                  selectedStatus =
-                                  value!;
+                                  selectedStatus = value!;
                                 });
-
                               },
-                              buttonStyleData:
-                              const ButtonStyleData(
-
-
+                              buttonStyleData: const ButtonStyleData(),
+                              menuItemStyleData: const MenuItemStyleData(),
+                              decoration: const InputDecoration(
+                                  border: InputBorder.none
                               ),
-                              menuItemStyleData:
-                              const MenuItemStyleData(
-
-                              ),
-                              decoration:
-                              const InputDecoration(
-                                  border:
-                                  InputBorder
-                                      .none),
                             ),
                           ),
                         ),
                       ),
                     ),
 
- const SizedBox(height: 10,),
+                    const SizedBox(height: 10,),
                     Row(
                       mainAxisAlignment: MainAxisAlignment.end,
                       children: [
+                        // ElevatedButton(
+                        //     style: const ButtonStyle(backgroundColor: MaterialStatePropertyAll(Color(0xff39cad0))),
+                        //     onPressed: () async {
+                        //       await FirebaseFirestore.instance.collection('Complaints').doc(userData.id).update({'status': selectedStatus});
+                        //       Navigator.pop(context);
+                        //     },
+                        //     child: KText(text: 'Update', style: GoogleFonts.openSans(color: Colors.white),)
+                        // )
+
+                        // ElevatedButton(
+                        //     style: const ButtonStyle(backgroundColor: MaterialStatePropertyAll(Color(0xff39cad0))),
+                        //     onPressed: () async {
+                        //       await FirebaseFirestore.instance.collection('Complaints').doc(userData.id).update({'status': selectedStatus});
+                        //
+                        //       // Retrieve the FCM token from the Users collection using the userData['userId']
+                        //       DocumentSnapshot userSnapshot = await FirebaseFirestore.instance.collection('Users').doc('oXjAcnvco6ev6pbNLjQF').get();
+                        //       String token = userSnapshot['fcmToken'];
+                        //
+                        //       // Send the push notification
+                        //       sendPushMessage(token: token, body: 'Your complaint status has been updated', title: 'Complaint Status Updated');
+                        //
+                        //       Navigator.pop(context);
+                        //     },
+                        //     child: KText(text: 'Update', style: GoogleFonts.openSans(color: Colors.white),)
+                        // )
+
+
+
+                        ///getting id
                         ElevatedButton(
                             style: const ButtonStyle(backgroundColor: MaterialStatePropertyAll(Color(0xff39cad0))),
                             onPressed: () async {
                               await FirebaseFirestore.instance.collection('Complaints').doc(userData.id).update({'status': selectedStatus});
-                              // Close the dialog
-                              Navigator.pop(context);
+                              QuerySnapshot userQuerySnapshot = await FirebaseFirestore.instance.collection('Users').where('uid', isEqualTo: userData['uid']).get();
 
-                            }, child: KText(text:'Update', style: GoogleFonts.openSans(color: Colors.white),))
+                              if (userQuerySnapshot.docs.isNotEmpty) {
+                                String token = userQuerySnapshot.docs.first['fcmToken'];
+
+                                // Send the push notification
+                                sendPushMessage(token: token, body: 'Your complaint status has been updated to "${selectedStatus}"', title: 'Complaint Status Updated');
+                              } else {
+                                print('User not found');
+                                // Handle the case where the user is not found
+                              }
+
+                              Navigator.pop(context);
+                            },
+                            child: KText(text: 'Update', style: GoogleFonts.openSans(color: Colors.white),)
+                        )
+
+
                       ],
                     )
-
-
                   ],
                 ),
               ),
             ),
           );
+        }
+    );
+  }
 
 
+  void sendPushMessage({required String token, required String body, required String title}) async {
+    try {
+      await http.post(
+        Uri.parse('https://fcm.googleapis.com/fcm/send'),
+        headers: <String, String>{
+          'Content-Type': 'application/json',
+          'Authorization':
+          'key=${Constants.apiKeyForNotification}',
         },
+        body: jsonEncode(
+          <String, dynamic>{
+            'notification': <String, dynamic>{'body': body, 'title': title},
+            'priority': 'high',
+            'data': <String, dynamic>{
+              'click_action': 'FLUTTER_NOTIFICATION_CLICK',
+              'id': '1',
+              'status': 'done'
+            },
+            "to": token,
+          },
+        ),
       );
+    } catch (e) {
+      print("error push notification");
     }
-
-
-
-
+  }
 }

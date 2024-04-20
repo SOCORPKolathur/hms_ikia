@@ -1,10 +1,14 @@
+import 'dart:convert';
+import 'package:http/http.dart'as http;
 import 'package:animate_do/animate_do.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:csv/csv.dart';
+import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:hms_ikia/widgets/kText.dart';
 import 'package:intl/intl.dart';
+import 'package:lottie/lottie.dart';
 import 'package:pdf/pdf.dart';
 import 'package:printing/printing.dart';
 import 'package:top_snackbar_flutter/custom_snack_bar.dart';
@@ -26,9 +30,17 @@ class Visitor_Page extends StatefulWidget {
 }
 
 class _Visitor_PageState extends State<Visitor_Page> {
+
+  final DateFormat formatter = DateFormat('dd-MM-yyyy');
+  DateTime selectedDate = DateTime.now();
+  bool VisitorStatus = false;
+  DateTime ? selectedVisitorDate;
+  bool isDataAvailable = true;
+
   final TextEditingController searchVisitors = TextEditingController();
   //main fields
   final TextEditingController visitorName = TextEditingController();
+  final TextEditingController visitorDate = TextEditingController();
   final TextEditingController visitorNumber = TextEditingController();
   final TextEditingController totalVisitors = TextEditingController();
   final TextEditingController reasonFor = TextEditingController();
@@ -43,18 +55,29 @@ class _Visitor_PageState extends State<Visitor_Page> {
 
   List<String> BlockNames = [];
   String selectedBlockName = "Select Block Name";
-  // List<String> BlockNames = [];
+
+  List<String> ResidentNames = [];
+  String selectedResidentName = "Select Name";
+
+  List<String> ResidentUserIds = [];
+  String selectedResidentUserId = "Select UserId";
+
   List<String> RoomNames= [];
   // blockname list here
+
+
   Future<List<String>> getBlockNames() async {
     try {
       List<String> blockNames = ['Select Block Name'];
       QuerySnapshot querySnapshot = await FirebaseFirestore.instance.collection('Block').get();
       querySnapshot.docs.forEach((doc) {
         String blockName = doc['blockname'];
-        if (blockName != null) {
+        if (blockName != "") {
           blockNames.add(blockName);
         }
+      });
+      setState(() {
+        BlockNames.addAll(blockNames);
       });
       print(blockNames);
       return blockNames;
@@ -63,9 +86,46 @@ class _Visitor_PageState extends State<Visitor_Page> {
       return [];
     }
   }
+
+  Future<void> getResidentNames() async {
+    try {
+      List<String> residentNames = ['Select Name'];
+      QuerySnapshot querySnapshot = await FirebaseFirestore.instance.collection('Users').get();
+      querySnapshot.docs.forEach((doc) {
+        String residentName = doc['firstName'];
+        if (residentName != "") {
+          residentNames.add(residentName);
+        }
+      });
+      setState(() {
+        ResidentNames.addAll(residentNames);
+      });
+      print(residentNames);
+    } catch (e) {
+      print("Error fetching names: $e");
+    }
+  }
+  Future<void> getResidentUserids() async {
+    try {
+      List<String> residentUserids = ['Select UserId'];
+      QuerySnapshot querySnapshot = await FirebaseFirestore.instance.collection('Users').get();
+      querySnapshot.docs.forEach((doc) {
+        String residentUserid = doc['userid'];
+        if (residentUserid != "") {
+          residentUserids.add(residentUserid);
+        }
+      });
+      setState(() {
+        ResidentUserIds.addAll(residentUserids);
+      });
+      print(residentUserids);
+    } catch (e) {
+      print("Error fetching UserId: $e");
+    }
+  }
   void getRoomNames(String selectedBlockName) async {
     setState(() {
-      blockRoomNames = ['Select Room Name']; // Reset room names
+      blockRoomNames = ['Select Room Name'];
     });
     try {
       QuerySnapshot querySnapshot = await FirebaseFirestore.instance
@@ -75,7 +135,7 @@ class _Visitor_PageState extends State<Visitor_Page> {
       // Iterate through the documents and extract data
       querySnapshot.docs.forEach((doc) {
         String roomName = doc['roomnumber'];
-        if (roomName != null) {
+        if (roomName != "") {
           setState(() {
             blockRoomNames.add(roomName);
           });
@@ -86,6 +146,7 @@ class _Visitor_PageState extends State<Visitor_Page> {
       print("Error fetching room names: $e");
     }
   }
+
   List<String> blockRoomNames = ['Select Room Name'];
   // String selectedBlockName = "Select Block Name";
   String selectedRoomName = "Select Room Name";
@@ -161,7 +222,7 @@ class _Visitor_PageState extends State<Visitor_Page> {
       setState(() {
         selectedCheckinDate = picked;
         print('normal date $selectedCheckinDate');
-        checkInDate.text = DateFormat('yyyy-MM-dd').format(picked);
+        checkInDate.text = DateFormat('dd-MM-yyyy').format(picked);
       });
     }
   }
@@ -171,7 +232,7 @@ class _Visitor_PageState extends State<Visitor_Page> {
       setState(() {
         selectedCheckoutDate = picked;
         print('normal date $selectedCheckoutDate');
-        checkOutDate.text = DateFormat('yyyy-MM-dd').format(picked);
+        checkOutDate.text = DateFormat('dd-MM-yyyy').format(picked);
       });
     }
   }
@@ -188,25 +249,61 @@ class _Visitor_PageState extends State<Visitor_Page> {
     return formattedDate;
   }
 
+  String getSelectedDate() {
+    return selectedVisitorDate != null
+        ? DateFormat('dd-MM-yyyy').format(selectedVisitorDate!)
+        : DateFormat('dd-MM-yyyy').format(DateTime.now());
+  }
+
 
 
 
   @override
   void initState() {
-    setState(() {
-      // getBlockNames();
+
+     getResidentNames();
+     getResidentUserids();
+      getBlockNames();
       getRoomNames(selectedBlockName);
       getTodaysVisitors();
-      getBlockNames().then((names) {
-        setState(() {
-          BlockNames.addAll(names);
-        });
-      }
-      );
+
+
+    setState(() {
+      // fetchUserData();
     });
     // TODO: implement initState
     super.initState();
   }
+
+
+
+
+  // Future<void> fetchUserData() async {
+  //   try {
+  //     // Fetch Resident Names
+  //     QuerySnapshot residentNamesSnapshot = await FirebaseFirestore.instance.collection('Users').get();
+  //     ResidentNames = residentNamesSnapshot.docs.map((doc) => doc['firstName'] as String).toList();
+  //
+  //     // Fetch Resident User IDs
+  //     QuerySnapshot residentUserIdsSnapshot = await FirebaseFirestore.instance.collection('Users').get();
+  //     ResidentUserIds = residentUserIdsSnapshot.docs.map((doc) => doc['userid'] as String).toList();
+  //
+  //     // Fetch Block Names
+  //     QuerySnapshot blockNamesSnapshot = await FirebaseFirestore.instance.collection('Block').get();
+  //     BlockNames = blockNamesSnapshot.docs.map((doc) => doc['blockname'] as String).toList();
+  //
+  //     // Fetch Room Names
+  //     QuerySnapshot roomNamesSnapshot = await FirebaseFirestore.instance.collection('Room').get();
+  //     RoomNames = roomNamesSnapshot.docs.map((doc) => doc['roomnumber'] as String).toList();
+  //
+  //     // Update state to rebuild the UI
+  //     setState(() {});
+  //   } catch (error) {
+  //     print('Error fetching data: $error');
+  //   }
+  // }
+
+
   final Color _svgColor = Colors.white;
   @override
   Widget build(BuildContext context) {
@@ -339,6 +436,49 @@ class _Visitor_PageState extends State<Visitor_Page> {
                       child: Row(
                         mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                         children: [
+
+                          Container(
+                            width: 260,
+                            height: 46,
+                            decoration: BoxDecoration(
+                              color: const Color(0xffF5F5F5),
+                              borderRadius: BorderRadius.circular(30),
+                              border: Border.all(color: const Color(0x7f262626)),
+                            ),
+                            child: Padding(
+                              padding: const EdgeInsets.only(left: 0.0, right: 0),
+                              child: TextFormField(
+                                onTap: () {
+                                  VisitorsDatePicker(context);
+                                },
+                                cursorColor: Constants().primaryAppColor,
+                                controller: visitorDate,
+                                readOnly: true,
+                                decoration: InputDecoration(
+                                  prefixIcon: IconButton(
+                                    onPressed: () {
+                                      VisitorsDatePicker(context);
+                                    },
+                                    icon: const Icon(Icons.calendar_month, size: 20,),
+                                  ),
+                                  border: InputBorder.none,
+                                  hintText: "Select the Date",
+                                  hintStyle: GoogleFonts.openSans(
+                                    fontSize: 12,
+                                    fontWeight: FontWeight.w600,
+                                    color: const Color(0x7f262626),
+                                  ),
+                                ),
+                                style: GoogleFonts.openSans(
+                                  fontSize: 13,
+                                  fontWeight: FontWeight.w600,
+                                  color: Colors.black,
+                                ),
+                              ),
+                            ),
+                          ),
+
+SizedBox(width: 20,),
                           Container(
                             height: 44,
                             // width: 100,
@@ -347,6 +487,13 @@ class _Visitor_PageState extends State<Visitor_Page> {
                                     elevation: MaterialStatePropertyAll(2),
                                     backgroundColor: MaterialStatePropertyAll(Color(0xff37D1D3))),
                                 onPressed: (){
+
+                                  setState(() {
+                                selectedResidentName = 'Select Name';
+                                selectedResidentUserId = 'Select UserId';
+                                selectedRoomName = 'Select Room Name';
+                                selectedBlockName = 'Select Block Name';
+                                  });
                                   AddvisitorsPopup();
                                 }, child:
                             Row(
@@ -432,10 +579,7 @@ class _Visitor_PageState extends State<Visitor_Page> {
                          child: Center(child: KText(text:'Actions', style: GoogleFonts.openSans(fontWeight: FontWeight.w700, fontSize: 18),))),
                  ],),
                  Container(color: const Color(0xff262626).withOpacity(0.1), width: double.infinity, height: 2,),
-
-
-
-              StreamBuilder(stream: FirebaseFirestore.instance.collection('Visitors').snapshots(), builder: (context, snapshot) {
+              StreamBuilder(stream: FirebaseFirestore.instance.collection('Visitors').where('checkinDate', isEqualTo: getSelectedDate()).snapshots(), builder: (context, snapshot) {
                 if(snapshot.hasData){
                   // this is matched one with the search
                   List<DocumentSnapshot> matchedData = [];
@@ -468,12 +612,13 @@ class _Visitor_PageState extends State<Visitor_Page> {
                   }
                   // Concatenate matched data and remaining data
                   List<DocumentSnapshot> combinedData = [...matchedData, ...remainingData];
-
+                  print(snapshot.data!.docs.length);
+                  print('iuoiuji');
                   return
                       ListView.builder(
                         shrinkWrap: true,
                         itemBuilder: (context, index) {
-                          if(snapshot.hasData){
+                          if(snapshot.data!.docs.length > 0){
                             final document = combinedData[index];
                             int serialNumber = index + 1;
                             return Column(
@@ -506,7 +651,7 @@ class _Visitor_PageState extends State<Visitor_Page> {
                                       Container(
                                           height: 50,
                                           width: 200,
-                                          child: Center(child: KText( text:'${document['checkinTime']} - ${document['checkoutTime']}', style: GoogleFonts.openSans(fontWeight: FontWeight.w600, fontSize: 16, color: const Color(0xff262626).withOpacity(0.8)),))),
+                                          child: Center(child: KText( text:'${document['checkinDate']} - ${document['checkoutDate']}', style: GoogleFonts.openSans(fontWeight: FontWeight.w600, fontSize: 16, color: const Color(0xff262626).withOpacity(0.8)),))),
                                       document['checkoutTime'] == '' ?
                                       Container(
                                           height: 50,
@@ -565,28 +710,34 @@ class _Visitor_PageState extends State<Visitor_Page> {
                                     ],),
                                 ),
                                 Container(color: const Color(0xff262626).withOpacity(0.1), width: double.infinity, height: 2,),
-
                               ],
                             );
-
+                          }else {
+                            return Center(
+                              child: Padding(
+                                padding: const EdgeInsets.only(top: 40),
+                                child: Container(
+                                  color: Colors.blue,
+                                  width: 200,
+                                  height: 230,
+                                  child: Center(
+                                    child: Lottie.asset(
+                                        'assets/ui-design-/noData.json'),
+                                  ),
+                                ),
+                              ),
+                            );
                           }
-
-
-                      }, itemCount: snapshot.data!.docs.length );
+                      }, itemCount: snapshot.data!.docs.length);
                   }else{
                   return const CircularProgressIndicator();
                 }
               },)
                ],
              ),
-
            ),
            ),
-
          )
-
-
-
             ],
           ),
         ),
@@ -659,6 +810,7 @@ class _Visitor_PageState extends State<Visitor_Page> {
                     children: [
                       const SizedBox(height: 10,),
                       Divider(color: const Color(0xff262626).withOpacity(0.1), thickness: 1, height: 0.5),
+                      ///visitor name, visitor phone number, no.of visitors
                       Row(
                         mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                         children: [
@@ -727,6 +879,7 @@ class _Visitor_PageState extends State<Visitor_Page> {
                           ),
                         ],
                       ),
+                      /// from time, to time, reason
                       Row(
                         mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                         children: [
@@ -738,7 +891,7 @@ class _Visitor_PageState extends State<Visitor_Page> {
                               children: [
                                 KText(text:'From Time', style: GoogleFonts.openSans(color: const Color(0xff262626).withOpacity(0.6), fontSize: 16, fontWeight: FontWeight.w600),),
                                 Padding(
-                                  padding: const EdgeInsets.only(top: 10, bottom: 20),
+                                  padding: const EdgeInsets.only(bottom: 10, top: 10),
                                   child: Container(
                                     width: 220,
                                     height: 50,
@@ -857,7 +1010,7 @@ class _Visitor_PageState extends State<Visitor_Page> {
                           ),
                         ],
                       ),
-                
+                      /// check in date, checkout date, resident name
                       Row(
                         mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                         children: [
@@ -965,61 +1118,15 @@ class _Visitor_PageState extends State<Visitor_Page> {
                               ],
                             ),
                           ),
-                          //reason for
-                          Padding(
-                            padding: const EdgeInsets.only(top: 20.0),
-                            child: Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: [
-                                KText(text:'Resident Name', style: GoogleFonts.openSans(color: const Color(0xff262626).withOpacity(0.6), fontSize: 16, fontWeight: FontWeight.w600),),
-                                Padding(
-                                  padding: const EdgeInsets.only(bottom: 10, top: 10),
-                                  child: CustomTextField(
-                                    hint: 'Resident Name',
-                                    controller: residentName,
-                                    fillColor: Colors.white,
-                                    validator: null,
-                                    header: '',
-                                    width: 200,
-                                    height: 45,
-                                  ),
-                                ),
-                              ],
-                            ),
-                          ),
-                        ],
-                      ),
-                      Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                        children: [
-                          Padding(
-                            padding: const EdgeInsets.only(top: 20.0),
-                            child: Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: [
-                                KText(text:'Resident User ID', style: GoogleFonts.openSans(color: const Color(0xff262626).withOpacity(0.6), fontSize: 16, fontWeight: FontWeight.w600),),
-                                Padding(
-                                  padding: const EdgeInsets.only(bottom: 10, top: 10),
-                                  child: CustomTextField(
-                                    hint: 'Enter Id here',
-                                    controller: residentId,
-                                    fillColor: Colors.white,
-                                    validator: null,
-                                    header: '',
-                                    width: 200,
-                                    height: 45,
-                                  ),
-                                ),
-                              ],
-                            ),
-                          ),
-                          //block here
+
+
+                          // res name
                           Padding(
                             padding: const EdgeInsets.only(top: 20),
                             child: Column(
                               crossAxisAlignment: CrossAxisAlignment.start,
                               children: [
-                                KText(text:'Visitor Name', style: GoogleFonts.openSans(color: const Color(0xff262626).withOpacity(0.6), fontSize: 16, fontWeight: FontWeight.w600),),
+                                KText(text: 'Resident Name', style: GoogleFonts.openSans(color: const Color(0xff262626).withOpacity(0.6), fontSize: 16, fontWeight: FontWeight.w600),),
                                 Padding(
                                   padding: const EdgeInsets.only(top: 10.0, bottom: 10.0),
                                   child: Container(
@@ -1035,18 +1142,18 @@ class _Visitor_PageState extends State<Visitor_Page> {
                                         child: DropdownButtonFormField<String>(
                                           isExpanded: true,
                                           hint: const KText(text:
-                                            'Select Block Name',
+                                          'Select Resident Name',
                                             style: TextStyle(
                                               fontSize: 12,
                                               fontWeight: FontWeight.w600,
                                               color: Color(0x7f262626),
                                             ),
                                           ),
-                                          items: BlockNames.map((String item) {
+                                          items: ResidentNames.map((String item) {
                                             return DropdownMenuItem<String>(
                                               value: item,
                                               child: KText(text:
-                                                item,
+                                              item,
                                                 style: const TextStyle(
                                                   fontSize: 12,
                                                   fontWeight: FontWeight.w600,
@@ -1054,24 +1161,27 @@ class _Visitor_PageState extends State<Visitor_Page> {
                                               ),
                                             );
                                           }).toList(),
-                                          value: selectedBlockName,
+                                          value: selectedResidentName,
                                           onChanged: (String? value) async {
                                             set(() {
-                                              selectedBlockName = value!;
-                                              selectedRoomName = "Select Room Name";
+                                              selectedResidentName = value!;
                                             });
-                                            set(() {
-                                              blockRoomNames = ['Select Room Name']; // Reset room names
-                                            });
+
+                                            var docu = await FirebaseFirestore.instance.collection('Users').where('firstName', isEqualTo: selectedResidentName).get();
+                                              set(() {
+                                                selectedResidentUserId = docu.docs[0]['userid'];
+                                                selectedBlockName = docu.docs[0]['blockname'];
+                                              });
                                             try {
                                               QuerySnapshot querySnapshot = await FirebaseFirestore.instance
                                                   .collection('Room')
                                                   .where('blockname', isEqualTo: selectedBlockName)
                                                   .get();
                                               // Iterate through the documents and extract data
+                                              blockRoomNames = ['Select Room Name'];
                                               querySnapshot.docs.forEach((doc) {
                                                 String roomName = doc['roomnumber'];
-                                                if (roomName != null) {
+                                                if (roomName != "") {
                                                   set(() {
                                                     blockRoomNames.add(roomName);
                                                   });
@@ -1081,8 +1191,189 @@ class _Visitor_PageState extends State<Visitor_Page> {
                                             } catch (e) {
                                               print("Error fetching room names: $e");
                                             }
+                                         set(() {
+                                           selectedRoomName = docu.docs[0]['roomnumber'];
+                                         });
                                           },
                                           decoration: const InputDecoration(border: InputBorder.none),
+                                        ),
+                                      ),
+                                    ),
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ),
+                          const SizedBox(width: 18,),
+                        ],
+                      ),
+                      /// UserId, Block Name, Room
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                        children: [
+                          Padding(
+                            padding: const EdgeInsets.only(top: 20),
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                KText(text: 'Resident UserId', style: GoogleFonts.openSans(color: const Color(0xff262626).withOpacity(0.6), fontSize: 16, fontWeight: FontWeight.w600),),
+                                Padding(
+                                  padding: const EdgeInsets.only(top: 10.0, bottom: 10.0),
+                                  child: Container(
+                                    width: 220,
+                                    height: 50,
+                                    decoration: BoxDecoration(
+                                      border: Border.all(color: const Color(0x7f262626)),
+                                      borderRadius: BorderRadius.circular(30),
+                                    ),
+                                    child: Padding(
+                                      padding: const EdgeInsets.only(left: 12.0, right: 10),
+                                      child: DropdownButtonHideUnderline(
+                                        child: DropdownButtonFormField<String>(
+                                          isExpanded: true,
+                                          hint: const KText(text:
+                                          'Select Resident UserId',
+                                            style: TextStyle(
+                                              fontSize: 12,
+                                              fontWeight: FontWeight.w600,
+                                              color: Color(0x7f262626),
+                                            ),
+                                          ),
+                                          items: ResidentUserIds.map((String item) {
+                                            return DropdownMenuItem<String>(
+                                              value: item,
+                                              child: KText(text:
+                                              item,
+                                                style: const TextStyle(
+                                                  fontSize: 12,
+                                                  fontWeight: FontWeight.w600,
+                                                ),
+                                              ),
+                                            );
+                                          }).toList(),
+                                          value: selectedResidentUserId,
+                                          // onChanged: (String? value) async {
+                                          //   set(() {
+                                          //     selectedResidentUserId = value!;
+                                          //   });
+                                          // },
+                                          onChanged: (String? value) async {
+                                            set(() {
+                                              selectedResidentUserId = value!;
+                                            });
+                                            var docu = await FirebaseFirestore.instance.collection('Users').where('userid', isEqualTo: selectedResidentUserId).get();
+                                            set(() {
+                                              selectedRoomName = docu.docs[0]['roomnumber'];
+                                              selectedBlockName = docu.docs[0]['blockname'];
+                                              selectedResidentName = docu.docs[0]['firstName'];
+                                            });
+                                            try {
+                                              QuerySnapshot querySnapshot = await FirebaseFirestore.instance
+                                                  .collection('Room')
+                                                  .where('blockname', isEqualTo: selectedBlockName)
+                                                  .get();
+                                              // Iterate through the documents and extract data
+                                              querySnapshot.docs.forEach((doc) {
+                                                String roomName = doc['roomnumber'];
+                                                if (roomName != "") {
+                                                  set(() {
+                                                    blockRoomNames.add(roomName);
+                                                  });
+                                                }
+                                              });
+                                              print(blockRoomNames);
+                                            } catch (e) {
+                                              print("Error fetching room names: $e");
+                                            }
+                                            set(() {
+                                              selectedRoomName = docu.docs[0]['roomnumber'];
+                                            });
+                                          },
+                                          decoration: const InputDecoration(border: InputBorder.none),
+                                        ),
+                                      ),
+                                    ),
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ),
+                          //block here
+                          Padding(
+                            padding: const EdgeInsets.only(top: 20),
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                KText(text: 'Block Name', style: GoogleFonts.openSans(color: const Color(0xff262626).withOpacity(0.6), fontSize: 16, fontWeight: FontWeight.w600),),
+                                Padding(
+                                  padding: const EdgeInsets.only(top: 10.0, bottom: 10.0),
+                                  child: Container(
+                                    width: 220,
+                                    height: 50,
+                                    decoration: BoxDecoration(
+                                      border: Border.all(color: const Color(0x7f262626)),
+                                      borderRadius: BorderRadius.circular(30),
+                                    ),
+                                    child: Padding(
+                                      padding: const EdgeInsets.only(left: 12.0, right: 10),
+                                      child: IgnorePointer(
+
+                                        child: DropdownButtonHideUnderline(
+
+                                          child: DropdownButtonFormField<String>(
+
+                                            isExpanded: true,
+                                            hint: const KText(text:
+                                              'Select Block Name',
+                                              style: TextStyle(
+                                                fontSize: 12,
+                                                fontWeight: FontWeight.w600,
+                                                color: Color(0x7f262626),
+                                              ),
+                                            ),
+                                            items: BlockNames.map((String item) {
+                                              return DropdownMenuItem<String>(
+                                                value: item,
+                                                child: KText(text:
+                                                  item,
+                                                  style: const TextStyle(
+                                                    fontSize: 12,
+                                                    fontWeight: FontWeight.w600,
+                                                  ),
+                                                ),
+                                              );
+                                            }).toList(),
+                                            value: selectedBlockName,
+                                            onChanged: (String? value) async {
+                                              // set(() {
+                                              //   // selectedBlockName = value!;
+                                              //   selectedRoomName = "Select Room Name";
+                                              // });
+                                              // set(() {
+                                              //   blockRoomNames = ['Select Room Name'];
+                                              // }
+                                              // );
+                                              // try {
+                                              //   QuerySnapshot querySnapshot = await FirebaseFirestore.instance
+                                              //       .collection('Room')
+                                              //       .where('blockname', isEqualTo: selectedBlockName)
+                                              //       .get();
+                                              //   // Iterate through the documents and extract data
+                                              //   querySnapshot.docs.forEach((doc) {
+                                              //     String roomName = doc['roomnumber'];
+                                              //     if (roomName != null) {
+                                              //       set(() {
+                                              //         blockRoomNames.add(roomName);
+                                              //       });
+                                              //     }
+                                              //   });
+                                              //   print(blockRoomNames);
+                                              // } catch (e) {
+                                              //   print("Error fetching room names: $e");
+                                              // }
+                                            },
+                                            decoration: const InputDecoration(border: InputBorder.none),
+                                          ),
                                         ),
                                       ),
                                     ),
@@ -1108,37 +1399,39 @@ class _Visitor_PageState extends State<Visitor_Page> {
                                   ),
                                   child: Padding(
                                     padding: const EdgeInsets.only(left: 12.0, right: 6),
-                                    child: DropdownButtonHideUnderline(
-                                      child: DropdownButtonFormField<String>(
-                                        isExpanded: true,
-                                        hint: const KText(text:
-                                          'Select Room Name',
-                                          style: TextStyle(
-                                            fontSize: 12,
-                                            fontWeight: FontWeight.w600,
-                                            color: Color(0x7f262626),
-                                          ),
-                                        ),
-                                        items: blockRoomNames.map((String item) {
-                                          return DropdownMenuItem<String>(
-                                            value: item,
-                                            child: KText(
-                                              text:
-                                              item,
-                                              style: const TextStyle(
-                                                fontSize: 12,
-                                                fontWeight: FontWeight.w600,
-                                              ),
+                                    child: IgnorePointer(
+                                      child: DropdownButtonHideUnderline(
+                                        child: DropdownButtonFormField<String>(
+                                          isExpanded: true,
+                                          hint: const KText(text:
+                                            'Select Room Name',
+                                            style: TextStyle(
+                                              fontSize: 12,
+                                              fontWeight: FontWeight.w600,
+                                              color: Color(0x7f262626),
                                             ),
-                                          );
-                                        }).toList(),
-                                        value: selectedRoomName,
-                                        onChanged: (String? value) {
-                                          setState(() {
-                                            selectedRoomName = value!;
-                                          });
-                                        },
-                                        decoration: const InputDecoration(border: InputBorder.none),
+                                          ),
+                                          items: blockRoomNames.map((String item) {
+                                            return DropdownMenuItem<String>(
+                                              value: item,
+                                              child: KText(
+                                                text:
+                                                item,
+                                                style: const TextStyle(
+                                                  fontSize: 12,
+                                                  fontWeight: FontWeight.w600,
+                                                ),
+                                              ),
+                                            );
+                                          }).toList(),
+                                          value: selectedRoomName,
+                                          onChanged: (String? value) {
+                                            setState(() {
+                                              selectedRoomName = value!;
+                                            });
+                                          },
+                                          decoration: const InputDecoration(border: InputBorder.none),
+                                        ),
                                       ),
                                     ),
                                   ),
@@ -1149,6 +1442,7 @@ class _Visitor_PageState extends State<Visitor_Page> {
                         ],
                       ),
                       const SizedBox(height: 20),
+                      /// For Button
                       Row(
                         mainAxisAlignment: MainAxisAlignment.spaceBetween,
                         // mainAxisAlignment: MainAxisAlignment.center,
@@ -1165,7 +1459,7 @@ class _Visitor_PageState extends State<Visitor_Page> {
                                       backgroundColor: MaterialStatePropertyAll(Color(0xfff5f6f7))),
                                   onPressed: (){
                                     visitorName.clear();
-                                    residentId.clear();
+                                    // residentId.clear();
                                     visitorNumber.clear();
                                     totalVisitors.clear();
                                     reasonFor.clear();
@@ -1173,6 +1467,13 @@ class _Visitor_PageState extends State<Visitor_Page> {
                                     checkInDate.clear();
                                     checkOutTime.clear();
                                     checkOutDate.clear();
+                                    set(() {
+                                      selectedResidentName = 'Select Name';
+                                      selectedResidentUserId = 'Select Id';
+                                      selectedRoomName = 'Select Room Name';
+                                      selectedBlockName = 'Select Block Name';
+                                    });
+
                                   }, child:
                                 KText(text:
                                   'Clear All',
@@ -1221,7 +1522,7 @@ class _Visitor_PageState extends State<Visitor_Page> {
                                   onPressed: () {
                                     if (
                                     visitorName.text.isNotEmpty &&
-                                        residentId.text.isNotEmpty &&
+                                        // residentId.text.isNotEmpty &&
                                         visitorNumber.text.isNotEmpty &&
                                         totalVisitors.text.isNotEmpty &&
                                         reasonFor.text.isNotEmpty &&
@@ -1229,18 +1530,17 @@ class _Visitor_PageState extends State<Visitor_Page> {
                                         checkInDate.text.isNotEmpty
                                     ) {
                                       final visitorname = visitorName.text;
-                                      final residentid = residentId.text;
+                                      // final residentid = residentId.text;
                                       final visitornumber = visitorNumber.text;
-
                                       final checkinTime = checkInTime.text;
                                       final checkoutTime = checkOutTime.text;
 
                                       final checkinDate = checkInDate.text;
                                       final checkoutDate = checkOutDate.text;
-
-                                      final residentname = residentName.text;
                                       final totalvisitors = totalVisitors.text;
                                       final blockname = selectedBlockName;
+                                      final residentname = selectedResidentName;
+                                      final residentuserid = selectedResidentUserId;
                                       final roomname = selectedRoomName;
                                       final ReasonFor = reasonFor.text;
                                       bool Status = true;
@@ -1255,8 +1555,8 @@ class _Visitor_PageState extends State<Visitor_Page> {
                                       }
                                       createVisitor(
                                           visitorname,  visitornumber, totalvisitors, checkinTime,
-                                          checkoutTime,  checkinDate,  checkoutDate,  residentname,  residentid, blockname, roomname, ReasonFor, Status!)
-                                          .then((_) {
+                                          checkoutTime,  checkinDate,  checkoutDate,  residentname,  residentuserid, blockname, roomname, ReasonFor, Status!)
+                                          .then((_) async {
                                         showTopSnackBar(
                                           Overlay.of(context),
                                           const CustomSnackBar.success(
@@ -1265,6 +1565,20 @@ class _Visitor_PageState extends State<Visitor_Page> {
                                             "Added successfully!",
                                           ),
                                         );
+
+                                        QuerySnapshot userQuerySnapshot = await FirebaseFirestore.instance.collection('Users').where('userid', isEqualTo: selectedResidentUserId).get();
+
+                                        if (userQuerySnapshot.docs.isNotEmpty) {
+                                          String token = userQuerySnapshot.docs.first['fcmToken'];
+
+                                          // Send the push notification
+                                          sendPushMessage(token: token, body: '${visitorName.text} came to Hostel to Visit you', title: 'Visitor');
+                                        } else {
+                                          print('User not found');
+                                          // Handle the case where the user is not found
+                                        }
+
+
                                         visitorName.clear();
                                         residentId.clear();
                                         visitorNumber.clear();
@@ -1280,6 +1594,7 @@ class _Visitor_PageState extends State<Visitor_Page> {
                                         ScaffoldMessenger.of(context).showSnackBar(SnackBar(
                                           content: KText(text:'Error adding visitor: $error', style: GoogleFonts.openSans(),),
                                         ));
+
                                       });
                                     } else {
                                       // Navigator.pop(context);
@@ -1733,61 +2048,12 @@ class _Visitor_PageState extends State<Visitor_Page> {
                                 ],
                               ),
                             ),
-                            //reason for
-                            Padding(
-                              padding: const EdgeInsets.only(top: 20.0),
-                              child: Column(
-                                crossAxisAlignment: CrossAxisAlignment.start,
-                                children: [
-                                  KText(text:'Resident Name', style: GoogleFonts.openSans(color: const Color(0xff262626).withOpacity(0.6), fontSize: 16, fontWeight: FontWeight.w600),),
-                                  Padding(
-                                    padding: const EdgeInsets.only(bottom: 10, top: 10),
-                                    child: CustomTextField(
-                                      hint: 'Resident Name',
-                                      controller: residentName,
-                                      fillColor: Colors.white,
-                                      validator: null,
-                                      header: '',
-                                      width: 200,
-                                      height: 45,
-                                    ),
-                                  ),
-                                ],
-                              ),
-                            ),
-                          ],
-                        ),
-                        Row(
-                          mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                          children: [
-                            Padding(
-                              padding: const EdgeInsets.only(top: 20.0),
-                              child: Column(
-                                crossAxisAlignment: CrossAxisAlignment.start,
-                                children: [
-                                  KText(text:'Resident User ID', style: GoogleFonts.openSans(color: const Color(0xff262626).withOpacity(0.6), fontSize: 16, fontWeight: FontWeight.w600),),
-                                  Padding(
-                                    padding: const EdgeInsets.only(bottom: 10, top: 10),
-                                    child: CustomTextField(
-                                      hint: 'Enter Id here',
-                                      controller: residentId,
-                                      fillColor: Colors.white,
-                                      validator: null,
-                                      header: '',
-                                      width: 200,
-                                      height: 45,
-                                    ),
-                                  ),
-                                ],
-                              ),
-                            ),
-                            //block here
                             Padding(
                               padding: const EdgeInsets.only(top: 20),
                               child: Column(
                                 crossAxisAlignment: CrossAxisAlignment.start,
                                 children: [
-                                  KText(text:'Visitor Name', style: GoogleFonts.openSans(color: const Color(0xff262626).withOpacity(0.6), fontSize: 16, fontWeight: FontWeight.w600),),
+                                  KText(text: 'Resident Name', style: GoogleFonts.openSans(color: const Color(0xff262626).withOpacity(0.6), fontSize: 16, fontWeight: FontWeight.w600),),
                                   Padding(
                                     padding: const EdgeInsets.only(top: 10.0, bottom: 10.0),
                                     child: Container(
@@ -1803,18 +2069,18 @@ class _Visitor_PageState extends State<Visitor_Page> {
                                           child: DropdownButtonFormField<String>(
                                             isExpanded: true,
                                             hint: const KText(text:
-                                              'Select Block Name',
+                                            'Select Resident Name',
                                               style: TextStyle(
                                                 fontSize: 12,
                                                 fontWeight: FontWeight.w600,
                                                 color: Color(0x7f262626),
                                               ),
                                             ),
-                                            items: BlockNames.map((String item) {
+                                            items: ResidentNames.map((String item) {
                                               return DropdownMenuItem<String>(
                                                 value: item,
                                                 child: KText(text:
-                                                  item,
+                                                item,
                                                   style: const TextStyle(
                                                     fontSize: 12,
                                                     fontWeight: FontWeight.w600,
@@ -1822,14 +2088,15 @@ class _Visitor_PageState extends State<Visitor_Page> {
                                                 ),
                                               );
                                             }).toList(),
-                                            value: selectedBlockName,
+                                            value: selectedResidentName,
                                             onChanged: (String? value) async {
                                               set(() {
-                                                selectedBlockName = value!;
-                                                selectedRoomName = "Select Room Name";
+                                                selectedResidentName = value!;
                                               });
+                                              var docu = await FirebaseFirestore.instance.collection('Users').where('firstName', isEqualTo: selectedResidentName).get();
                                               set(() {
-                                                blockRoomNames = ['Select Room Name']; // Reset room names
+                                                selectedResidentUserId = docu.docs[0]['userid'];
+                                                selectedBlockName = docu.docs[0]['blockname'];
                                               });
                                               try {
                                                 QuerySnapshot querySnapshot = await FirebaseFirestore.instance
@@ -1839,7 +2106,7 @@ class _Visitor_PageState extends State<Visitor_Page> {
                                                 // Iterate through the documents and extract data
                                                 querySnapshot.docs.forEach((doc) {
                                                   String roomName = doc['roomnumber'];
-                                                  if (roomName != null) {
+                                                  if (roomName != "") {
                                                     set(() {
                                                       blockRoomNames.add(roomName);
                                                     });
@@ -1849,8 +2116,189 @@ class _Visitor_PageState extends State<Visitor_Page> {
                                               } catch (e) {
                                                 print("Error fetching room names: $e");
                                               }
+                                              set(() {
+                                                selectedRoomName = docu.docs[0]['roomnumber'];
+                                              });
                                             },
                                             decoration: const InputDecoration(border: InputBorder.none),
+                                          ),
+                                        ),
+                                      ),
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            ),
+                            const SizedBox(width: 18,),
+                          ],
+                        ),
+                        Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                          children: [
+                            Padding(
+                              padding: const EdgeInsets.only(top: 20),
+                              child: Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  KText(text: 'Resident UserId', style: GoogleFonts.openSans(color: const Color(0xff262626).withOpacity(0.6), fontSize: 16, fontWeight: FontWeight.w600),),
+                                  Padding(
+                                    padding: const EdgeInsets.only(top: 10.0, bottom: 10.0),
+                                    child: Container(
+                                      width: 220,
+                                      height: 50,
+                                      decoration: BoxDecoration(
+                                        border: Border.all(color: const Color(0x7f262626)),
+                                        borderRadius: BorderRadius.circular(30),
+                                      ),
+                                      child: Padding(
+                                        padding: const EdgeInsets.only(left: 12.0, right: 10),
+                                        child: DropdownButtonHideUnderline(
+                                          child: DropdownButtonFormField<String>(
+                                            isExpanded: true,
+                                            hint: const KText(text:
+                                            'Select Resident UserId',
+                                              style: TextStyle(
+                                                fontSize: 12,
+                                                fontWeight: FontWeight.w600,
+                                                color: Color(0x7f262626),
+                                              ),
+                                            ),
+                                            items: ResidentUserIds.map((String item) {
+                                              return DropdownMenuItem<String>(
+                                                value: item,
+                                                child: KText(text:
+                                                item,
+                                                  style: const TextStyle(
+                                                    fontSize: 12,
+                                                    fontWeight: FontWeight.w600,
+                                                  ),
+                                                ),
+                                              );
+                                            }).toList(),
+                                            value: selectedResidentUserId,
+                                            // onChanged: (String? value) async {
+                                            //   set(() {
+                                            //     selectedResidentUserId = value!;
+                                            //   });
+                                            // },
+                                            onChanged: (String? value) async {
+                                              set(() {
+                                                selectedResidentUserId = value!;
+                                              });
+                                              var docu = await FirebaseFirestore.instance.collection('Users').where('userid', isEqualTo: selectedResidentUserId).get();
+                                              set(() {
+                                                selectedRoomName = docu.docs[0]['roomnumber'];
+                                                selectedBlockName = docu.docs[0]['blockname'];
+                                                selectedResidentName = docu.docs[0]['firstName'];
+                                              });
+                                              try {
+                                                QuerySnapshot querySnapshot = await FirebaseFirestore.instance
+                                                    .collection('Room')
+                                                    .where('blockname', isEqualTo: selectedBlockName)
+                                                    .get();
+                                                // Iterate through the documents and extract data
+                                                querySnapshot.docs.forEach((doc) {
+                                                  String roomName = doc['roomnumber'];
+                                                  if (roomName != "") {
+                                                    set(() {
+                                                      blockRoomNames.add(roomName);
+                                                    });
+                                                  }
+                                                });
+                                                print(blockRoomNames);
+                                              } catch (e) {
+                                                print("Error fetching room names: $e");
+                                              }
+                                              set(() {
+                                                selectedRoomName = docu.docs[0]['roomnumber'];
+                                              });
+                                            },
+
+                                            decoration: const InputDecoration(border: InputBorder.none),
+                                          ),
+                                        ),
+                                      ),
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            ),
+                            //block here
+                            Padding(
+                              padding: const EdgeInsets.only(top: 20),
+                              child: Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  KText(text: 'Block Name', style: GoogleFonts.openSans(color: const Color(0xff262626).withOpacity(0.6), fontSize: 16, fontWeight: FontWeight.w600),),
+                                  Padding(
+                                    padding: const EdgeInsets.only(top: 10.0, bottom: 10.0),
+                                    child: Container(
+                                      width: 220,
+                                      height: 50,
+                                      decoration: BoxDecoration(
+                                        border: Border.all(color: const Color(0x7f262626)),
+                                        borderRadius: BorderRadius.circular(30),
+                                      ),
+                                      child: Padding(
+                                        padding: const EdgeInsets.only(left: 12.0, right: 10),
+                                        child: IgnorePointer(
+
+                                          child: DropdownButtonHideUnderline(
+
+                                            child: DropdownButtonFormField<String>(
+
+                                              isExpanded: true,
+                                              hint: const KText(text:
+                                              'Select Block Name',
+                                                style: TextStyle(
+                                                  fontSize: 12,
+                                                  fontWeight: FontWeight.w600,
+                                                  color: Color(0x7f262626),
+                                                ),
+                                              ),
+                                              items: BlockNames.map((String item) {
+                                                return DropdownMenuItem<String>(
+                                                  value: item,
+                                                  child: KText(text:
+                                                  item,
+                                                    style: const TextStyle(
+                                                      fontSize: 12,
+                                                      fontWeight: FontWeight.w600,
+                                                    ),
+                                                  ),
+                                                );
+                                              }).toList(),
+                                              value: selectedBlockName,
+                                              onChanged: (String? value) async {
+                                                // set(() {
+                                                //   // selectedBlockName = value!;
+                                                //   selectedRoomName = "Select Room Name";
+                                                // });
+                                                // set(() {
+                                                //   blockRoomNames = ['Select Room Name'];
+                                                // }
+                                                // );
+                                                // try {
+                                                //   QuerySnapshot querySnapshot = await FirebaseFirestore.instance
+                                                //       .collection('Room')
+                                                //       .where('blockname', isEqualTo: selectedBlockName)
+                                                //       .get();
+                                                //   // Iterate through the documents and extract data
+                                                //   querySnapshot.docs.forEach((doc) {
+                                                //     String roomName = doc['roomnumber'];
+                                                //     if (roomName != null) {
+                                                //       set(() {
+                                                //         blockRoomNames.add(roomName);
+                                                //       });
+                                                //     }
+                                                //   });
+                                                //   print(blockRoomNames);
+                                                // } catch (e) {
+                                                //   print("Error fetching room names: $e");
+                                                // }
+                                              },
+                                              decoration: const InputDecoration(border: InputBorder.none),
+                                            ),
                                           ),
                                         ),
                                       ),
@@ -1876,36 +2324,39 @@ class _Visitor_PageState extends State<Visitor_Page> {
                                     ),
                                     child: Padding(
                                       padding: const EdgeInsets.only(left: 12.0, right: 6),
-                                      child: DropdownButtonHideUnderline(
-                                        child: DropdownButtonFormField<String>(
-                                          isExpanded: true,
-                                          hint: const KText(text:
+                                      child: IgnorePointer(
+                                        child: DropdownButtonHideUnderline(
+                                          child: DropdownButtonFormField<String>(
+                                            isExpanded: true,
+                                            hint: const KText(text:
                                             'Select Room Name',
-                                            style: TextStyle(
-                                              fontSize: 12,
-                                              fontWeight: FontWeight.w600,
-                                              color: Color(0x7f262626),
-                                            ),
-                                          ),
-                                          items: blockRoomNames.map((String item) {
-                                            return DropdownMenuItem<String>(
-                                              value: item,
-                                              child: KText(text:
-                                                item,
-                                                style: const TextStyle(
-                                                  fontSize: 12,
-                                                  fontWeight: FontWeight.w600,
-                                                ),
+                                              style: TextStyle(
+                                                fontSize: 12,
+                                                fontWeight: FontWeight.w600,
+                                                color: Color(0x7f262626),
                                               ),
-                                            );
-                                          }).toList(),
-                                          value: selectedRoomName,
-                                          onChanged: (String? value) {
-                                            setState(() {
-                                              selectedRoomName = value!;
-                                            });
-                                          },
-                                          decoration: const InputDecoration(border: InputBorder.none),
+                                            ),
+                                            items: blockRoomNames.map((String item) {
+                                              return DropdownMenuItem<String>(
+                                                value: item,
+                                                child: KText(
+                                                  text:
+                                                  item,
+                                                  style: const TextStyle(
+                                                    fontSize: 12,
+                                                    fontWeight: FontWeight.w600,
+                                                  ),
+                                                ),
+                                              );
+                                            }).toList(),
+                                            value: selectedRoomName,
+                                            onChanged: (String? value) {
+                                              setState(() {
+                                                selectedRoomName = value!;
+                                              });
+                                            },
+                                            decoration: const InputDecoration(border: InputBorder.none),
+                                          ),
                                         ),
                                       ),
                                     ),
@@ -1915,6 +2366,7 @@ class _Visitor_PageState extends State<Visitor_Page> {
                             ),
                           ],
                         ),
+
                         const SizedBox(height: 20),
                         Row(
                           mainAxisAlignment: MainAxisAlignment.end,
@@ -1977,7 +2429,7 @@ class _Visitor_PageState extends State<Visitor_Page> {
                                     backgroundColor: MaterialStatePropertyAll(Color(0xff37D1D3))
                                 ),
                                 // Adjusted onPressed callback
-                                onPressed: () {
+                                onPressed: () async {
                                   bool Status = true;
                                   final checkoutDate = checkOutDate.text;
                                   final checkoutTime = checkOutTime.text;
@@ -1995,6 +2447,22 @@ class _Visitor_PageState extends State<Visitor_Page> {
                                       "Added successfully!",
                                     ),
                                   );
+
+
+                                  QuerySnapshot userQuerySnapshot = await FirebaseFirestore.instance.collection('Users').where('userid', isEqualTo: selectedResidentUserId).get();
+
+                                  if (userQuerySnapshot.docs.isNotEmpty) {
+                                    String token = userQuerySnapshot.docs.first['fcmToken'];
+
+                                    // Send the push notification
+                                    sendPushMessage(token: token, body: '${visitorName.text} went outside the Hostel', title: 'Visitor');
+                                  } else {
+                                    print('User not found');
+                                    // Handle the case where the user is not found
+                                  }
+
+
+
                                   visitorName.clear();
                                   residentId.clear();
                                   visitorNumber.clear();
@@ -2066,7 +2534,7 @@ class _Visitor_PageState extends State<Visitor_Page> {
   }
   // for update passing (id to get the EXACT person)
   updateuser(id, Status){
-    FirebaseFirestore.instance.collection("Visitors").doc(id).set({
+    FirebaseFirestore.instance.collection("Visitors").doc(id).update({
       "name":visitorName.text,
       "number" :visitorNumber.text,
       "totalvisitors" : totalVisitors.text,
@@ -2076,7 +2544,7 @@ class _Visitor_PageState extends State<Visitor_Page> {
       "reason":reasonFor.text,
       "checkinDate" : checkInDate.text,
       "checkoutDate" : checkOutDate.text,
-      "residentname":residentName.text,
+      "residentname":selectedResidentName,
       "residentid" : residentId.text,
       "blockname" : selectedBlockName,
       "roomname" : selectedRoomName,
@@ -2165,13 +2633,29 @@ class _Visitor_PageState extends State<Visitor_Page> {
                       children: [
                         Container(
                             width: 150,
-                            child: KText(text:'Visitor ID', style: GoogleFonts.openSans(fontWeight: FontWeight.w600),)),
+                            child: KText(text:'Receiver User ID', style: GoogleFonts.openSans(fontWeight: FontWeight.w600),)),
+                        Container(
+                            width: 70,
+                            child: Center(child: KText(text:':', style: GoogleFonts.openSans(fontWeight: FontWeight.w600),))),
+                        Container(
+
+                            width: 150,
+                            child: KText(text:'${visitorData['residentid']}',style: GoogleFonts.openSans(fontWeight: FontWeight.w600, color: const Color(0xff262626).withOpacity(0.8)),)),
+                      ],
+                    ),
+                    const SizedBox(height: 4,),
+                    ///name
+                    Row(
+                      children: [
+                        Container(
+                            width: 150,
+                            child: KText(text:'Receiver Name', style: GoogleFonts.openSans(fontWeight: FontWeight.w600),)),
                         Container(
                             width: 70,
                             child: Center(child: KText(text:':', style: GoogleFonts.openSans(fontWeight: FontWeight.w600),))),
                         Container(
                             width: 150,
-                            child: KText(text:'${visitorData['residentid']}',style: GoogleFonts.openSans(fontWeight: FontWeight.w600, color: const Color(0xff262626).withOpacity(0.8)),)),
+                            child: KText(text:'${visitorData['residentname']}',style: GoogleFonts.openSans(fontWeight: FontWeight.w600, color: const Color(0xff262626).withOpacity(0.8)),)),
                       ],
                     ),
                     const SizedBox(height: 4,),
@@ -2179,13 +2663,27 @@ class _Visitor_PageState extends State<Visitor_Page> {
                       children: [
                         Container(
                             width: 150,
-                            child: KText(text:'Date', style: GoogleFonts.openSans(fontWeight: FontWeight.w600),)),
+                            child: KText(text:'Check in Date', style: GoogleFonts.openSans(fontWeight: FontWeight.w600),)),
                         Container(
                             width: 70,
                             child: Center(child: KText(text:':', style: GoogleFonts.openSans(fontWeight: FontWeight.w600),))),
                         Container(
                             width: 150,
                             child: KText(text:'${visitorData['checkinDate']}',style: GoogleFonts.openSans(fontWeight: FontWeight.w600, color: const Color(0xff262626).withOpacity(0.8)),)),
+                      ],
+                    ),
+                    const SizedBox(height: 4,),
+                    Row(
+                      children: [
+                        Container(
+                            width: 150,
+                            child: KText(text:'Check out Date', style: GoogleFonts.openSans(fontWeight: FontWeight.w600),)),
+                        Container(
+                            width: 70,
+                            child: Center(child: KText(text:':', style: GoogleFonts.openSans(fontWeight: FontWeight.w600),))),
+                        Container(
+                            width: 150,
+                            child: KText(text:'${visitorData['checkoutDate']}',style: GoogleFonts.openSans(fontWeight: FontWeight.w600, color: const Color(0xff262626).withOpacity(0.8)),)),
                       ],
                     ),
                     const SizedBox(height: 4,),
@@ -2219,21 +2717,7 @@ class _Visitor_PageState extends State<Visitor_Page> {
                       ],
                     ),
                     const SizedBox(height: 4,),
-                    Row(
-                      children: [
-                        Container(
-                            width: 150,
-                            child: KText(text:'Receiver User ID', style: GoogleFonts.openSans(fontWeight: FontWeight.w600),)),
-                        Container(
-                            width: 70,
-                            child: Center(child: KText(text:':', style: GoogleFonts.openSans(fontWeight: FontWeight.w600),))),
-                        Container(
 
-                            width: 150,
-                            child: KText(text:'${visitorData['residentid']}',style: GoogleFonts.openSans(fontWeight: FontWeight.w600, color: const Color(0xff262626).withOpacity(0.8)),)),
-                      ],
-                    ),
-                    const SizedBox(height: 4,),
                     Row(
                       children: [
                         Container(
@@ -2315,10 +2799,6 @@ class _Visitor_PageState extends State<Visitor_Page> {
         elevation: 8.0,
         useRootNavigator: true);
   }
-
-
-
-
   Future<void> _generateCSVAndView(BuildContext context) async {
     final List<List<dynamic>> data = [[
       'Visitor Name',
@@ -2481,6 +2961,77 @@ class _Visitor_PageState extends State<Visitor_Page> {
     });
     return userData;
   }
+
+  ///Date Picker
+  Future<void> VisitorsDatePicker(BuildContext context) async {
+    final DateTime? picked = await showDatePicker(
+      context: context,
+      firstDate: DateTime.now().subtract(const Duration(days: 365)),
+      lastDate: DateTime.now(),
+      initialDate: selectedVisitorDate ?? DateTime.now(),
+    );
+    if (picked != null) {
+      setState(() {
+        selectedVisitorDate = picked;
+        visitorDate.text = DateFormat('dd-MM-yyyy').format(picked);
+      });
+      fetchVisitorsData(DateFormat('dd-MM-yyyy').format(picked));
+    } else {
+      setState(() {
+        selectedVisitorDate = DateTime.now();
+        visitorDate.text = DateFormat('dd-MM-yyyy').format(DateTime.now());
+      });
+      fetchVisitorsData(DateFormat('dd-MM-yyyy').format(DateTime.now()));
+    }
+  }
+
+  ///fetch visitor data
+  Future fetchVisitorsData(String selectedDate) async {
+    DocumentSnapshot attendanceDoc = await FirebaseFirestore.instance
+        .collection('Visitors')
+        .doc(selectedDate)
+        .get();
+    if (attendanceDoc.exists) {
+      // Data is available
+      isDataAvailable = true;
+    } else {
+      // Data is not available
+      isDataAvailable = false;
+    }
+  }
+
+  ///Notification
+  void sendPushMessage({required String token, required String body, required String title}) async {
+    try {
+      await http.post(
+        Uri.parse('https://fcm.googleapis.com/fcm/send'),
+        headers: <String, String>{
+          'Content-Type': 'application/json',
+          'Authorization':
+          'key=${Constants.apiKeyForNotification}',
+        },
+        body: jsonEncode(
+          <String, dynamic>{
+            'notification': <String, dynamic>{'body': body, 'title': title},
+            'priority': 'high',
+            'data': <String, dynamic>{
+              'click_action': 'FLUTTER_NOTIFICATION_CLICK',
+              'id': '1',
+              'status': 'done'
+            },
+            "to": token,
+          },
+        ),
+      );
+    } catch (e) {
+      print("error push notification");
+    }
+  }
+
+
+
+
+
 
 
 }

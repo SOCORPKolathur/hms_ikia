@@ -8,6 +8,7 @@ import 'package:hms_ikia/Constants/constants.dart';
 import 'package:hms_ikia/Views/ComNotifications.dart';
 import 'package:hms_ikia/Views/SMSPage.dart';
 import 'package:hms_ikia/Views/asset_tab.dart';
+import 'package:hms_ikia/Views/birthday_wishes.dart';
 import 'package:hms_ikia/Views/block_name.dart';
 import 'package:hms_ikia/Views/complains.dart';
 import 'package:hms_ikia/Views/email.dart';
@@ -31,6 +32,7 @@ class HomeDrawer extends StatefulWidget {
 class _HomeDrawerState extends State<HomeDrawer> {
   int dawer = 0;
   var pages;
+  bool isOn = false;
   @override
   void initState() {
     //addinglist();
@@ -799,8 +801,10 @@ class _HomeDrawerState extends State<HomeDrawer> {
                                   Padding(
                                     padding: const EdgeInsets.symmetric(horizontal: 6),
                                     child: AnimatedContainer(
-                                      height:  dawer == 9
-                                          ? 170 : 35,
+                                      // height:  dawer == 9
+                                      //     ? 170 : 35,
+                                      height: dawer == 9 && isOn == true ? 170 : 40,
+
                                       decoration: BoxDecoration(
                                         borderRadius: BorderRadius.circular(10),
                                       ),
@@ -815,17 +819,18 @@ class _HomeDrawerState extends State<HomeDrawer> {
                                             padding: const EdgeInsets.only(left: 50),
                                             width:  dawer == 9
                                                 ? 200 : 0,
-                                            height: dawer == 9
-                                                ? 170 : 35,
+                                            // height: dawer == 9
+                                            //     ? 170 : 35,
+                                            height: isOn == true && dawer == 9 ? 170 : 40,
                                             decoration: BoxDecoration(
                                               borderRadius: BorderRadius.circular(20),
                                               color: dawer == 9
                                                   ? Constants().primaryAppColor : Colors.transparent,
                                             ),
-
                                           ),
                                           InkWell(
                                             onTap: () {
+                                              isOn = !isOn;
                                               setState(() {
                                                 dawer=9;
                                                 col1=false;
@@ -1197,6 +1202,78 @@ class _HomeDrawerState extends State<HomeDrawer> {
                                 ],
                               ),
                             ),
+                            Visibility(
+                              visible: modules.contains("Birthday Wishes"),
+                              child: Column(
+                                children: [
+                                  Padding(
+                                    padding: const EdgeInsets.symmetric(horizontal: 6),
+                                    child: AnimatedContainer(
+                                      height: 35,
+                                      decoration: BoxDecoration(
+                                        borderRadius: BorderRadius.circular(10),
+                                      ),
+                                      padding:  EdgeInsets.only(left: dawer == 15 ? 10.0 :0),
+                                      duration: const Duration(milliseconds: 700),
+                                      child: Stack(
+                                        alignment: Alignment.centerLeft,
+                                        children: [
+                                          AnimatedContainer(
+                                            curve: Curves.fastOutSlowIn,
+                                            duration: const Duration(milliseconds: 700),
+                                            padding: const EdgeInsets.only(left: 50),
+                                            width:  dawer == 15
+                                                ? 200 : 0,
+                                            decoration: BoxDecoration(
+                                              borderRadius: BorderRadius.circular(20),
+                                              color: dawer == 15
+                                                  ? Constants().primaryAppColor : Colors.transparent,
+                                            ),
+                                          ),
+                                          InkWell(
+                                            onTap: () {
+                                              setState(() {
+                                                // pages = Dashboard2(currentRole: widget.currentRole, sessionStateStream: widget.sessionStateStream);
+                                                pages = const BirthdayWishes();
+                                                dawer=15;
+                                                col1=false;
+                                                col2=false;
+                                                col3=false;
+                                                col4=false;
+                                                col5=false;
+                                                col6=false;
+                                                col7=false;
+                                                col8=false;
+                                                col9=false;
+                                                pagename="";
+                                              });
+                                            },
+                                            child: Row(
+                                              children: [
+                                                Padding(
+                                                  padding: const EdgeInsets.only(left: 8.0),
+                                                  child: KText(text:
+                                                  "Birthday Wishes",
+                                                    style: GoogleFonts.openSans(
+                                                        fontSize: width/95,
+                                                        fontWeight: FontWeight.w500,
+                                                        color: dawer == 15 ?  Colors.white : const Color(0xff9197B3)),
+                                                  ),
+                                                ),
+                                              ],
+                                            ),
+                                          ),
+                                        ],
+                                      ),
+                                    ),
+                                  ),
+                                  const SizedBox(height: 5,),
+                                ],
+                              ),
+                            ),
+
+
+
                           ],
                         ),
                       ),

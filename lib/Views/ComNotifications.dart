@@ -37,7 +37,7 @@ class _NotificationsPageState extends State<NotificationsPage> {
   @override
   void initState() {
     super.initState();
-    fetchPhoneNumber(); // and also users
+    fetchPhoneNumber();
     fetchBlockNames();
     fetchPincode();
   }
@@ -173,27 +173,6 @@ class _NotificationsPageState extends State<NotificationsPage> {
 
                         ],),
                       const SizedBox(height: 20,),
-                   /*   Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          ReusableDropdown4Commu(dropDownItems: const ['Male', 'Female', 'Transgender'], hintText: 'Gender', onChanged: (value){}),
-                          ReusableDropdown4Commu(dropDownItems: const ['A+', 'A-', 'B+', 'B-', 'AB+', 'AB-', 'O+', 'O-'], hintText: 'Blood Group', onChanged: (value){}),
-                          ReusableDropdown4Commu(dropDownItems: phoneNumbers, hintText: 'Phone Number', onChanged: (value){
-                            setState(() {
-                              selectedPhoneNum  = value!;
-                            });
-                            // fetchPhoneNumber();
-                            selectedPhoneNum = 'Select the value';
-                          }),
-                          ReusableDropdown4Commu(dropDownItems:pincodes, hintText: 'Pin Code', onChanged: (value){
-                            setState(() {
-                              selectedPincode = value!;
-                            });
-                            selectedPincode = 'Select Pincode';
-                          }),
-                        ],),
-                      const SizedBox(height: 10,),*/
                       Row(
                         mainAxisAlignment: MainAxisAlignment.end,
                         children: [
@@ -272,26 +251,122 @@ class _NotificationsPageState extends State<NotificationsPage> {
     );
   }
 
+  // sendNotification() async {
+  //   FirebaseFirestore.instance.collection("Notifications").add({
+  //     "type":sendfor.toString(),
+  //     "title":SubjectCont.text,
+  //     "message":msgController.text,
+  //     "date": "${DateTime.now().day}/${DateTime.now().month}/${DateTime.now().year}",
+  //     "time": "${DateTime.now().hour} : ${DateTime.now().minute}",
+  //     "timestamp": DateTime.now().millisecondsSinceEpoch,
+  //   });
+  //
+  //   var user = await
+  //   sendfor=="Individual User"? FirebaseFirestore.instance.collection('Users').where('firstName', isEqualTo: selectedBlock ).get() :
+  //   FirebaseFirestore.instance.collection('Users').get();
+  //   for(int i=0;i<user.docs.length;i++){
+  //     print(user.docs[i]["fcmToken"]);
+  //     sendPushMessage(title:SubjectCont.text,body: msgController.text,token: user.docs[i]["fcmToken"]);
+  //   }
+  //   setState(() {
+  //     SubjectCont.clear();
+  //     msgController.clear();
+  //     sendfor="All";
+  //   });
+  // }
+
+
   sendNotification() async {
+
+    List userids= [];
+
+    setState(() {
+      userids.clear();
+    });
+    if(sendfor == "Individual User"){
+      var docu= await FirebaseFirestore.instance.collection('Users').where('firstName', isEqualTo: selectedBlock).get();
+      for(int i=0;i<docu.docs.length;i++) {
+        userids.add(docu.docs[i]["userid"]);
+      }
+    }
+    else if(sendfor == "Block Wise"){
+      var docu= await FirebaseFirestore.instance.collection('Users').where('blockname', isEqualTo: selectedBlock).get();
+      for(int i=0;i<docu.docs.length;i++) {
+        userids.add(docu.docs[i]["userid"]);
+      }
+    }
+    else if(sendfor == "Room Wise"){
+      var docu= await FirebaseFirestore.instance.collection('Users').where('blockname', isEqualTo: selectedBlock).where('roomnumber', isEqualTo: selectedRoom).get();
+      for(int i=0;i<docu.docs.length;i++) {
+        userids.add(docu.docs[i]["userid"]);
+      }
+    }
+    else if(sendfor == "Gender"){
+      var docu= await FirebaseFirestore.instance.collection('Users').where('gender', isEqualTo: selectedBlock).get();
+      for(int i=0;i<docu.docs.length;i++) {
+        userids.add(docu.docs[i]["userid"]);
+      }
+    }
+    else if(sendfor == "Blood Group"){
+      var docu= await FirebaseFirestore.instance.collection('Users').where('bloodgroup', isEqualTo: selectedBlock).get();
+      for(int i=0;i<docu.docs.length;i++) {
+        userids.add(docu.docs[i]["userid"]);
+      }
+    }
+    else if(sendfor == "Pin-code Wise"){
+      var docu= await FirebaseFirestore.instance.collection('Users').where('pincode', isEqualTo: selectedPincode).get();
+      for(int i=0;i<docu.docs.length;i++) {
+        userids.add(docu.docs[i]["userid"]);
+      }
+    }
+
+
+
+
+
     FirebaseFirestore.instance.collection("Notifications").add({
-      "type":sendfor.toString(),
-      "title":SubjectCont.text,
-      "message":msgController.text,
+      "type": sendfor.toString(),
+      "title": SubjectCont.text,
+      "message": msgController.text,
+      "userids":userids,
+      "viewed": [],
       "date": "${DateTime.now().day}/${DateTime.now().month}/${DateTime.now().year}",
       "time": "${DateTime.now().hour} : ${DateTime.now().minute}",
       "timestamp": DateTime.now().millisecondsSinceEpoch,
     });
-    var user = await FirebaseFirestore.instance.collection('Users').get();
-    for(int i=0;i<user.docs.length;i++){
+
+
+
+
+    var user = await (
+        sendfor == "Individual User" ?
+        FirebaseFirestore.instance.collection('Users').where('firstName', isEqualTo: selectedBlock).get():
+            sendfor == 'Block Wise' ?
+            FirebaseFirestore.instance.collection('Users').where('blockname', isEqualTo: selectedBlock).get():
+                sendfor == 'Room Wise'?
+                FirebaseFirestore.instance.collection('Users').where('blockname', isEqualTo: selectedBlock).where('roomnumber', isEqualTo: selectedRoom).get():
+                    sendfor == 'Gender'?
+                    FirebaseFirestore.instance.collection('Users').where('gender', isEqualTo: selectedBlock).get():
+                        sendfor == 'Blood Group'?
+                        FirebaseFirestore.instance.collection('Users').where('bloodgroup', isEqualTo: selectedBlock).get():
+                            sendfor == 'Pin-code Wise' ?
+                            FirebaseFirestore.instance.collection('Users').where('pincode', isEqualTo: selectedPincode).get():
+        FirebaseFirestore.instance.collection('Users').get());
+    for (int i = 0; i < user.docs.length; i++) {
       print(user.docs[i]["fcmToken"]);
-      sendPushMessage(title:SubjectCont.text,body: msgController.text,token: user.docs[i]["fcmToken"] );
+      sendPushMessage(title: SubjectCont.text, body: msgController.text, token: user.docs[i]["fcmToken"]);
     }
     setState(() {
       SubjectCont.clear();
       msgController.clear();
-      sendfor="All";
+      sendfor = "All";
     });
   }
+
+
+
+
+
   void sendPushMessage({required String token, required String body, required String title}) async {
     try {
       await http.post(
@@ -315,7 +390,7 @@ class _NotificationsPageState extends State<NotificationsPage> {
         ),
       );
     } catch (e) {
-      print("error push notification");
+      print("error push notification $e");
     }
   }
   void fetchBlockNames() async {
@@ -465,7 +540,6 @@ class _NotificationsPageState extends State<NotificationsPage> {
       },
     );
   }
-
 
   Future<void> _showViewNotificationPopup() async {
     showDialog<void>(

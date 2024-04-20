@@ -5,12 +5,14 @@ import 'dart:convert';
 import 'dart:html';
 import 'dart:typed_data';
 import 'package:firebase_storage/firebase_storage.dart';
+import 'package:fl_chart/fl_chart.dart';
 import 'package:hms_ikia/Views/block_name.dart';
 import 'package:hms_ikia/Views/resident_tab.dart';
 import 'package:hms_ikia/Views/rooms.dart';
 import 'package:intl/intl.dart';
 import 'package:lottie/lottie.dart';
 import 'package:percent_indicator/circular_percent_indicator.dart';
+import 'package:syncfusion_flutter_charts/sparkcharts.dart';
 import 'package:table_calendar/table_calendar.dart';
 import 'package:animate_do/animate_do.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
@@ -25,10 +27,13 @@ import 'package:hms_ikia/Views/notifications.dart';
 import 'package:hms_ikia/Views/setting.dart';
 import 'package:hms_ikia/widgets/event_calender.dart';
 import 'package:hms_ikia/widgets/kText.dart';
-
+import 'package:syncfusion_flutter_charts/charts.dart';
 
 import '../Constants/constants.dart';
 import '../widgets/customtextfield.dart';
+import 'package:syncfusion_flutter_charts/charts.dart' as sfc;
+
+import '../widgets/graph.dart';
 
 class Event {
   final String title;
@@ -77,6 +82,7 @@ final kLastDay = DateTime(kToday.year, kToday.month + 3, kToday.day);
 
 
 class Dashboard extends StatefulWidget {
+
   const Dashboard({super.key});
 
   @override
@@ -84,6 +90,22 @@ class Dashboard extends StatefulWidget {
 }
 
 class _DashboardState extends State<Dashboard> {
+
+
+  List<Color> gradientColors = [
+    Constants().primaryAppColor,
+    Constants().primaryAppColor,
+  ];
+  List<Color> gradientColors2 = [
+    Constants().primaryAppColor.withOpacity(0.25),
+    Constants().primaryAppColor.withOpacity(0),
+
+  ];
+  bool showAvg = false;
+
+
+  late TooltipBehavior _tooltipBehavior;
+
   // textfields
   TextEditingController hostelname = TextEditingController();
   TextEditingController hostelphone = TextEditingController();
@@ -194,23 +216,7 @@ class _DashboardState extends State<Dashboard> {
     }
   }
 
-  // Future<void> getTotalBedCount() async {
-  //   try {
-  //     QuerySnapshot querySnapshot =
-  //     await FirebaseFirestore.instance.collection('Room').get();
-  //     int totalBedCount = 0;
-  //     querySnapshot.docs.forEach((doc) {
-  //       // totalBedCount += (doc.data()['bedcount'] ?? 0).round();
-  //       totalBedCount += (doc.data()['bedcount'] ?? 0).round();
-  //     });
-  //     setState(() {
-  //       // Assign the total bed count to your variable
-  //       totalBedCountVariable = totalBedCount;
-  //     });
-  //   } catch (e) {
-  //     print("Error getting total bed count: $e");
-  //   }
-  // }
+
 
 
 
@@ -372,6 +378,7 @@ class _DashboardState extends State<Dashboard> {
   void initState() {
     super.initState();
     getBlockCounts();
+    _tooltipBehavior = TooltipBehavior(enable: true);
     getRoomsLength();
     fetchBedCounts();
     getHostellersLength();
@@ -1035,41 +1042,49 @@ class _DashboardState extends State<Dashboard> {
                           ),
 
                           const SizedBox(height: 20,),
-                          Container(
-                            width: 700,
-                            decoration: BoxDecoration(border: Border.all(color: const Color(0xff262626).withOpacity(0.10)), borderRadius: BorderRadius.circular(30) ),
-                            child:
-                            SizedBox(
-                              height: 40,
-                              child: Padding(
-                                padding: const EdgeInsets.only(left: 30, right: 30),
-                                child: Row(
-                                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                                  // mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                                  children: [
-                                    SizedBox(
-                                        width: 70,
-                                        child: KText(text:'S.No', style: GoogleFonts.openSans(fontWeight: FontWeight.w700, fontSize: 18),)),
-                                    SizedBox(
-                                        width: 70,
-                                        child: KText(text:'User ID', style: GoogleFonts.openSans(fontWeight: FontWeight.w700, fontSize: 18),)),
-                                    SizedBox(
-                                        width: 120,
-                                        child: KText(text:'Name', style: GoogleFonts.openSans(fontWeight: FontWeight.w700, fontSize: 18),)),
-                                    SizedBox(
-                                        width: 130,
-                                        child: KText(text: 'Phone No', style: GoogleFonts.openSans(fontWeight: FontWeight.w700, fontSize: 18),)),
-                                    SizedBox(
-                                        width: 110,
-                                        child: Center(child: KText(text:'Status', style: GoogleFonts.openSans(fontWeight: FontWeight.w700, fontSize: 18),))),
-                                  ],),
+                          Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Padding(
+                                padding: const EdgeInsets.only(left: 20),
+                                child: Text('Check In / Check Out Report', style: GoogleFonts.openSans(fontWeight: FontWeight.w700, fontSize: 19)),
                               ),
-                            ),
+                              Divider(thickness: 1),
+                              Container(
+                                width: 700,
+                                decoration: BoxDecoration(border: Border.all(color: const Color(0xff262626).withOpacity(0.10)), borderRadius: BorderRadius.circular(30) ),
+                                child:
+                                SizedBox(
+                                  height: 40,
+                                  child: Padding(
+                                    padding: const EdgeInsets.only(left: 30, right: 30),
+                                    child: Row(
+                                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                      // mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                                      children: [
+                                        SizedBox(
+                                            width: 50,
+                                            child: KText(text:'S.No', style: GoogleFonts.openSans(fontWeight: FontWeight.w700, fontSize: 18),)),
+                                        SizedBox(
+                                            width: 70,
+                                            child: KText(text:'User ID', style: GoogleFonts.openSans(fontWeight: FontWeight.w700, fontSize: 18),)),
+                                        SizedBox(
+                                            width: 120,
+                                            child: KText(text:'Name', style: GoogleFonts.openSans(fontWeight: FontWeight.w700, fontSize: 18),)),
+                                        SizedBox(
+                                            width: 130,
+                                            child: KText(text: 'Phone No', style: GoogleFonts.openSans(fontWeight: FontWeight.w700, fontSize: 18),)),
+                                        SizedBox(
+                                            width: 110,
+                                            child: Center(child: KText(text:'Status', style: GoogleFonts.openSans(fontWeight: FontWeight.w700, fontSize: 18),))),
+                                      ],),
+                                  ),
+                                ),
+                              ),
+                            ],
                           ),
 
-                          StreamBuilder(stream: FirebaseFirestore.instance.collection('Attendance').
-                          doc(getSelectedDate()
-                          ).collection('Residents').snapshots(), builder: (context, snapshot) {
+                          StreamBuilder(stream: FirebaseFirestore.instance.collection('Users').snapshots(), builder: (context, snapshot) {
                             print(snapshot);
                             if (snapshot.hasData) {
                               // var documents = snapshot.data!.docs;
@@ -1082,15 +1097,6 @@ class _DashboardState extends State<Dashboard> {
                                     if(snapshot.hasData){
                                       final document = snapshot.data!.docs[index];
                                       int serialNumber = index + 1;
-                                      String status = 'Absent';
-                                      Color Tcolor = const Color(0xffF12D2D);
-                                      Color Bcolor = const Color(0xffFFD3D3);
-                                      document['attendanceStatus'] == true ?
-                                      status = 'Present' : status = 'Absent';
-                                      document['attendanceStatus'] == true ?
-                                      Tcolor = const Color(0xff1DA644) : Tcolor = const Color(0xffF12D2D);
-                                      document['attendanceStatus'] == true ?
-                                      Bcolor = const Color(0xffDDFFE7): Bcolor = const Color(0xffFFD3D3);
                                       return Container(
                                         child: Padding(
                                           padding: const EdgeInsets.only(left: 10, right: 10),
@@ -1098,19 +1104,19 @@ class _DashboardState extends State<Dashboard> {
                                             mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                                             children: [
                                               SizedBox(
-                                                  width: 70,
+                                                  width: 50,
                                                   child: Text(serialNumber.toString(),
                                                     style: GoogleFonts.openSans(fontSize: 18),)),
                                               SizedBox(
-                                                  width: 70,
+                                                  width: 80,
                                                   child: Padding(
                                                     padding: const EdgeInsets.only(left: 0),
                                                     child: Text(document['userid'],
                                                       style: GoogleFonts.openSans(fontSize: 18),),
                                                   )),
                                               SizedBox(
-                                                  width: 120,
-                                                  child: Text(document['name'],
+                                                  width: 135,
+                                                  child: Text(document['firstName'],
                                                     style: GoogleFonts.openSans(fontSize: 18),)
                                               ),
                                               SizedBox(
@@ -1123,10 +1129,10 @@ class _DashboardState extends State<Dashboard> {
                                                 padding: const EdgeInsets.only(left: 15),
                                                 child: SizedBox(
                                                     height: 50,
-                                                    width: 110,
+                                                    width: 120,
                                                     child: Center(child: ElevatedButton(
-                                                      style: ButtonStyle(backgroundColor: MaterialStatePropertyAll(Bcolor)),
-                                                      onPressed: () {}, child: Text(status, style: GoogleFonts.openSans(color: Tcolor, fontSize: 15),),)
+                                                      style: ButtonStyle(backgroundColor: MaterialStatePropertyAll(document['status'] == true ? Color(0xffDDFFE7) : Color(0xffFFD3D3))),
+                                                      onPressed: () {}, child: Text(document['status'] == true ? 'Check In' : 'Check Out', style: GoogleFonts.openSans(color: document['status'] == true ?Color(0xff1DA644) : Color(0xffF12D2D), fontSize: 13),),)
                                                     )
                                                 ),
                                               ),
@@ -1157,31 +1163,70 @@ class _DashboardState extends State<Dashboard> {
                       const SizedBox(width: 20,),
                       SizedBox(
                         width: 350,
-                        child: Column(children: [
-                          Container(
-                            decoration: BoxDecoration(
-                              borderRadius: BorderRadius.circular(10),
-                              boxShadow: [
-                                BoxShadow(
-                                  color: Colors.grey.withOpacity(0.5),
-                                  spreadRadius: 2,
-                                  blurRadius: 7,
-                                  blurStyle: BlurStyle.outer,
-                                  offset: const Offset(0,5),
-                                ),
-                              ],
-                            ),
-                            child: TableCalendar(
-                              calendarStyle: CalendarStyle(
-                                isTodayHighlighted: true,
-                                selectedDecoration: const BoxDecoration(), todayDecoration: BoxDecoration(color: const Color(0xff37D1D3), borderRadius: BorderRadius.circular(50)), ),
-                              firstDay: DateTime.utc(2010, 10, 16),
-                              lastDay: DateTime.utc(2030, 3, 14),
-                              focusedDay: DateTime.now(),
+                        child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                          // Container(
+                          //   decoration: BoxDecoration(
+                          //     borderRadius: BorderRadius.circular(10),
+                          //     boxShadow: [
+                          //       BoxShadow(
+                          //         color: Colors.grey.withOpacity(0.5),
+                          //         spreadRadius: 2,
+                          //         blurRadius: 7,
+                          //         blurStyle: BlurStyle.outer,
+                          //         offset: const Offset(0,5),
+                          //       ),
+                          //     ],
+                          //   ),
+                          //   child: TableCalendar(
+                          //     calendarStyle: CalendarStyle(
+                          //       isTodayHighlighted: true,
+                          //       selectedDecoration: const BoxDecoration(), todayDecoration: BoxDecoration(color: const Color(0xff37D1D3), borderRadius: BorderRadius.circular(50)), ),
+                          //     firstDay: DateTime.utc(2010, 10, 16),
+                          //     lastDay: DateTime.utc(2030, 3, 14),
+                          //     focusedDay: DateTime.now(),
+                          //   ),
+                          // ),
+
+
+                          // GraphTem(),
+                          Text('Fees Reports', style: GoogleFonts.openSans(fontWeight: FontWeight.w700, fontSize: 18),),
+                          SizedBox(height: 10,),
+
+
+
+
+                          Material(
+                            elevation: 10,
+                            borderRadius: BorderRadius.circular(12),
+                            shadowColor:  Constants().primaryAppColor.withOpacity(0.20),
+                            child: Container(
+                              width: 600,
+                              height: 200,
+                              child: Stack(
+                                children: <Widget>[
+                                  Padding(
+                                    padding: const EdgeInsets.only(
+                                      right: 10,
+                                      left: 12,
+                                      top: 24,
+                                      bottom: 12,
+                                    ),
+                                    child: LineChart(
+                                      mainData(),
+
+                                    ),
+                                  ),
+
+                                ],
+                              ),
                             ),
                           ),
+
+
                           const SizedBox(height: 30,),
-                          //   indicator here
+                            // indicator here
                           Container(
                             width: 350,
                             height: 350,
@@ -1208,13 +1253,6 @@ class _DashboardState extends State<Dashboard> {
                                     ],
                                   ),
                                   const SizedBox(height: 20,),
-                                  // CircularPercentIndicator(
-                                  //   animation: true,
-                                  //   radius: 100, lineWidth: 35, percent: attendancePercentage / 100, progressColor: const Color(0xff1982FD), backgroundColor: const Color(0xffB344F6),
-                                  // circularStrokeCap: CircularStrokeCap.round,
-                                  //   center: KText(text: '${attendancePercentage.toStringAsFixed(1)}%', style: GoogleFonts.openSans(fontWeight: FontWeight.w700, fontSize: 17),),
-                                  // ),
-
                                   _buildAttendanceInfo( presentCount, presentPercentage),
                                   Row(
                                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -1274,6 +1312,7 @@ class _DashboardState extends State<Dashboard> {
                               ),
                             ),
                           )
+
                         ],),
                       )
                     ],
@@ -1883,7 +1922,439 @@ class _DashboardState extends State<Dashboard> {
   }
 
 
+/// Chart...
+
+  // static List<LineSeries<SalesData, num>> getDefaultData() {
+  //   final bool isDataLabelVisible = true,
+  //       isMarkerVisible = true,
+  //       isTooltipVisible = true;
+  //   double? lineWidth, markerWidth, markerHeight;
+  //   final List<SalesData> chartData = <SalesData>[
+  //     // SalesData(DateTime(2005, 0, 1), 'India', 1.5, 21, 28, 680, 760),
+  //     // SalesData(DateTime(2006, 0, 1), 'China', 2.2, 24, 44, 550, 880),
+  //     // SalesData(DateTime(2007, 0, 1), 'USA', 3.32, 36, 48, 440, 788),
+  //     // SalesData(DateTime(2008, 0, 1), 'Japan', 4.56, 38, 50, 350, 560),
+  //     // SalesData(DateTime(2009, 0, 1), 'Russia', 5.87, 54, 66, 444, 566),
+  //     // SalesData(DateTime(2010, 0, 1), 'France', 6.8, 57, 78, 780, 650),
+  //     // SalesData(DateTime(2011, 0, 1), 'Germany', 8.5, 70, 84, 450, 800)
+  //   ];
+  //   // return <LineSeries<SalesData, num>>[
+  //   //   LineSeries<SalesData, num>(
+  //   //       enableTooltip: true,
+  //   //       dataSource: chartData,
+  //   //       xValueMapper: (SalesData sales, _) => sales.sales,
+  //   //       yValueMapper: (SalesData sales, _) => sales.sales,
+  //   //       width: lineWidth ?? 2,
+  //   //       markerSettings: MarkerSettings(
+  //   //           isVisible: isMarkerVisible,
+  //   //           height: markerWidth ?? 4,
+  //   //           width: markerHeight ?? 4,
+  //   //           shape: DataMarkerType.circle,
+  //   //           borderWidth: 3,
+  //   //           borderColor: Colors.red),
+  //   //       dataLabelSettings: DataLabelSettings(
+  //   //           isVisible: isDataLabelVisible,
+  //   //           labelAlignment: ChartDataLabelAlignment.auto)),
+  //   //   LineSeries<SalesData, num>(
+  //   //       enableTooltip: isTooltipVisible,
+  //   //       dataSource: chartData,
+  //   //       width: lineWidth ?? 2,
+  //   //       xValueMapper: (SalesData sales, _) => sales.sales,
+  //   //       yValueMapper: (SalesData sales, _) => sales.sales,
+  //   //       markerSettings: MarkerSettings(
+  //   //           isVisible: isMarkerVisible,
+  //   //           height: markerWidth ?? 4,
+  //   //           width: markerHeight ?? 4,
+  //   //           shape: DataMarkerType.circle,
+  //   //           borderWidth: 3,
+  //   //           borderColor: Colors.black),
+  //   //       dataLabelSettings: DataLabelSettings(
+  //   //           isVisible: isDataLabelVisible,
+  //   //           labelAlignment: ChartDataLabelAlignment.auto))
+  //   // ];
+  //
+  //   Container(
+  //       height: 370,
+  //       width: 300,
+  //       child: Padding(
+  //         padding: const EdgeInsets.symmetric(horizontal: 2, vertical: 40),
+  //         child: Container(
+  //           height: 170,
+  //           width: 850,
+  //           child: sfc.SfCartesianChart(
+  //               primaryXAxis: sfc.CategoryAxis(),
+  //               title: sfc.ChartTitle(
+  //                   text: '',
+  //                   textStyle: GoogleFonts.poppins(
+  //                     fontWeight: FontWeight.w600,
+  //                     color: Colors.black,
+  //                   ),
+  //                   alignment: sfc.ChartAlignment.near
+  //               ),
+  //               legend: sfc.Legend(isVisible: true),
+  //               // tooltipBehavior: _tooltipBehavior,
+  //               series: <sfc.LineSeries<SalesData, String>>[
+  //                 sfc.LineSeries<SalesData, String>(
+  //                   name: "",
+  //                   dataSource: chartData,
+  //                   xValueMapper: (SalesData sales, _) => sales.year,
+  //                   yValueMapper: (SalesData sales, _) => sales.sales,
+  //                   // Enable data label
+  //                   dataLabelSettings: sfc.DataLabelSettings(isVisible: true),
+  //                   color: Constants().primaryAppColor,
+  //                   width: 5,
+  //                   animationDuration: 2000,
+  //                 )
+  //               ]
+  //           ),
+  //         ),
+  //       )
+  //   );
+  //
+  // }
+
+
+
+  Widget bottomTitleWidgets(double value, TitleMeta meta) {
+    const style = TextStyle(
+      fontWeight: FontWeight.bold,
+      fontSize: 16,
+    );
+    Widget text;
+    switch (value.toInt()) {
+      case 0:
+        text =  KText(text:'Jan', style: GoogleFonts.inter(
+            fontWeight: FontWeight.w400,
+            fontSize: 12,
+            color: Color(0xff718EBF)
+        ), );
+        break;
+  case 2:
+        text =  KText(text:'Feb', style: GoogleFonts.inter(
+            fontWeight: FontWeight.w400,
+            fontSize: 12,
+            color: Color(0xff718EBF)
+        ), );
+        break;
+      case 4:
+        text =  KText(text:'Mar', style: GoogleFonts.inter(
+            fontWeight: FontWeight.w400,
+            fontSize: 12,
+            color: Color(0xff718EBF)
+        ), );
+        break;
+  case 6:
+        text =  KText(text:'Apr', style: GoogleFonts.inter(
+            fontWeight: FontWeight.w400,
+            fontSize: 12,
+            color: Color(0xff718EBF)
+        ), );
+        break;
+      case 8:
+        text =  KText(text:'May', style: GoogleFonts.inter(
+            fontWeight: FontWeight.w400,
+            fontSize: 12,
+            color: Color(0xff718EBF)
+        ), );
+        break;
+  case 10:
+        text =  KText(text:'Jun', style: GoogleFonts.inter(
+            fontWeight: FontWeight.w400,
+            fontSize: 12,
+            color: Color(0xff718EBF)
+        ), );
+        break;
+      case 12:
+        text =  KText(text:'Jul', style: GoogleFonts.inter(
+            fontWeight: FontWeight.w400,
+            fontSize: 12,
+            color: Color(0xff718EBF)
+        ), );
+        break;
+      case 14:
+        text =  KText(text:'Aug', style: GoogleFonts.inter(
+            fontWeight: FontWeight.w400,
+            fontSize: 12,
+            color: Color(0xff718EBF)
+        ), );
+        break;
+      case 16:
+        text =  KText(text:'Sep', style: GoogleFonts.inter(
+            fontWeight: FontWeight.w400,
+            fontSize: 12,
+            color: Color(0xff718EBF)
+        ), );
+        break;
+     case 18:
+        text =  KText(text:'Oct', style: GoogleFonts.inter(
+            fontWeight: FontWeight.w400,
+            fontSize: 12,
+            color: Color(0xff718EBF)
+        ), );
+        break;
+      case 20:
+        text =  KText(text:'Nov', style: GoogleFonts.inter(
+            fontWeight: FontWeight.w400,
+            fontSize: 12,
+            color: Color(0xff718EBF)
+        ), );
+        break;
+     case 22:
+        text =  KText(text:'Dec', style: GoogleFonts.inter(
+            fontWeight: FontWeight.w400,
+            fontSize: 12,
+            color: Color(0xff718EBF)
+        ), );
+        break;
+      default:
+        text =  KText(text:'', style: GoogleFonts.inter(
+            fontWeight: FontWeight.w400,
+            fontSize: 12,
+            color: Color(0xff718EBF)
+        ), );
+        break;
+    }
+
+    return SideTitleWidget(
+      axisSide: meta.axisSide,
+      child: text,
+    );
+  }
+
+  Widget leftTitleWidgets(double value, TitleMeta meta) {
+
+    String text;
+    switch (value.toInt()) {
+      case 1:
+        text = '0';
+        break;
+      case 3:
+        text = '100';
+        break;
+      case 5:
+        text = '200';
+        break;
+      case 7:
+        text = '800';
+      case 9:
+        text = '1000';
+        break;
+      default:
+        return Container();
+    }
+
+    return KText(text:text, style: GoogleFonts.inter(
+        fontWeight: FontWeight.w400,
+        fontSize: 12,
+        color: Color(0xff718EBF)
+    ), );
+  }
+
+  LineChartData mainData() {
+    return LineChartData(
+
+      gridData: FlGridData(
+        show: true,
+
+
+        drawVerticalLine: true,
+        horizontalInterval: 1,
+        verticalInterval: 1,
+
+        getDrawingHorizontalLine: (value) {
+          return const FlLine(
+            color: AppColors.mainGridLineColor,
+            strokeWidth: 1,
+          );
+        },
+        getDrawingVerticalLine: (value) {
+          return const FlLine(
+            color: AppColors.mainGridLineColor,
+            strokeWidth: 1,
+          );
+        },
+
+      ),
+      titlesData: FlTitlesData(
+        show: true,
+        rightTitles: const AxisTitles(
+          sideTitles: SideTitles(showTitles: false),
+        ),
+        topTitles: const AxisTitles(
+          sideTitles: SideTitles(showTitles: false),
+        ),
+        bottomTitles: AxisTitles(
+          sideTitles: SideTitles(
+            showTitles: true,
+            reservedSize: 27,
+            interval: 1,
+            getTitlesWidget: bottomTitleWidgets,
+          ),
+        ),
+        leftTitles: AxisTitles(
+          sideTitles: SideTitles(
+            showTitles: true,
+            interval: 1,
+            getTitlesWidget: leftTitleWidgets,
+            reservedSize: 42,
+          ),
+        ),
+      ),
+      borderData: FlBorderData(
+        show: false,
+        border: Border.all(color: const Color(0xff37434d)),
+      ),
+      minX: 0,
+      maxX: 22,
+      minY: 0,
+      maxY: 9,
+      lineBarsData: [
+        LineChartBarData(
+          spots: const [
+            FlSpot(0, 3),
+            FlSpot(2.6, 2),
+            FlSpot(4.9, 5),
+            FlSpot(6.8, 3.1),
+            FlSpot(8, 4),
+            FlSpot(9.5, 3),
+            FlSpot(11, 4),
+            FlSpot(14, 6),
+            FlSpot(16, 3),
+            FlSpot(18, 2),
+            FlSpot(20, 5),
+            FlSpot(22, 4.1),
+          ],
+          isCurved: true,
+          gradient: LinearGradient(
+            colors: gradientColors,
+          ),
+          barWidth: 3,
+          //isStrokeCapRound: true,
+
+
+          dotData: const FlDotData(
+            show: false,
+          ),
+          belowBarData: BarAreaData(
+            show: true,
+            gradient: LinearGradient(
+              begin: Alignment.topCenter,
+              end: Alignment.bottomCenter,
+              colors: gradientColors2,
+            ),
+          ),
+
+        ),
+      ],
+
+    );
+  }
+
+  LineChartData avgData() {
+    return LineChartData(
+      lineTouchData: const LineTouchData(enabled: false),
+      gridData: FlGridData(
+        show: true,
+        drawHorizontalLine: true,
+        verticalInterval: 1,
+        horizontalInterval: 1,
+        getDrawingVerticalLine: (value) {
+          return const FlLine(
+            color: Color(0xff37434d),
+            strokeWidth: 1,
+          );
+        },
+        getDrawingHorizontalLine: (value) {
+          return const FlLine(
+            color: Color(0xff37434d),
+            strokeWidth: 1,
+          );
+        },
+      ),
+      titlesData: FlTitlesData(
+        show: true,
+        bottomTitles: AxisTitles(
+          sideTitles: SideTitles(
+            showTitles: true,
+            reservedSize: 30,
+            getTitlesWidget: bottomTitleWidgets,
+            interval: 1,
+          ),
+        ),
+        leftTitles: AxisTitles(
+          sideTitles: SideTitles(
+            showTitles: true,
+            getTitlesWidget: leftTitleWidgets,
+            reservedSize: 42,
+            interval: 1,
+          ),
+        ),
+        topTitles: const AxisTitles(
+          sideTitles: SideTitles(showTitles: false),
+        ),
+        rightTitles: const AxisTitles(
+          sideTitles: SideTitles(showTitles: false),
+        ),
+      ),
+      borderData: FlBorderData(
+        show: true,
+        border: Border.all(color: const Color(0xff37434d)),
+      ),
+      minX: 0,
+      maxX: 11,
+      minY: 0,
+      maxY: 9,
+      lineBarsData: [
+        LineChartBarData(
+          spots: const [
+            FlSpot(0, 3.44),
+            FlSpot(2.6, 3.44),
+            FlSpot(4.9, 3.44),
+            FlSpot(6.8, 3.44),
+            FlSpot(8, 3.44),
+            FlSpot(9.5, 3.44),
+            FlSpot(11, 3.44),
+          ],
+          isCurved: true,
+          gradient: LinearGradient(
+            colors: [
+              ColorTween(begin: gradientColors[0], end: gradientColors[1])
+                  .lerp(0.2)!,
+              ColorTween(begin: gradientColors[0], end: gradientColors[1])
+                  .lerp(0.2)!,
+            ],
+          ),
+          barWidth: 5,
+          isStrokeCapRound: true,
+          dotData: const FlDotData(
+            show: false,
+          ),
+          belowBarData: BarAreaData(
+            show: true,
+            gradient: LinearGradient(
+              colors: [
+                ColorTween(begin: gradientColors[0], end: gradientColors[1])
+                    .lerp(0.2)!
+                    .withOpacity(0.1),
+                ColorTween(begin: gradientColors[0], end: gradientColors[1])
+                    .lerp(0.2)!
+                    .withOpacity(0.1),
+              ],
+            ),
+          ),
+        ),
+      ],
+    );
+  }
+
+
 
 }
+
+
+
+
+
+
 
 

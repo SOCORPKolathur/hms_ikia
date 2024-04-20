@@ -6,6 +6,8 @@ class SmartSwitch extends StatefulWidget {
   final SwitchSize size;
   final Color? activeColor;
   final Color? inActiveColor;
+  final String inactiveName;
+  final String activeName;
   final bool disabled;
   final bool defaultActive;
   final Function(bool)? onChanged;
@@ -16,7 +18,7 @@ class SmartSwitch extends StatefulWidget {
     this.activeColor,
     this.disabled = false,
     this.defaultActive = true,
-    this.onChanged,
+    this.onChanged, required this.inactiveName, required this.activeName,
   }) : super(key: key);
 
   @override
@@ -97,7 +99,7 @@ class _SmartSwitchState extends State<SmartSwitch> {
               alignment: Alignment.center,
               clipBehavior: Clip.none,
               children: [
-                const Padding(
+                 Padding(
                   padding: EdgeInsets.symmetric(horizontal: 10.0),
                   child: Row(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -105,13 +107,15 @@ class _SmartSwitchState extends State<SmartSwitch> {
                     children: [
                       Expanded(
                           child: Text(
-                            'Check Out',
+                            // 'Check Out',
+                            widget.inactiveName,
                             textAlign: TextAlign.start,
                             style: TextStyle(color: Colors.white),
                           )),
                       Expanded(
                           child: Text(
-                            'Check Out',
+                            widget.activeName,
+
                             textAlign: TextAlign.end,
                             style: TextStyle(color: Colors.white),
                           )),

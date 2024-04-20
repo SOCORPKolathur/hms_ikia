@@ -5,7 +5,9 @@ import 'package:animate_do/animate_do.dart';
 import 'package:awesome_dialog/awesome_dialog.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:csv/csv.dart';
+import 'package:dropdown_search/dropdown_search.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:hms_ikia/Views/resident_add_view.dart';
 import 'package:pdf/pdf.dart';
@@ -20,10 +22,8 @@ import 'package:hms_ikia/widgets/TextPersonalDetails.dart';
 import 'package:hms_ikia/widgets/customtextfield.dart';
 import 'package:hms_ikia/widgets/kText.dart';
 import 'package:intl/intl.dart';
-import 'package:flutter_svg/flutter_svg.dart';
-import 'package:path_provider/path_provider.dart';
 import 'package:printing/printing.dart';
-import 'package:share_plus/share_plus.dart';
+import 'package:country_state_city_picker/model/select_status_model.dart' as Statusmodel;
 
 import '../widgets/userMiniDetails.dart';
 class Resident_Tab extends StatefulWidget {
@@ -34,8 +34,128 @@ class Resident_Tab extends StatefulWidget {
 }
 
 class _Resident_TabState extends State<Resident_Tab> {
+
+
+
+
+  Future<void> statusPopUp(BuildContext con, String documentId, bool status,bool newStatus) async {
+    return showDialog<void>(
+      context: context,
+      barrierDismissible: false,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          contentPadding: EdgeInsets.zero,
+          shape: const RoundedRectangleBorder(borderRadius: BorderRadius.all(Radius.circular(20))),
+          content: ClipRRect(
+            borderRadius: const BorderRadius.all(Radius.circular(10)),
+            child: Container(
+              padding: EdgeInsets.zero,
+              color: Colors.white,
+              height: 350,
+              width: 550,
+              child: Padding(
+                padding: const EdgeInsets.all(10.0),
+                child: Column(
+                  children: [
+                    Row(
+                      crossAxisAlignment: CrossAxisAlignment.center,
+                      mainAxisAlignment: MainAxisAlignment.end,
+                      children: [
+                        InkWell(
+                          onTap: (){
+                            Navigator.pop(context);
+                          },
+                          child: const CircleAvatar(
+                            backgroundColor: Color(0xffF5F6F7), radius: 20, child: Padding(
+                            padding: EdgeInsets.all(4),
+                            child: Icon(Icons.close, color: Colors.grey, size: 18,),
+                          ),
+                          ),
+                        )
+                      ],
+                    ),
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                      children: [
+                        // SizedBox(
+                        //   height: 130,
+                        //   width: 130,
+                        //   child: Image.asset('assets/ui-design-/images/DeleteL.png'),
+                        // ),
+                        SizedBox(
+                          height: 160,
+                          width: 170,
+                          child: Image.asset('assets/ui-design-/images/statusUpdate.png'),
+                        ),
+                        // SizedBox(
+                        //   height: 130,
+                        //   width: 130,
+                        //   child: Image.asset('assets/ui-design-/images/DeleteR.png'),
+                        // ),
+                      ],
+                    ),
+                    Padding(
+                      padding: const EdgeInsets.only(left: 40, right: 20),
+                      child: KText(text:'Are you sure you want to ${!status == false? 'InActive' : 'Active'} this User?', style: GoogleFonts.openSans(fontWeight: FontWeight.w600, fontSize: 17),),
+                    ),
+                    KText(text: 'You can also ${status == false? 'InActive' : 'Active'} it later', style: GoogleFonts.openSans(fontWeight: FontWeight.w600, fontSize: 17),),
+                    const SizedBox(height: 25,),
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        Container(
+                          width: 130,
+                          height: 42,
+                          child: ElevatedButton(
+                            style: const ButtonStyle(backgroundColor: MaterialStatePropertyAll(Color(0xffF5F5F5))),
+                            onPressed: (){
+                              Navigator.pop(context);
+                            },
+                            child: KText(text: 'Cancel', style: GoogleFonts.openSans(fontSize: 17, fontWeight: FontWeight.w700, color: const Color(0xff262626).withOpacity(0.8)),),
+                          ),
+                        ),
+                        const SizedBox(width: 20,),
+                        Container(
+                          width: 130,
+                          height: 42,
+                          child: ElevatedButton(
+                            style: const ButtonStyle(backgroundColor: MaterialStatePropertyAll(Color(0xffF12D2D))),
+                            onPressed: () async {
+                              newStatus;
+                              FirebaseFirestore.instance.collection('Users').doc(documentId).update({
+                                'status2': newStatus,
+                              });
+                              Navigator.pop(context);
+
+
+                            },
+
+
+                            child: Row(
+                              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                              children: [
+                                KText(text:'Update',style: GoogleFonts.openSans(fontSize: 17, fontWeight: FontWeight.w700, color: const Color(0xffFFFFFF))),
+                                const Icon(Icons.update, size: 18, color: Color(0xffFFFFFF),)
+                              ],
+                            ),
+                          ),
+                        ),
+                      ],
+                    )
+                  ],
+                ),
+              ),
+            ),
+          ),
+        );
+      },
+    );
+  }
+
+
   // list for the export data
   List<List<dynamic>> data = [];
+  bool isActive = true;
 
   // for the search one
   TextEditingController searchNamePhone = TextEditingController();
@@ -208,7 +328,7 @@ class _Resident_TabState extends State<Resident_Tab> {
                               fontSize: 17,
                               fontWeight: FontWeight.w600,
                               color: Colors.white),),
-                          SizedBox(width: 4,),
+                          const SizedBox(width: 4,),
                           SizedBox(
                               width: 30,
                               height: 30,
@@ -320,7 +440,7 @@ class _Resident_TabState extends State<Resident_Tab> {
                             Container(
                               // status47X (55:1499)
                               margin: EdgeInsets.fromLTRB(
-                                  0 * fem, 0 * fem, 101 * fem, 0 * fem),
+                                  10 * fem, 0 * fem, 101 * fem, 0 * fem),
                               child: KText(
                                 text: 'Status',
                                 style: GoogleFonts.openSans(
@@ -435,6 +555,7 @@ class _Resident_TabState extends State<Resident_Tab> {
                                 // if (searchNamePhone.text.isNotEmpty && index < filteredData.length) {
                                 if (snapshot.hasData) {
                                   final document = combinedData[index];
+
                                   return Container(
                                     // frame5102azy (59:1668)
                                     margin: EdgeInsets.fromLTRB(
@@ -523,35 +644,61 @@ class _Resident_TabState extends State<Resident_Tab> {
                                                     ),
                                                   ),
                                                 ),
+                                                ///status here
+
+                                               //  Container(
+                                               //    // frame5096XSM (59:1640)
+                                               //    margin: EdgeInsets.fromLTRB(
+                                               //        0 * fem, 6 * fem,
+                                               //        98 * fem, 6 * fem),
+                                               // width: 80,
+                                               //    height: double.infinity,
+                                               //    decoration: BoxDecoration(
+                                               //      color: document['status'] == true?  const Color(
+                                               //          0xffddffe6) : const Color(0xffFFD3D3),
+                                               //      borderRadius: BorderRadius
+                                               //          .circular(64 * fem),
+                                               //    ),
+                                               //    child: Center(
+                                               //      child: KText(
+                                               //        text: document['status'] == true? 'Active' : 'In Active',
+                                               //        style: GoogleFonts
+                                               //            .openSans(
+                                               //          fontSize: 16 * ffem,
+                                               //          fontWeight: FontWeight
+                                               //              .w600,
+                                               //          height: 1.3625 * ffem /
+                                               //              fem,
+                                               //          color: document['status'] == true ? const Color(
+                                               //              0xff1da543) : const Color(0xffF12D2D)
+                                               //        ),
+                                               //      ),
+                                               //    ),
+                                               //  ),
+
+
                                                 Container(
-                                                  // frame5096XSM (59:1640)
-                                                  margin: EdgeInsets.fromLTRB(
-                                                      0 * fem, 6 * fem,
-                                                      98 * fem, 6 * fem),
-                                                  width: 68 * fem,
-                                                  height: double.infinity,
-                                                  decoration: BoxDecoration(
-                                                    color: const Color(
-                                                        0xffddffe6),
-                                                    borderRadius: BorderRadius
-                                                        .circular(64 * fem),
-                                                  ),
-                                                  child: Center(
-                                                    child: KText(
-                                                      text: 'Active',
-                                                      style: GoogleFonts
-                                                          .openSans(
-                                                        fontSize: 16 * ffem,
-                                                        fontWeight: FontWeight
-                                                            .w600,
-                                                        height: 1.3625 * ffem /
-                                                            fem,
-                                                        color: const Color(
-                                                            0xff1da543),
+                                                  child: Row(
+                                                    children: [
+                                                      SizedBox(
+                                                        width: 110,
+                                                        height: 40,
+                                                        child: ElevatedButton(
+                                                          style: ButtonStyle(backgroundColor: MaterialStatePropertyAll(
+                                                            document['status2'] == true?   Color(0xffDDFFE7) : Color(0xffFFD3D3))),
+                                                            onPressed: (){
+                                                              bool newStatus = !document['status2'];
+                                                              statusPopUp(context, document.id, document['status2'], newStatus,);
+                                                            }, child: Text(document['status2'] == true? 'Active' : 'In Active', style: GoogleFonts.openSans(fontWeight: FontWeight.w500, color: document['status2'] == true ? Color(0xff1DA644) : Color(0xffF12D2D)),)),
                                                       ),
-                                                    ),
+                                                      SizedBox(width: 50,),
+                                                    ],
                                                   ),
                                                 ),
+
+
+
+
                                                 Container(
                                                   // QFF (59:1641)
                                                   margin: EdgeInsets.fromLTRB(
@@ -639,7 +786,6 @@ class _Resident_TabState extends State<Resident_Tab> {
                                                   width: 16 * fem,
                                                 ),
                                                 // View Button
-
                                                 InkWell(
                                                   onTap: () {
                                                     print('View Button');
@@ -720,6 +866,12 @@ class _Resident_TabState extends State<Resident_Tab> {
                                       ),
                                     ),
                                   );
+
+
+
+
+
+
                                 }
 
                                 else {
@@ -1014,6 +1166,11 @@ class _Resident_TabState extends State<Resident_Tab> {
                         },
                       )
 
+
+
+
+
+
                     ],
                   ),
                 ),
@@ -1048,11 +1205,246 @@ class _Resident_TabState extends State<Resident_Tab> {
   TextEditingController userid = new TextEditingController();
   TextEditingController roomnumber = new TextEditingController();
   TextEditingController blockname = new TextEditingController();
+  TextEditingController countrycon = TextEditingController();
+  TextEditingController citycon = TextEditingController();
   List<String> prefix = ["Select Prefix", "Mr.", "Ms.", "Mrs"];
   List<String> gender = ["Select Gender", "Male", "Female", "Transgender"];
   String selectedprefix = "Select Prefix";
   String selectedprefix2 = "Select Prefix";
   String selectedgender = "Select Gender";
+  List<String> bloodgroups =['Select Blood Group', 'A+', 'B+', 'A-', 'B-', 'AB+', 'AB-'];
+  String selectedBloodgroup = 'Select Blood Group';
+
+  List<String> StateList = <String>[
+    "Select State",
+    "Andhra Pradesh",
+    "Arunachal Pradesh",
+    "Assam",
+    "Bihar",
+    "Chhattisgarh",
+    "Goa",
+    'Gujarat',
+    "Haryana",
+    "Himachal Pradesh",
+    "Jharkhand",
+    "Karnataka",
+    "Kerala",
+    "Madhya Pradesh",
+    "Maharashtra",
+    "Manipur",
+    "Meghalaya",
+    "Mizoram",
+    "Nagaland",
+    "Odisha",
+    "Punjab",
+    "Rajasthan",
+    "Sikkim",
+    "Tamil Nadu",
+    "Telangana",
+    "Tripura",
+    "Uttarakhand",
+    " Uttar Pradesh",
+    "West Bengal",
+  ];
+  List<String> coutryList = <String>[
+    'Select Country',
+    "Afghanistan",
+    "Albania",
+    "Algeria",
+    "Andorra",
+    "Angola",
+    "Antigua and Barbuda",
+    "Argentina",
+    "Armenia",
+    "Australia",
+    "Austria",
+    "Azerbaijan",
+    "Bahamas",
+    "Bahrain",
+    "Bangladesh",
+    "Barbados",
+    "Belarus",
+    "Belgium",
+    'Belize',
+    "Bhutan",
+    'Bolivia',
+    'Bosnia and Herzegovina',
+    'Botswana',
+    'Brazil',
+    'Brunei',
+    'Bulgaria',
+    'Burkina Faso',
+    'Burundi',
+    "Côte d'Ivoire",
+    'Cabo Verde	',
+    'Cambodia',
+    'Cameroon	',
+    'Canada',
+    'Central African Republic',
+    'Chad',
+    'Chile',
+    'China',
+    'Colombia',
+    'Comoros',
+    'Congo (Congo-Brazzaville)	',
+    'Costa Rica	',
+    'Croatia	',
+    'Cuba	',
+    'Cyprus	',
+    'Czechia (Czech Republic)',
+    'Democratic Republic of the Congo',
+    'Denmark',
+    'Djibouti',
+    'Dominica',
+    'Dominican Republic',
+    'Ecuador',
+    'Egypt',
+    'El Salvador',
+    'Equatorial Guinea',
+    'Eritrea	',
+    'Estonia	',
+    'Eswatini (Swaziland)	',
+    'Ethiopia	',
+    'Fiji	',
+    'Finland	',
+    'France	',
+    'Gabon	',
+    'Gambia	',
+    'Georgia',
+    'Germany',
+    'Ghana',
+    'Greece',
+    'Grenada',
+    'Guatemala',
+    'Guinea',
+    'Guinea-Bissau',
+    'Guyana',
+    'Haiti',
+    'Holy See	',
+    'Honduras',
+    'Hungary',
+    'Iceland',
+    'India',
+    'Indonesia',
+    'Iran',
+    'Iraq',
+    'Ireland',
+    'Israel',
+    'Italy',
+    'Jamaica',
+    'Japan',
+    'Jordan',
+    'Kazakhstan',
+    'Kenya',
+    'Kiribati',
+    'Kuwait',
+    'Kyrgyzstan',
+    'Laos',
+    'Latvia',
+    'Lebanon',
+    'Lesotho',
+    'Liberia',
+    'Libya',
+    'Liechtenstein',
+    'Lithuania',
+    'Luxembourg',
+    'Madagascar',
+    'Malawi',
+    'Malaysia',
+    'Maldives',
+    'Mali',
+    'Malta',
+    'Marshall Islands	',
+    'Mauritania',
+    'Mauritius',
+    'Mexico',
+    'Micronesia',
+    'Moldova',
+    'Monaco',
+    'Mongolia',
+    'Montenegro',
+    'Morocco',
+    'Mozambique',
+    'Myanmar (formerly Burma)',
+    'Namibia',
+    'Nauru',
+    'Nepal',
+    'Netherlands',
+    'New Zealand',
+    'Nicaragua',
+    'Niger',
+    'Nigeria',
+    'North Korea',
+    'North Macedonia',
+    'Norway',
+    'Oman',
+    'Pakistan',
+    'Palau',
+    'Palestine State',
+    'Panama',
+    'Papua New Guinea',
+    'Paraguay',
+    'Peru',
+    'Philippines',
+    'Poland',
+    'Portugal',
+    'Qatar',
+    'Romania',
+    'Russia',
+    'Rwanda',
+    'Saint Kitts and Nevis	',
+    'Saint Lucia	',
+    'Saint Vincent and the Grenadines	',
+    'Samoa',
+    'San Marino	',
+    'Sao Tome and Principe	',
+    'Saudi Arabia	',
+    'Senegal',
+    'Serbia',
+    'Seychelles	',
+    'Sierra Leone	',
+    'Singapore',
+    'Slovakia',
+    'Slovenia',
+    'Solomon Islands	',
+    'Somalia',
+    'South Africa',
+    'South Korea',
+    'South Sudan',
+    'Spain',
+    'Sri Lanka',
+    'Sudan',
+    'Suriname',
+    'Sweden',
+    'Switzerland',
+    'Syria',
+    'Tajikistan',
+    'Tanzania',
+    'Thailand',
+    'Timor-Leste',
+    'Togo',
+    'Tonga',
+    'Trinidad and Tobago',
+    'Tunisia',
+    'Turkey',
+    'Turkmenistan',
+    'Tuvalu',
+    'Uganda',
+    'Ukraine',
+    'United Arab Emirates',
+    'United Kingdom	',
+    'United States of America	',
+    'Uruguay	',
+    'Uzbekistan	',
+    'Vanuatu	',
+    'Venezuela	',
+    'Vietnam	',
+    'Yemen',
+    'Zambia',
+    'Zimbabwe',
+  ];
+  List <String> _cities = [];
+
   File? Url;
   var Uploaddocument;
   String imgUrl = "";
@@ -1098,9 +1490,23 @@ class _Resident_TabState extends State<Resident_Tab> {
       barrierDismissible: false,
       // user must tap button!
       builder: (BuildContext context) {
+        double baseWidth = 1512;
+        double fem = MediaQuery.of(context).size.width / baseWidth;
+        double ffem = fem * 0.97;
+
+        double width = MediaQuery
+            .of(context)
+            .size
+            .width;
+        double height = MediaQuery
+            .of(context)
+            .size
+            .height;
         return StatefulBuilder(
           builder: (context, set) {
+
             return AlertDialog(
+
                 backgroundColor: Colors.transparent,
                 content: SingleChildScrollView(
                   child: Column(
@@ -1379,7 +1785,7 @@ class _Resident_TabState extends State<Resident_Tab> {
                                               selectedprefix,
                                               onChanged:
                                                   (String? value) {
-                                                setState(() {
+                                                set(() {
                                                   selectedprefix =
                                                   value!;
                                                 });
@@ -1590,7 +1996,7 @@ class _Resident_TabState extends State<Resident_Tab> {
                                               selectedgender,
                                               onChanged:
                                                   (String? value) {
-                                                setState(() {
+                                                set(() {
                                                   selectedgender =
                                                   value!;
                                                 });
@@ -1617,10 +2023,98 @@ class _Resident_TabState extends State<Resident_Tab> {
                                   ],
                                 ),
                                 const SizedBox(width: 18,),
-                                CustomTextField(header: "Blood Group",
-                                  hint: "Enter bloob group",
-                                  controller: bloodgroup,
-                                  validator: null,),
+                                // CustomTextField(header: "Blood Group",
+                                //   hint: "Enter bloob group",
+                                //   controller: bloodgroup,
+                                //   validator: null,),
+
+                                Column(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: [
+
+                                    Container(
+                                      // firstnameSVK (87:1540)
+                                      child: Text(
+                                        "Blood Group",
+                                        style: GoogleFonts.openSans (
+                                          fontSize: 14,
+                                          fontWeight: FontWeight.w600,
+                                          color: const Color(0xff262626),
+                                        ),
+                                      ),
+                                    ),
+
+                                    Padding(
+                                      padding: const EdgeInsets.only(top: 8.0),
+                                      child: Container(
+                                        width: 220,
+                                        height: 50,
+                                        decoration: BoxDecoration (
+                                          border: Border.all(color: const Color(0x7f262626)),
+                                          borderRadius: BorderRadius.circular(30),
+                                        ),
+                                        child: Padding(
+                                          padding: const EdgeInsets.only(left: 12.0,right: 6),
+                                          child:  DropdownButtonHideUnderline(
+                                            child:
+                                            DropdownButtonFormField2<
+                                                String>(
+                                              isExpanded: true,
+                                              hint: Text(
+                                                'Select Blood Group', style:
+                                              GoogleFonts.openSans (
+                                                fontSize: 12,
+                                                fontWeight: FontWeight.w600,
+                                                color: const Color(0x7f262626),
+                                              ),
+                                              ),
+                                              items: bloodgroups
+                                                  .map((String
+                                              item) =>
+                                                  DropdownMenuItem<
+                                                      String>(
+                                                    value: item,
+                                                    child: Text(
+                                                      item,
+                                                      style:
+                                                      GoogleFonts.openSans (
+                                                        fontSize: 12,
+                                                        fontWeight: FontWeight.w600,
+                                                      ),
+                                                    ),
+                                                  )).toList(),
+                                              value:
+                                              selectedBloodgroup,
+                                              onChanged:
+                                                  (String? value) {
+                                                set(() {
+                                                  selectedBloodgroup =
+                                                  value!;
+                                                });
+                                              },
+                                              buttonStyleData:
+                                              const ButtonStyleData(
+                                              ),
+                                              menuItemStyleData:
+                                              const MenuItemStyleData(
+
+                                              ),
+                                              decoration:
+                                              const InputDecoration(
+                                                  border:
+                                                  InputBorder
+                                                      .none),
+                                            ),
+                                          ),
+                                        ),
+                                      ),
+                                    ),
+                                  ],
+                                ),
+
+
+
+
                                 const SizedBox(width: 18,),
                               ],
                             ),
@@ -1650,7 +2144,7 @@ class _Resident_TabState extends State<Resident_Tab> {
                                   controller: phone,
                                   validator: null,),
                                 const SizedBox(width: 18,),
-                                CustomTextField(header: "Mobile Number",
+                                CustomTextField(header: "Alternative Phone Number",
                                   hint: "Enter mobile number",
                                   controller: mobile,
                                   validator: null,),
@@ -1677,25 +2171,213 @@ class _Resident_TabState extends State<Resident_Tab> {
                                   width: 696,
                                 ),
                                 const SizedBox(width: 18,),
-                                CustomTextField(header: "Country",
-                                  hint: "Select country",
-                                  controller: country,
-                                  validator: null,),
+                                // CustomTextField(header: "Country",
+                                //   hint: "Select country",
+                                //   controller: country,
+                                //   validator: null,),
+
+                                Column(
+                                  crossAxisAlignment:
+                                  CrossAxisAlignment
+                                      .start,
+                                  children: [
+                                    Container(
+                                      // firstnameSVK (87:1540)
+                                      child: Text(
+                                        "Country",
+                                        style: GoogleFonts.openSans (
+                                          fontSize: 14,
+                                          fontWeight: FontWeight.w600,
+                                          color: const Color(0xff262626),
+                                        ),
+                                      ),
+                                    ),
+
+                                    SizedBox(
+                                        height: height / 123.1666),
+
+                                    Container(
+                                      width: 220,
+                                      height: 50,
+                                      decoration: BoxDecoration(
+                                        color: Colors.white,
+                                        borderRadius: BorderRadius.circular(30),
+                                        border: Border.all(color: const Color(0x7f262626)),
+                                      ),
+                                      padding:  EdgeInsets.only(
+                                          left: width/273.2),
+                                      child:
+                                      DropdownSearch <String>(
+                                        autoValidateMode: AutovalidateMode.onUserInteraction,
+                                        selectedItem: countrycon.text,
+                                        popupProps: const PopupProps.menu(
+                                          showSearchBox: true,
+                                        ),
+                                        dropdownDecoratorProps: const DropDownDecoratorProps(
+                                          textAlignVertical: TextAlignVertical.center,
+                                          dropdownSearchDecoration: InputDecoration(
+                                              contentPadding: EdgeInsets.only(bottom: 8, left: 6),
+                                              border: InputBorder.none),
+                                        ),
+                                        items: coutryList,
+                                        onChanged: (String?
+                                        value) {
+                                          if (value ==
+                                              'Select Country') {
+                                          }
+                                          else {
+                                            set(() {
+                                              countrycon.text = value!;
+                                            });
+                                          }
+                                        },
+                                      ), ),
+                                  ],
+                                ),
+
+
+
+
                               ],
                             ),
                             const SizedBox(height: 18,),
                             Row(
                               mainAxisAlignment: MainAxisAlignment.start,
                               children: [
-                                CustomTextField(header: "State",
-                                  hint: "Select state",
-                                  controller: state,
-                                  validator: null,),
+                                // CustomTextField(header: "State",
+                                //   hint: "Select state",
+                                //   controller: state,
+                                //   validator: null,),
+                                Column(
+                                  crossAxisAlignment:
+                                  CrossAxisAlignment
+                                      .start,
+                                  children: [
+                                    Container(
+                                      // firstnameSVK (87:1540)
+                                      child: Text(
+                                        "State",
+                                        style: GoogleFonts.openSans (
+                                          fontSize: 14,
+                                          fontWeight: FontWeight.w600,
+                                          color: const Color(0xff262626),
+                                        ),
+                                      ),
+                                    ),
+                                    SizedBox(
+                                        height: height / 123.1666),
+                                    Container(
+                                      width: 220,
+                                      height: 50,
+                                      decoration: BoxDecoration(
+                                        color: Colors.white,
+                                        borderRadius: BorderRadius.circular(30),
+                                        border: Border.all(color: const Color(0x7f262626)),
+                                      ),
+                                      padding:  EdgeInsets.only(
+                                          left: width/273.2),
+                                      child:
+                                      DropdownSearch <String>(
+                                        autoValidateMode: AutovalidateMode.onUserInteraction,
+                                        selectedItem: state.text,
+                                        popupProps: const PopupProps.menu(
+                                          showSearchBox: true,
+                                        ),
+                                        dropdownDecoratorProps: const DropDownDecoratorProps(
+                                          // baseStyle:SafeGoogleFont( 'Nunito', fontSize:  20 * ffem,),
+                                          textAlignVertical: TextAlignVertical.center,
+                                          dropdownSearchDecoration: InputDecoration(
+                                              contentPadding: EdgeInsets.only(bottom: 8, left: 6),
+                                              border: InputBorder.none),
+                                        ),
+                                        items: StateList,
+                                        onChanged: (String? value) {
+                                          getCity(value.toString());
+                                          set(() {
+                                            state.text =
+                                            value!;
+                                          });
+                                        },
+                                      ),  ),
+                                  ],
+                                ),
                                 const SizedBox(width: 18,),
-                                CustomTextField(header: "City",
-                                  hint: "Select City",
-                                  controller: city,
-                                  validator: null,),
+                                Column(
+                                  crossAxisAlignment:
+                                  CrossAxisAlignment
+                                      .start,
+                                  children: [
+                                    Container(
+                                      // firstnameSVK (87:1540)
+                                      child: Text(
+                                        "City",
+                                        style: GoogleFonts.openSans (
+                                          fontSize: 14,
+                                          fontWeight: FontWeight.w600,
+                                          color: const Color(0xff262626),
+                                        ),
+                                      ),
+                                    ),
+                                    SizedBox(
+                                        height: height / 123.1666),
+                                    Container(
+                                      height: 50,
+                                      width:220,
+                                      decoration: BoxDecoration(
+                                        color: Colors.white,
+                                        borderRadius: BorderRadius.circular(30),
+                                        border: Border.all(color: const Color(0x7f262626)),
+                                      ),
+                                      padding:  EdgeInsets.only(
+                                          left: width/273.2),
+                                      child:
+                                      DropdownSearch <String>(
+                                        autoValidateMode: AutovalidateMode.onUserInteraction,
+                                        selectedItem: citycon.text,
+                                        popupProps: const PopupProps.menu(
+                                          showSearchBox: true,
+                                        ),
+                                        dropdownDecoratorProps: const DropDownDecoratorProps(
+                                          textAlignVertical: TextAlignVertical.center,
+                                          dropdownSearchDecoration: InputDecoration(
+                                              contentPadding: EdgeInsets.only(bottom: 8, left: 6),
+                                              border: InputBorder.none),
+                                        ),
+                                        items: _cities,
+                                        validator: (value) {
+                                          if (value ==
+                                              'Select City') {
+                                            set(() {
+                                              citycon.text = value!;
+                                            });
+                                          }
+                                          return null;
+                                        },
+                                        onChanged: (String?
+                                        value) {
+                                          if (value ==
+                                              'Select City') {
+                                            set(() {
+
+                                            });
+                                          }
+                                          else {
+                                            set(() {
+                                              citycon.text =
+                                              value!;
+                                            });
+                                          }
+                                        },
+                                      ),
+
+                                    ),
+                                  ],
+                                ),
+                                const SizedBox(width: 18,),
+                                // CustomTextField(header: "City",
+                                //   hint: "Select City",
+                                //   controller: city,
+                                //   validator: null,),
                                 const SizedBox(width: 18,),
                                 CustomTextField(header: "Pin Code",
                                   hint: "Enter pin code",
@@ -1799,7 +2481,7 @@ class _Resident_TabState extends State<Resident_Tab> {
                                               selectedprefix2,
                                               onChanged:
                                                   (String? value) {
-                                                setState(() {
+                                                set(() {
                                                   selectedprefix2 =
                                                   value!;
                                                 });
@@ -1984,28 +2666,31 @@ class _Resident_TabState extends State<Resident_Tab> {
     );
   }
 
+
   // Update UI stuff finished
   // for Update (Functionalities)
+
   setuserdata(id) async {
     // creating a variable to store the Users data dynamically... using thier ID
     var docu = await FirebaseFirestore.instance.collection("Users")
         .doc(id)
         .get();
+
     Map<String, dynamic> ? val = docu.data();
     setState(() {
       firstName.text = val!["firstName"];
       middleName.text = val["middleName"];
       lastName.text = val["lastName"];
       dob.text = val["dob"];
-      bloodgroup.text = val["bloodgroup"];
+      selectedBloodgroup = val["bloodgroup"];
       phone.text = val["phone"];
       mobile.text = val["mobile"];
       aadhaar.text = val["aadhaar"];
       email.text = val["email"];
       address.text = val["address"];
-      country.text = val["country"];
+      countrycon.text = val["country"];
       state.text = val["state"];
-      city.text = val["city"];
+      citycon.text = val["city"];
       pincode.text = val["pincode"];
       parentname.text = val["parentname"];
       parentmobile.text = val["parentmobile"];
@@ -2035,9 +2720,9 @@ class _Resident_TabState extends State<Resident_Tab> {
       "aadhaar": aadhaar.text,
       "email": email.text,
       "address": address.text,
-      "country": country.text,
+      "country": countrycon.text,
       "state": state.text,
-      "city": city.text,
+      "city": citycon.text,
       "pincode": pincode.text,
       "parentprefix": selectedprefix2,
       "parentname": parentname.text,
@@ -2220,10 +2905,47 @@ class _Resident_TabState extends State<Resident_Tab> {
       animType: AnimType.rightSlide,
       title: 'Resident Deleted Successfully',
       btnOkOnPress: () {
-
       },
     )
       ..show();
+  }
+
+  Future getCity(state) async {
+    setState(() {
+      _cities.clear();
+    });
+    setState(() {
+      _cities.add("Select City");
+    });
+    var response = await getResponse();
+    var takestate = response
+        .map((map) => Statusmodel.StatusModel.fromJson(map))
+        .where((item) => item.emoji + "    " + item.name == "🇮🇳    India")
+        .map((item) => item.state)
+        .toList();
+    var states = takestate as List;
+    states.forEach((f) {
+      var name = f.where((item) => item.name == state);
+      var cityname = name.map((item) => item.city).toList();
+      cityname.forEach((ci) {
+        if (!mounted) return;
+        setState(() {
+          var citiesname = ci.map((item) => item.name).toList();
+          for (var citynames in citiesname) {
+            _cities.add(citynames.toString());
+          }
+        });
+      });
+    });
+    print("Get cityssss");
+    print(_cities);
+    return _cities;
+  }
+
+  Future getResponse() async {
+    var res = await rootBundle.loadString(
+        'packages/country_state_city_picker/lib/assets/country.json');
+    return jsonDecode(res);
   }
 
   // BuildContext con,id
@@ -2700,7 +3422,7 @@ class _Resident_TabState extends State<Resident_Tab> {
       ]);
     });
     // Convert data to CSV format
-    String csvData = ListToCsvConverter().convert(data);
+    String csvData = const ListToCsvConverter().convert(data);
     // Convert to Blob (for web)
     final blob = html.Blob([csvData], 'text/csv');
     // Create object URL

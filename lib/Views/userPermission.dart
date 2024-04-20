@@ -36,7 +36,8 @@ class _userPermissionState extends State<userPermission> {
     'Notifications',
     'User Permissions',
     'Mess Time Table',
-    'Complaints'
+    'Complaints',
+    'Birthday Wishes'
   ];
 
   Map<String, bool> moduleStates = {};
